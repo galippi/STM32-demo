@@ -1,0 +1,1 @@
+start "%CD% gdb" "C:\Programs\Sourcery G++ Lite\bin\arm-none-eabi-gdb.exe" -se blinker02.gcc.thumb.elf
