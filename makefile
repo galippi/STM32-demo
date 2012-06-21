@@ -21,3 +21,7 @@ blinker02.gcc.thumb2.bin : memmap vectors.o blinker02.gcc.thumb2.o
 	$(ARMGNU)-ld -o blinker02.gcc.thumb2.elf -T memmap vectors.o blinker02.gcc.thumb2.o
 	$(ARMGNU)-objdump -D blinker02.gcc.thumb2.elf > blinker02.gcc.thumb2.list
 	$(ARMGNU)-objcopy blinker02.gcc.thumb2.elf blinker02.gcc.thumb2.bin -O binary
+
+clean:
+	rm -f vectors.o blinker02.gcc.thumb.o blinker02.gcc.thumb2.o blinker02.gcc.thumb.bin blinker02.gcc.thumb2.bin
+	rm -f blinker02.gcc.thumb.elf blinker02.gcc.thumb.list
