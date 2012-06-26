@@ -1,11 +1,12 @@
 all: blinker02.gcc.thumb.bin
 
-CFLAGS_DEBUG= -gdwarf-2
+CFLAGS_DEBUG = -gdwarf-2 -I./ST_lib
+CFLAGS_OPTIM = -O1
 
 ARMGNU := arm-none-eabi
 CFLAGS :=
 
-CFLAGS += $(CFLAGS_DEBUG)
+CFLAGS += $(CFLAGS_DEBUG) $(CFLAGS_OPTIM)
 
 vectors.o : vectors.s
 	$(ARMGNU)-as vectors.s -o vectors.o
