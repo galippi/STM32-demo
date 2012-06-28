@@ -1,6 +1,6 @@
+#include "stdint.h"
 #include "stm32f0xx.h"
 #include "stm32f0xx_gpio.h"
-//#include "stdint.h"
 
 int var1;
 struct s
@@ -12,7 +12,8 @@ struct s
 
 double fv = 5.0;
 
-GPIO_TypeDef * const gpioc = (GPIO_TypeDef *)GPIOC_BASE;
+GPIO_TypeDef * const gpioa = GPIOA;
+GPIO_TypeDef * const gpioc = GPIOC;
 RCC_TypeDef * const rcc = RCC;
 
 static void func(void)
@@ -22,52 +23,128 @@ static void func(void)
   fv = - 2.0;
 }
 
-inline void GPIO_PortInit(GPIO_TypeDef * const gpio, uint8_t portnum)
+#define BitfieldSet(var, bit_num, bit_length, val) ((var) = ((var) & (~(((1 << (bit_length)) - 1)) << (bit_num)) | ((val) << (bit_num))))
+
+void CAT_Error(uint8_t code)
 {
-  gpio->OSPEEDR = GPIO_Speed_50MHz << (portnum * 2);
-  gpio->OTYPER = GPIO_OType_PP << portnum;
-  gpio->MODER = GPIO_Mode_OUT << (portnum * 2);
-  gpio->PUPDR = GPIO_PuPd_NOPULL << (portnum * 2);
+  while(1)
+    ; /* endless loop */
+}
+
+inline void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum)
+{
+  if (gpio == GPIOC)
+  {
+    /* enable the GPIO-C, if it was not enabled */
+    if (!(RCC->AHBENR & RCC_AHBENR_GPIOCEN))
+    {
+      RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+    }
+  }else
+    CAT_Error(1);
+
+  //gpio->OSPEEDR = GPIO_Speed_50MHz << (portnum * 2);
+  BitfieldSet(gpio->OSPEEDR, portnum * 2, 2, GPIO_Speed_50MHz);
+  //gpio->OTYPER = GPIO_OType_PP << portnum;
+  BitfieldSet(gpio->OTYPER, portnum, 1, GPIO_OType_PP);
+  //gpio->MODER = GPIO_Mode_OUT << (portnum * 2);
+  BitfieldSet(gpio->MODER, portnum * 2, 2, GPIO_Mode_OUT);
+  //gpio->PUPDR = GPIO_PuPd_NOPULL << (portnum * 2);
+  BitfieldSet(gpio->PUPDR, portnum * 2, 2, GPIO_PuPd_NOPULL);
+}
+
+inline void GPIO_PortInit_In(GPIO_TypeDef * const gpio, uint8_t portnum)
+{
+  if (gpio == GPIOA)
+  {
+    /* enable the GPIO-A, if it was not enabled */
+    if (!(RCC->AHBENR & RCC_AHBENR_GPIOAEN))
+    {
+      RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+    }
+  }else
+    CAT_Error(1);
+
+  //gpio->OSPEEDR = GPIO_Speed_50MHz << (portnum * 2);
+  BitfieldSet(gpio->OSPEEDR, portnum * 2, 2, GPIO_Speed_50MHz);
+  //gpio->OTYPER = GPIO_OType_PP << portnum;
+  BitfieldSet(gpio->OTYPER, portnum, 1, GPIO_OType_PP);
+  //gpio->MODER = GPIO_Mode_OUT << (portnum * 2);
+  BitfieldSet(gpio->MODER, portnum * 2, 2, GPIO_Mode_IN);
+  //gpio->PUPDR = GPIO_PuPd_NOPULL << (portnum * 2);
+  BitfieldSet(gpio->PUPDR, portnum * 2, 2, GPIO_PuPd_NOPULL);
+}
+
+#define LED3_PORT GPIOC
+#define LED3_PIN_NUM 9
+#define LED4_PORT GPIOC
+#define LED4_PIN_NUM 8
+#define BUTTON1_PORT GPIOA
+#define BUTTON1_PIN_NUM 0
+
+inline void Button1_Init(void)
+{
+  GPIO_PortInit_In(BUTTON1_PORT, BUTTON1_PIN_NUM);
+}
+
+uint8_t Button1_Get(void)
+{
+  return (BUTTON1_PORT->IDR & (1 << BUTTON1_PIN_NUM)) ? 1 : 0;
 }
 
 inline void LED3_Init(void)
 {
-  /* enable the GPIO-C */
-  RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
-  GPIO_PortInit(GPIOC, 9);
+  GPIO_PortInit_Out(LED3_PORT, LED3_PIN_NUM);
 }
 
-void LED4_Init(void)
+void LED3_Set(uint8_t val)
 {
-  /* enable the GPIO-C */
-  RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
-  GPIO_PortInit(GPIOC, 8);
+  if (val)
+  {
+    LED3_PORT->ODR |= (1 << LED3_PIN_NUM);
+  }else
+  {
+    LED3_PORT->ODR &= ~(1 << LED3_PIN_NUM);
+  }
+}
+
+inline void LED4_Init(void)
+{
+  GPIO_PortInit_Out(LED4_PORT, LED4_PIN_NUM);
+}
+
+void LED4_Set(uint8_t val)
+{
+  if (val)
+  {
+    LED3_PORT->ODR |= (1 << LED4_PIN_NUM);
+  }else
+  {
+    LED3_PORT->ODR &= ~(1 << LED4_PIN_NUM);
+  }
 }
 
 void main(void)
 {
-  #define GPIO_Pin_9_num 9
-#if 0
-  #define GPIO_OType_PP 0
-  #define GPIO_OType_OD 1
-#define GPIO_Mode_IN      0
-#define GPIO_Mode_OUT     1
-#define GPIO_Mode_AF      2
-#define GPIO_Mode_Rserved 3
-#define GPIO_PuPd_NOPULL 0
-#define GPIO_PuPd_PU     1
-#define GPIO_PuPd_PD     2
-#endif
-  RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
-  gpioc->OSPEEDR = GPIO_Speed_50MHz << (GPIO_Pin_9_num * 2);
-  gpioc->OTYPER = GPIO_OType_PP << GPIO_Pin_9_num;
-  gpioc->MODER = GPIO_Mode_OUT << (GPIO_Pin_9_num * 2);
-  gpioc->PUPDR = GPIO_PuPd_NOPULL << (GPIO_Pin_9_num * 2);
+  uint8_t led3 = 0;
+  LED3_Init();
+  LED4_Init();
+  Button1_Init();
+
   var1++;
   s_var.v2 = s_var.v3 +22;
+  s_var.v1 = 0;
   while(s_var.v1 < 40)
   {
     func();
-    gpioc->ODR ^= GPIO_Pin_9;
+    {
+      LED3_Set(led3);
+      led3 = !led3;
+      LED4_Set(led3);
+      if (Button1_Get())
+      {
+        var1++;
+      }
+    }
   }
 }
