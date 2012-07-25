@@ -1,9 +1,17 @@
 MEMORY
 {
-    ram : ORIGIN = 0x20000000, LENGTH = 8k
+    ram : ORIGIN = 0x20000400, LENGTH = 8k
 }
 
 SECTIONS
 {
-    .text : { *(.text*) } > ram
+    .text : 
+    {
+      *(.text*);
+      *(.rodata*);
+    } > ram
+    .bss :
+    {
+      *(.bss*);
+    } > ram
 }
