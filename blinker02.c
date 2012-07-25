@@ -179,7 +179,7 @@ uint8_t timer_brake;
 
 inline uint16_t SysTick_Get(void)
 {
-  uint16_t val = SysTick->VAL & 0xFFFF;
+  uint16_t val = (~SysTick->VAL) & 0xFFFF;
   if (!timer_brake)
   {
     uint16_t idx = val + (SIZE_TIMER / 2);
@@ -240,10 +240,39 @@ void main(void)
     }
   }
   {
+    uint8_t state = 0;
+    uint16_t dac_val = 0;
+    DAC_Set(dac_val);
+    uint16_t dac_t = SysTick_Get();
+#define FSYS 8000000
     while (1)
     {
 #if 0
       SysTick_Get();
+#elif 0
+      uint16_t dac_t_new = SysTick_Get();
+      uint16_t dt = dac_t_new - dac_t;
+      while ((dt = dac_t_new - dac_t) > (FSYS / 1000))
+      {
+        dac_t += (FSYS / 1000);
+      }
+      if (dt > ((FSYS / 1000) / 2))
+      {
+        dac_val = 4095 - ((4095 * (uint32_t)dt) / ((FSYS / 1000) / 2));
+      }else
+      {
+        dac_val = (4095 * (uint32_t)dt) / ((FSYS / 1000) / 2);
+      }
+      DAC_Set(dac_val);
+#elif 1
+      dac_val = (SysTick_Get() >> 3) & 0x1FFF;
+      if (dac_val >= 0x1000)
+      {
+        DAC_Set(0x1FFF - dac_val);
+      }else
+      {
+        DAC_Set(dac_val);
+      }
 #else
       LED3_Set(1);
       while (SysTick_Get() > 32767)
