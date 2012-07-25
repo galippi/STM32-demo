@@ -28,7 +28,7 @@ void CAT_Error(uint8_t code)
     ; /* endless loop */
 }
 
-inline void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum)
+void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum)
 {
   if (gpio == GPIOC)
   {
@@ -50,7 +50,7 @@ inline void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum)
   BitfieldSet(gpio->PUPDR, portnum * 2, 2, GPIO_PuPd_NOPULL);
 }
 
-inline void GPIO_PortInit_In(GPIO_TypeDef * const gpio, uint8_t portnum)
+void GPIO_PortInit_In(GPIO_TypeDef * const gpio, uint8_t portnum)
 {
   if (gpio == GPIOA)
   {
@@ -72,7 +72,7 @@ inline void GPIO_PortInit_In(GPIO_TypeDef * const gpio, uint8_t portnum)
   BitfieldSet(gpio->PUPDR, portnum * 2, 2, GPIO_PuPd_NOPULL);
 }
 
-inline void GPIO_PortInit_Analog(GPIO_TypeDef * const gpio, uint8_t portnum)
+void GPIO_PortInit_Analog(GPIO_TypeDef * const gpio, uint8_t portnum)
 {
   if (gpio == GPIOA)
   {
