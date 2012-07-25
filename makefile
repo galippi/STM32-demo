@@ -2,9 +2,12 @@ all: blinker02.gcc.thumb.bin
 
 CFLAGS_DEBUG = -gdwarf-2 -I./ST_lib
 CFLAGS_OPTIM = -O1
+#CFLAGS_OPTIM = -O3
 
 ARMGNU := arm-none-eabi
-CFLAGS :=
+CFLAGS := -mthumb
+#CFLAGS += -mcpu=cortex-m0
+#CFLAGS += -march=armv7-m
 
 CFLAGS += $(CFLAGS_DEBUG) $(CFLAGS_OPTIM)
 
@@ -12,7 +15,7 @@ vectors.o : vectors.s
 	$(ARMGNU)-as vectors.s -o vectors.o
 
 blinker02.gcc.thumb.o : blinker02.c
-	$(ARMGNU)-gcc $(CFLAGS) -mthumb -c blinker02.c -o blinker02.gcc.thumb.o
+	$(ARMGNU)-gcc $(CFLAGS) -c blinker02.c -o blinker02.gcc.thumb.o
 
 blinker02.gcc.thumb2.o : blinker02.c
 	$(ARMGNU)-gcc $(CFLAGS) -mthumb -mcpu=cortex-m0 -march=armv7-m -c blinker02.c -o blinker02.gcc.thumb2.o
