@@ -4,6 +4,8 @@
 #include "stm32f0xx.h"
 #include "stm32f0xx_gpio.h"
 
+#define VDD 3.0 /* Volt */
+
 int var1;
 struct s
 {
@@ -16,6 +18,7 @@ GPIO_TypeDef * const gpioa = GPIOA;
 GPIO_TypeDef * const gpioc = GPIOC;
 RCC_TypeDef * const rcc = RCC;
 SysTick_Type * const systick = SysTick;
+DAC_TypeDef * const dac = DAC;
 
 #define BitfieldSet(var, bit_num, bit_length, val) ((var) = ((var) & (~(((1 << (bit_length)) - 1)) << (bit_num)) | ((val) << (bit_num))))
 
@@ -67,6 +70,46 @@ inline void GPIO_PortInit_In(GPIO_TypeDef * const gpio, uint8_t portnum)
   BitfieldSet(gpio->MODER, portnum * 2, 2, GPIO_Mode_IN);
   //gpio->PUPDR = GPIO_PuPd_NOPULL << (portnum * 2);
   BitfieldSet(gpio->PUPDR, portnum * 2, 2, GPIO_PuPd_NOPULL);
+}
+
+inline void GPIO_PortInit_Analog(GPIO_TypeDef * const gpio, uint8_t portnum)
+{
+  if (gpio == GPIOA)
+  {
+    /* enable the GPIO-A, if it was not enabled */
+    if (!(RCC->AHBENR & RCC_AHBENR_GPIOAEN))
+    {
+      RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+    }
+  }else
+    CAT_Error(1);
+
+  //gpio->OSPEEDR = GPIO_Speed_50MHz << (portnum * 2);
+  BitfieldSet(gpio->OSPEEDR, portnum * 2, 2, GPIO_Speed_50MHz);
+  //gpio->OTYPER = GPIO_OType_PP << portnum;
+  BitfieldSet(gpio->OTYPER, portnum, 1, GPIO_OType_PP);
+  //gpio->MODER = GPIO_Mode_OUT << (portnum * 2);
+  BitfieldSet(gpio->MODER, portnum * 2, 2, GPIO_Mode_AN);
+  //gpio->PUPDR = GPIO_PuPd_NOPULL << (portnum * 2);
+  BitfieldSet(gpio->PUPDR, portnum * 2, 2, GPIO_PuPd_NOPULL);
+}
+
+inline void DAC_Set(uint16_t val)
+{
+  DAC->DHR12R1 = val;
+}
+
+void DAC_Init(void)
+{
+  /* enable the GPIO-A, if it was not enabled */
+  if (!(RCC->APB1ENR & RCC_APB1ENR_DACEN))
+  {
+    RCC->APB1ENR |= RCC_APB1ENR_DACEN;
+  }
+  /* enable the GPIO-A, if it was not enabled - DAC is connected to PA.4-5 */
+  GPIO_PortInit_Analog(GPIOA, 4);
+  DAC->CR = (DAC->CR & 0x303F) | 0x0001;
+  DAC_Set((uint16_t)(1.1/VDD * 4096));
 }
 
 #define LED3_PORT GPIOC
@@ -171,8 +214,17 @@ void main(void)
   LED3_Init();
   LED4_Init();
   Button1_Init();
+  DAC_Init();
   memset(timer, 0, sizeof(timer));
   timer_brake = 0;
+  {
+    uint16_t val = 0;
+    while(val < 4096)
+    {
+      DAC_Set(val);
+      val = (val << 1) | 1;
+    }
+  }
 
   s_var.v1 = 0;
   //while(s_var.v1 < 40)
