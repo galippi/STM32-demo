@@ -142,7 +142,7 @@ inline uint16_t SysTick_Get(void)
     uint16_t idx = val + (SIZE_TIMER / 2);
     if (idx < SIZE_TIMER)
     {
-      timer[idx] += 1;
+      timer[idx] ++;
       if (timer[idx] == MAX_TIMER)
       {
         timer_brake = 1;
@@ -152,6 +152,18 @@ inline uint16_t SysTick_Get(void)
   return val;
 }
 
+inline void *memset(void *ptr_, int data, size_t size)
+{
+  uint8_t *ptr = ptr_;
+  while(size > 0)
+  {
+    *ptr = data;
+    ptr++;
+    size--;
+  }
+  return ptr_;
+}
+
 void main(void)
 {
   uint8_t led3 = 0;
@@ -159,7 +171,7 @@ void main(void)
   LED3_Init();
   LED4_Init();
   Button1_Init();
-  //memset(timer, 0, sizeof(timer));
+  memset(timer, 0, sizeof(timer));
   timer_brake = 0;
 
   s_var.v1 = 0;
@@ -178,12 +190,16 @@ void main(void)
   {
     while (1)
     {
+#if 0
+      SysTick_Get();
+#else
       LED3_Set(1);
       while (SysTick_Get() > 32767)
         ;
       LED3_Set(0);
       while (SysTick_Get() <= 32767)
         ;
+#endif
     }
   }
 }
