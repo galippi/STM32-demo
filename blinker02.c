@@ -30,13 +30,13 @@ void CAT_Error(uint8_t code)
     ; /* endless loop */
 }
 
-uint32_t DivU32_U32U32(uint32_t val, uint32_t divisor)
+uint32_t DivU32_U32U32(uint32_t dividend, uint32_t divisor)
 {
   if (divisor == 0)
   { /* error case -> overflow */
     return 0xFFFFFFFF;
   }
-  if (val < divisor)
+  if (dividend < divisor)
   {
     return 0;
   }
@@ -44,15 +44,22 @@ uint32_t DivU32_U32U32(uint32_t val, uint32_t divisor)
   { /* the divisor is power of 2 */
     while (divisor != 1)
     {
-      divisor = divisor >> 1;
-      val = val >> 1;
+      if ((divisor & 0xFF) == 0)
+      {
+        divisor = divisor >> 8;
+        dividend = dividend >> 8;
+      }else
+      {
+        divisor = divisor >> 1;
+        dividend = dividend >> 1;
+      }
     }
-    return val;
+    return dividend;
   }else
   {
     uint32_t result = 0;
     int32_t shift = 0;
-    if (val & 0x80000000)
+    if (dividend & 0x80000000)
     { /* the upper bit of the value is set -> take care of it */
       while ((divisor & 0x80000000) == 0)
       {
@@ -61,22 +68,22 @@ uint32_t DivU32_U32U32(uint32_t val, uint32_t divisor)
       }
     }else
     {
-      while (val > divisor)
+      while (dividend > divisor)
       {
         divisor = divisor << 1;
         shift++;
       }
     }
-    if (val == divisor)
-    {
-      return 1 << shift;
-    }
     while (shift >= 0)
     {
-      if (val >= divisor)
+      if (dividend >= divisor)
       {
-        val = val - divisor;
         result = result + (1 << shift);
+        dividend = dividend - divisor;
+        if (dividend == 0)
+        { /* no remainder -> return immediately */
+          return result;
+        }
       }
       shift--;
       divisor = divisor >> 1;
@@ -85,18 +92,18 @@ uint32_t DivU32_U32U32(uint32_t val, uint32_t divisor)
   }
 }
 
-int32_t DivI32_I32I32(int32_t val, int32_t divisor)
+int32_t DivI32_I32I32(int32_t dividend, int32_t divisor)
 {
   int32_t sign = 1;
-  uint32_t val_u;
+  uint32_t dividend_u;
   uint32_t divisor_u;
   uint32_t result_u;
-  if (val >= 0)
+  if (dividend >= 0)
   {
-    val_u = (uint32_t) val;
+    dividend_u = (uint32_t) dividend;
   }else
   {
-    val_u = (uint32_t) -val;
+    dividend_u = (uint32_t) -dividend;
     sign = -sign;
   }
   if (divisor >= 0)
@@ -107,7 +114,7 @@ int32_t DivI32_I32I32(int32_t val, int32_t divisor)
     divisor_u = (uint32_t) -divisor;
     sign = -sign;
   }
-  result_u = DivU32_U32U32(val_u, divisor_u);
+  result_u = DivU32_U32U32(dividend_u, divisor_u);
   if (sign > 0)
   {
     return (int32_t)result_u;
@@ -296,9 +303,18 @@ void ADC_Handler(void)
     if (adc_idx >= ADC_VALUES_NUM)
     {
       adc_idx = 0;
-      int16_t du_ref = ADC_values[ADC_Vref] - *VREFINT_CAL;
+      uint32_t v_ref_factor;
+      #define V_REF_FACTOR_SCALE 16
+      if (ADC_values[ADC_Vref] > 1000)
+      {
+        v_ref_factor = DivU32_U32U32(*VREFINT_CAL << V_REF_FACTOR_SCALE, ADC_values[ADC_Vref]);
+      }else
+      {
+        v_ref_factor = 1 << V_REF_FACTOR_SCALE;
+      }
+      uint16_t v_sensor = (ADC_values[ADC_TemperatureSensor] * v_ref_factor) >> V_REF_FACTOR_SCALE;
       //Temperature = (((ADC_values[ADC_TemperatureSensor] - (int16_t)*TS_CAL1) * (int16_t)(110 - 30)) / (*TS_CAL2 - *TS_CAL1)) + 30;
-      Temperature = (int8_t)DivI32_I32I32(((ADC_values[ADC_TemperatureSensor] - (int16_t)*TS_CAL1) * (int16_t)(110 - 30)), (*TS_CAL2 - *TS_CAL1)) + 30;
+      Temperature = (int8_t)DivI32_I32I32(((v_sensor - (int16_t)*TS_CAL1) * (int16_t)(110 - 30)), (*TS_CAL2 - *TS_CAL1)) + 30;
     }
     ADC_Start();
   }
