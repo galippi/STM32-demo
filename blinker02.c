@@ -21,6 +21,7 @@ RCC_TypeDef * const rcc = RCC;
 SysTick_Type * const systick = SysTick;
 DAC_TypeDef * const dac = DAC;
 ADC_TypeDef * const adc1 = ADC1;
+TIM_TypeDef * const tim3 = TIM3;
 
 #define BitfieldSet(var, bit_num, bit_length, val) ((var) = ((var) & (~(((1 << (bit_length)) - 1)) << (bit_num)) | ((val) << (bit_num))))
 
@@ -285,7 +286,10 @@ enum e_ADC_values
 };
 uint16_t ADC_values[ADC_Ch_Num];
 #define ADC_VALUES_NUM (sizeof(ADC_values)/sizeof(ADC_values[0]))
-int8_t Temperature = -128;
+#define TEMP_SCALE 10
+//int8_t Temperature = -128;
+int16_t Temperature = -32768;
+int16_t Temperature_raw = -32768;
 
 void ADC_HandlerInit(void)
 {
@@ -314,9 +318,71 @@ void ADC_Handler(void)
       }
       uint16_t v_sensor = (ADC_values[ADC_TemperatureSensor] * v_ref_factor) >> V_REF_FACTOR_SCALE;
       //Temperature = (((ADC_values[ADC_TemperatureSensor] - (int16_t)*TS_CAL1) * (int16_t)(110 - 30)) / (*TS_CAL2 - *TS_CAL1)) + 30;
-      Temperature = (int8_t)DivI32_I32I32(((v_sensor - (int16_t)*TS_CAL1) * (int16_t)(110 - 30)), (*TS_CAL2 - *TS_CAL1)) + 30;
+      //Temperature = (int8_t)DivI32_I32I32(((v_sensor - (int16_t)*TS_CAL1) * (int16_t)(110 - 30)), (*TS_CAL2 - *TS_CAL1)) + 30;
+      Temperature = (int16_t)DivI32_I32I32(((v_sensor - (int32_t)*TS_CAL1) * ((int32_t)(110 - 30) * TEMP_SCALE)), (*TS_CAL2 - *TS_CAL1)) + (30 * TEMP_SCALE);
+      Temperature_raw = (int16_t)DivI32_I32I32(((ADC_values[ADC_TemperatureSensor] - (int32_t)*TS_CAL1) * ((int32_t)(110 - 30) * TEMP_SCALE)), (*TS_CAL2 - *TS_CAL1)) + (30 * TEMP_SCALE);
     }
     ADC_Start();
+  }
+}
+
+#define TIM3_CR1_INIT 0x10 /* down counter mode */
+#define TIM3_CR2_INIT 0x0
+#define TIM3_PSC_INIT  8 /* 8MHz / 8 -> 1MHz */
+#define TIM3_ARR_INIT 1000 /* 1MHz / 1000 -> 1ms timebase */
+#define TIM3_CCER_INIT 0x01 /* enable CC1 out high */
+#define TIM3_CCMR1_INIT 0x0000
+#define TIM3_CCMR2_INIT 0x0000
+
+void TIM3_Init(void)
+{
+  if (!(RCC->APB1ENR & RCC_APB1Periph_TIM3))
+  {
+    RCC->APB1ENR |= RCC_APB1Periph_TIM3;
+  }
+  TIM3->CR1 = (TIM3->CR1 & 0xFC00) | TIM3_CR1_INIT;
+  TIM3->CR2 = (TIM3->CR2 & 0xFF07) | TIM3_CR2_INIT;
+  TIM3->ARR = TIM3_ARR_INIT;
+  TIM3->PSC = TIM3_PSC_INIT;
+  TIM3->EGR = 0x01; /* immediate reload */
+  TIM3->CCER = TIM3_CCER_INIT;
+  TIM3->CCMR1 = TIM3_CCMR1_INIT;
+  TIM3->CCMR2 = TIM3_CCMR2_INIT;
+  TIM3->SR = 0x0000; /* clear all IT requests */
+  TIM3->CR1 |= 1; /* enable timer */
+}
+
+inline uint32_t TIM3_SR_UIF_Get(void)
+{
+  return (TIM3->SR & TIM_SR_UIF);
+}
+
+inline void TIM3_SR_UIF_Reset(void)
+{
+  TIM3->SR = ~(TIM_SR_UIF); /* reset the UpdateInterrupFlag */
+}
+
+void Task_1ms(void)
+{
+
+}
+
+void Scheduler(void)
+{
+  Task_1ms();
+}
+
+inline void TIM3_UIF_Callback(void)
+{ /* call back function of TIM3 UIF - counter underflow */
+  Scheduler();
+}
+
+void TIM3_UIF_PollHandler(void)
+{
+  if (TIM3_SR_UIF_Get())
+  {
+    TIM3_SR_UIF_Reset();
+    TIM3_UIF_Callback();
   }
 }
 
@@ -437,6 +503,7 @@ void main(void)
       val = (val << 1) | 1;
     }
   }
+  TIM3_Init();
 
   s_var.v1 = 0;
   //while(s_var.v1 < 40)
@@ -494,6 +561,7 @@ void main(void)
         ;
 #endif
       ADC_Handler();
+      TIM3_UIF_PollHandler();
     }
   }
 }
