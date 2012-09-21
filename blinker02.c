@@ -2,6 +2,8 @@
 #include <string.h>
 
 #include "gpio_app.h"
+#include "adc.h"
+#include "adc_app.h"
 
 #include "stm32f0xx_rcc.h"
 
@@ -21,100 +23,6 @@ void CAT_Error(uint8_t code)
     ; /* endless loop */
 }
 
-uint32_t DivU32_U32U32(uint32_t dividend, uint32_t divisor)
-{
-  if (divisor == 0)
-  { /* error case -> overflow */
-    return 0xFFFFFFFF;
-  }
-  if (dividend < divisor)
-  {
-    return 0;
-  }
-  if ((divisor & (divisor - 1)) == 0)
-  { /* the divisor is power of 2 */
-    while (divisor != 1)
-    {
-      if ((divisor & 0xFF) == 0)
-      {
-        divisor = divisor >> 8;
-        dividend = dividend >> 8;
-      }else
-      {
-        divisor = divisor >> 1;
-        dividend = dividend >> 1;
-      }
-    }
-    return dividend;
-  }else
-  {
-    uint32_t result = 0;
-    int32_t shift = 0;
-    if (dividend & 0x80000000)
-    { /* the upper bit of the value is set -> take care of it */
-      while ((divisor & 0x80000000) == 0)
-      {
-        divisor = divisor << 1;
-        shift++;
-      }
-    }else
-    {
-      while (dividend > divisor)
-      {
-        divisor = divisor << 1;
-        shift++;
-      }
-    }
-    while (shift >= 0)
-    {
-      if (dividend >= divisor)
-      {
-        result = result + (1 << shift);
-        dividend = dividend - divisor;
-        if (dividend == 0)
-        { /* no remainder -> return immediately */
-          return result;
-        }
-      }
-      shift--;
-      divisor = divisor >> 1;
-    }
-    return result;
-  }
-}
-
-int32_t DivI32_I32I32(int32_t dividend, int32_t divisor)
-{
-  int32_t sign = 1;
-  uint32_t dividend_u;
-  uint32_t divisor_u;
-  uint32_t result_u;
-  if (dividend >= 0)
-  {
-    dividend_u = (uint32_t) dividend;
-  }else
-  {
-    dividend_u = (uint32_t) -dividend;
-    sign = -sign;
-  }
-  if (divisor >= 0)
-  {
-    divisor_u = (uint32_t) divisor;
-  }else
-  {
-    divisor_u = (uint32_t) -divisor;
-    sign = -sign;
-  }
-  result_u = DivU32_U32U32(dividend_u, divisor_u);
-  if (sign > 0)
-  {
-    return (int32_t)result_u;
-  }else
-  {
-    return -(int32_t)result_u;
-  }
-}
-
 inline void DAC_Set(uint16_t val)
 {
   DAC->DHR12R1 = val;
@@ -131,123 +39,6 @@ void DAC_Init(void)
   GPIO_PortInit_Analog(GPIOA, 4);
   DAC->CR = (DAC->CR & 0x303F) | 0x0001;
   DAC_Set((uint16_t)(1.1/VDD * 4096));
-}
-
-
-const uint16_t *TS_CAL1 = (uint16_t*)0x1FFFF7B8; /* ADC value of temp. sensor at 30C */
-const uint16_t *TS_CAL2 = (uint16_t*)0x1FFFF7C2; /* ADC value of temp. sensor at 110C */
-const uint16_t *VREFINT_CAL = (uint16_t*)0x1FFFF7BA; /* ADC value of reference voltage at 30C */
-
-#define ADC_CR_INIT     (ADC_CR_ADCAL | ADC_CR_ADEN)/* ADC calibration and enable it */
-#define ADC_CFGR1_INIT  (ADC_CFGR1_DISCEN)
-#define ADC_CFGR2_INIT  0x00000000
-#define ADC_SMPR_INIT   0x00000007
-#define ADC_TR_INIT     0x00000000
-/* enable ADC channels: DAC1-out, VBat, temperature sensor, Vref */
-#define ADC_CHSELR_INIT (ADC_CHSELR_CHSEL4 | ADC_CHSELR_CHSEL16 | ADC_CHSELR_CHSEL17 | ADC_CHSELR_CHSEL18)
-#define ADC_CCR_INIT    (ADC_CCR_VBATEN | ADC_CCR_TSEN | ADC_CCR_VREFEN)
-#define ADC_IER_INIT    0x00000000
-
-void ADC_Init(void)
-{
-  if (!(RCC->APB2ENR & RCC_APB2Periph_ADC1))
-  {
-    RCC->APB2ENR |= RCC_APB2Periph_ADC1;
-  }
-  if (ADC1->CR & ADC_CR_ADEN)
-  {
-    ADC1->CR |= ADC_CR_ADSTP;
-    while (ADC1->CR & ADC_CR_ADSTP)
-    { /* wait the end of the running conversion */ }
-  }
-  if (ADC_CR_INIT & ADC_CR_ADCAL)
-  {
-    if (ADC1->CR & ADC_CR_ADEN)
-    {
-      ADC1->CR = ADC_CR_ADDIS;
-      while (ADC1->CR & ADC_CR_ADEN)
-      { /* wait the end of the deinitialization */ }
-    }
-    ADC1->CR = ADC_CR_ADCAL;
-    while (ADC1->CR & ADC_CR_ADCAL)
-    { /* wait the end of the calibration */ }
-    ADC1->CR = ADC_CR_INIT & (ADC_CR_ADEN);
-  }else
-  {
-    ADC1->CR = ADC_CR_INIT;
-  }
-  ADC1->CFGR1 = ADC_CFGR1_INIT;
-  ADC1->CFGR2 = (ADC1->CFGR2 & ~(ADC_CFGR2_JITOFFDIV4 | ADC_CFGR2_JITOFFDIV2)) | ADC_CFGR2_INIT;
-  ADC1->SMPR = ADC_SMPR_INIT;
-  ADC1->TR = (ADC1->TR & 0xF000F000) | ADC_TR_INIT;
-  ADC1->CHSELR = ADC_CHSELR_INIT;
-  ADC1->IER = ADC_IER_INIT;
-  ADC->CCR = ADC_CCR_INIT;
-}
-
-inline void ADC_Start(void)
-{
-  ADC1->CR |= ADC_CR_ADSTART;
-}
-
-inline uint16_t ADC_Get(void)
-{
-  return ADC1->DR;
-}
-
-inline char ADC_GetStatus(void)
-{
-  return (ADC1->ISR & ADC_ISR_EOC) != 0; /* give back the state of the end of conversion flag */
-}
-
-enum e_ADC_values
-{
-  ADC_IN4_DAC,
-  ADC_TemperatureSensor,
-  ADC_Vref,
-  ADC_VBat,
-  ADC_Ch_Num /* this must be the last one */
-};
-uint16_t ADC_values[ADC_Ch_Num];
-#define ADC_VALUES_NUM (sizeof(ADC_values)/sizeof(ADC_values[0]))
-#define TEMP_SCALE 10
-//int8_t Temperature = -128;
-int16_t Temperature = -32768;
-int16_t Temperature_raw = -32768;
-
-void ADC_HandlerInit(void)
-{
-  ADC_Init();
-  ADC_Start();
-}
-
-void ADC_Handler(void)
-{
-  static uint8_t adc_idx = 0;
-  if (ADC_GetStatus())
-  {
-    ADC_values[adc_idx] = ADC_Get();
-    adc_idx ++;
-    if (adc_idx >= ADC_VALUES_NUM)
-    {
-      adc_idx = 0;
-      uint32_t v_ref_factor;
-      #define V_REF_FACTOR_SCALE 16
-      if (ADC_values[ADC_Vref] > 1000)
-      {
-        v_ref_factor = DivU32_U32U32(*VREFINT_CAL << V_REF_FACTOR_SCALE, ADC_values[ADC_Vref]);
-      }else
-      {
-        v_ref_factor = 1 << V_REF_FACTOR_SCALE;
-      }
-      uint16_t v_sensor = (ADC_values[ADC_TemperatureSensor] * v_ref_factor) >> V_REF_FACTOR_SCALE;
-      //Temperature = (((ADC_values[ADC_TemperatureSensor] - (int16_t)*TS_CAL1) * (int16_t)(110 - 30)) / (*TS_CAL2 - *TS_CAL1)) + 30;
-      //Temperature = (int8_t)DivI32_I32I32(((v_sensor - (int16_t)*TS_CAL1) * (int16_t)(110 - 30)), (*TS_CAL2 - *TS_CAL1)) + 30;
-      Temperature = (int16_t)DivI32_I32I32(((v_sensor - (int32_t)*TS_CAL1) * ((int32_t)(110 - 30) * TEMP_SCALE)), (*TS_CAL2 - *TS_CAL1)) + (30 * TEMP_SCALE);
-      Temperature_raw = (int16_t)DivI32_I32I32(((ADC_values[ADC_TemperatureSensor] - (int32_t)*TS_CAL1) * ((int32_t)(110 - 30) * TEMP_SCALE)), (*TS_CAL2 - *TS_CAL1)) + (30 * TEMP_SCALE);
-    }
-    ADC_Start();
-  }
 }
 
 #define TIM3_CR1_INIT 0x10 /* down counter mode */
@@ -344,19 +135,7 @@ uint8_t timer_brake;
   return val;
 }
 
-inline void *memset(void *ptr_, int data, size_t size)
-{
-  uint8_t *ptr = ptr_;
-  while(size > 0)
-  {
-    *ptr = data;
-    ptr++;
-    size--;
-  }
-  return ptr_;
-}
-
-void main(void)
+int main(void)
 {
   uint8_t led3 = 0;
   SysTick_Init();
@@ -432,4 +211,5 @@ void main(void)
       TIM3_UIF_PollHandler();
     }
   }
+  return 0;
 }

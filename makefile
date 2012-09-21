@@ -9,7 +9,7 @@ CFLAGS := -mthumb
 #CFLAGS += -mcpu=cortex-m0
 #CFLAGS += -march=armv7-m
 
-CFLAGS += $(CFLAGS_DEBUG) $(CFLAGS_OPTIM)
+CFLAGS += -Wall $(CFLAGS_DEBUG) $(CFLAGS_OPTIM)
 
 vectors.o : vectors.s
 	$(ARMGNU)-as vectors.s -o vectors.o
@@ -17,14 +17,23 @@ vectors.o : vectors.s
 gpio.o : gpio.c gpio.h
 	$(ARMGNU)-gcc $(CFLAGS) -c gpio.c -o gpio.o
 
-blinker02.gcc.thumb.o : blinker02.c gpio.h
+adc.o : adc.c adc.h
+	$(ARMGNU)-gcc $(CFLAGS) -c adc.c -o adc.o
+
+adc_app.o : adc_app.c adc_app.h adc.h util.h
+	$(ARMGNU)-gcc $(CFLAGS) -c adc_app.c -o adc_app.o
+
+util.o : util.c util.h
+	$(ARMGNU)-gcc $(CFLAGS) -c util.c -o util.o
+
+blinker02.gcc.thumb.o : blinker02.c gpio.h gpio_app.h adc_app.h adc.h
 	$(ARMGNU)-gcc $(CFLAGS) -c blinker02.c -o blinker02.gcc.thumb.o
 
 blinker02.gcc.thumb2.o : blinker02.c gpio.h
 	$(ARMGNU)-gcc $(CFLAGS) -mthumb -mcpu=cortex-m0 -march=armv7-m -c blinker02.c -o blinker02.gcc.thumb2.o
 
-blinker02.gcc.thumb.bin : memmap vectors.o blinker02.gcc.thumb.o gpio.o
-	$(ARMGNU)-ld -L./lib -o blinker02.gcc.thumb.elf -T memmap vectors.o blinker02.gcc.thumb.o gpio.o -lgcc
+blinker02.gcc.thumb.bin : memmap vectors.o blinker02.gcc.thumb.o gpio.o adc.o adc_app.o util.o
+	$(ARMGNU)-ld -L./lib -o blinker02.gcc.thumb.elf -T memmap vectors.o blinker02.gcc.thumb.o gpio.o adc.o adc_app.o util.o -lgcc
 	$(ARMGNU)-objdump -D blinker02.gcc.thumb.elf > blinker02.gcc.thumb.list
 	$(ARMGNU)-objcopy blinker02.gcc.thumb.elf blinker02.gcc.thumb.bin -O binary
 
