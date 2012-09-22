@@ -42,6 +42,7 @@ CFILES   =
 CFILES  += blinker02.c
 CFILES  += adc.c
 CFILES  += adc_app.c
+CFILES  += dac.c
 CFILES  += gpio.c
 CFILES  += util.c
 #CFILES  += 

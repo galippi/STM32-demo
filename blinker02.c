@@ -4,6 +4,7 @@
 #include "gpio_app.h"
 #include "adc.h"
 #include "adc_app.h"
+#include "dac.h"
 #include "util.h"
 
 #include "stm32f0xx_rcc.h"
@@ -23,24 +24,6 @@ void CAT_Error(uint8_t code)
   (void)code;
   while(1)
     ; /* endless loop */
-}
-
-inline void DAC_Set(uint16_t val)
-{
-  DAC->DHR12R1 = val;
-}
-
-void DAC_Init(void)
-{
-  /* enable the GPIO-A, if it was not enabled */
-  if (!(RCC->APB1ENR & RCC_APB1ENR_DACEN))
-  {
-    RCC->APB1ENR |= RCC_APB1ENR_DACEN;
-  }
-  /* enable the GPIO-A, if it was not enabled - DAC is connected to PA.4-5 */
-  GPIO_PortInit_Analog(GPIOA, 4);
-  DAC->CR = (DAC->CR & 0x303F) | 0x0001;
-  DAC_Set((uint16_t)(1.1/VDD * 4096));
 }
 
 #define TIM3_CR1_INIT 0x10 /* down counter mode */
@@ -145,6 +128,7 @@ int main(void)
   LED4_Init();
   Button1_Init();
   DAC_Init();
+  DAC_Set((uint16_t)(1.1/VDD * 4096));
   ADC_HandlerInit();
   memset(timer, 0, sizeof(timer));
   timer_brake = 0;
