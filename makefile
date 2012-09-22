@@ -1,48 +1,120 @@
-all: blinker02.gcc.thumb.bin
-
+##################################################################
 CFLAGS_DEBUG = -gdwarf-2 -I./ST_lib
+
+WARNINGS = -Wall -Wextra
+WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
+WARNINGS += -Wundef
+WARNINGS += -Wmissing-declarations
+
 CFLAGS_OPTIM = -O1
 #CFLAGS_OPTIM = -O3
 
-ARMGNU := arm-none-eabi
-CFLAGS := -mthumb
+ARMGNU := arm-none-eabi-
+
+LDFLAGS = -L./lib -T memmap
+
+AS = $(ARMGNU)as
+CC = $(ARMGNU)gcc
+CC_DEP = gcc
+LL = $(ARMGNU)ld
+OBJCOPY = $(ARMGNU)objcopy
+OBJDUMP = $(ARMGNU)objdump
+
+CFLAGS_TARGET := -mthumb
 #CFLAGS += -mcpu=cortex-m0
 #CFLAGS += -march=armv7-m
 
-CFLAGS += -Wall $(CFLAGS_DEBUG) $(CFLAGS_OPTIM)
+#LDFLAGS_STRIP_DEBUG_INFO = -s
+LDFLAGS  += $(LDFLAGS_STRIP_DEBUG_INFO)
 
-vectors.o : vectors.s
-	$(ARMGNU)-as vectors.s -o vectors.o
+LDLIBS :=
+LDLIBS += -lgcc
 
-gpio.o : gpio.c gpio.h
-	$(ARMGNU)-gcc $(CFLAGS) -c gpio.c -o gpio.o
+##################################################################
+TARGET=blinker02.gcc.thumb
+TARGET_DIR=bin
+DUMMY_DIR_FILE = $(TARGET_DIR)/dummy
 
-adc.o : adc.c adc.h
-	$(ARMGNU)-gcc $(CFLAGS) -c adc.c -o adc.o
+CPPFILES =
+#CPPFILES+=
 
-adc_app.o : adc_app.c adc_app.h adc.h util.h
-	$(ARMGNU)-gcc $(CFLAGS) -c adc_app.c -o adc_app.o
+CFILES   = 
+CFILES  += blinker02.c
+CFILES  += adc.c
+CFILES  += adc_app.c
+CFILES  += gpio.c
+CFILES  += util.c
+#CFILES  += 
 
-util.o : util.c util.h
-	$(ARMGNU)-gcc $(CFLAGS) -c util.c -o util.o
+SFILES  =
+SFILES += vectors.s
 
-blinker02.gcc.thumb.o : blinker02.c gpio.h gpio_app.h adc_app.h adc.h
-	$(ARMGNU)-gcc $(CFLAGS) -c blinker02.c -o blinker02.gcc.thumb.o
+TARGET_ELF = $(TARGET_DIR)/$(TARGET).elf
+TARGET_BIN = $(TARGET_DIR)/$(TARGET).bin
+TARGET_LIST = $(TARGET_DIR)/$(TARGET).list
 
-blinker02.gcc.thumb2.o : blinker02.c gpio.h
-	$(ARMGNU)-gcc $(CFLAGS) -mthumb -mcpu=cortex-m0 -march=armv7-m -c blinker02.c -o blinker02.gcc.thumb2.o
+all : $(TARGET_BIN) $(TARGET_LIST)
 
-blinker02.gcc.thumb.bin : memmap vectors.o blinker02.gcc.thumb.o gpio.o adc.o adc_app.o util.o
-	$(ARMGNU)-ld -L./lib -o blinker02.gcc.thumb.elf -T memmap vectors.o blinker02.gcc.thumb.o gpio.o adc.o adc_app.o util.o -lgcc
-	$(ARMGNU)-objdump -D blinker02.gcc.thumb.elf > blinker02.gcc.thumb.list
-	$(ARMGNU)-objcopy blinker02.gcc.thumb.elf blinker02.gcc.thumb.bin -O binary
+OBJECTS = $(addprefix $(TARGET_DIR)/,$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o))
+DEPFILES = $(addprefix $(TARGET_DIR)/,$(CPPFILES:.cpp=.d) $(CFILES:.c=.d))
 
-blinker02.gcc.thumb2.bin : memmap vectors.o blinker02.gcc.thumb2.o
-	$(ARMGNU)-ld -o blinker02.gcc.thumb2.elf -T memmap vectors.o blinker02.gcc.thumb2.o gpio.o 
-	$(ARMGNU)-objdump -D blinker02.gcc.thumb2.elf > blinker02.gcc.thumb2.list
-	$(ARMGNU)-objcopy blinker02.gcc.thumb2.elf blinker02.gcc.thumb2.bin -O binary
+CFLAGS = $(CFLAGS_TARGET) $(WARNINGS) $(CFLAGS_DEBUG) $(CFLAGS_OPTIM)
+CFLAGS_DEP = $(WARNINGS) $(CFLAGS_DEBUG) $(CFLAGS_OPTIM)
+
+$(TARGET_ELF) : $(OBJECTS)
+	$(LL) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+$(TARGET_BIN) : $(TARGET_ELF)
+	$(OBJCOPY) $^ $@ -O binary
+
+$(TARGET_LIST) : $(TARGET_ELF)
+	$(OBJDUMP) -D $^ > $@
+
+  #%.o: %.s $(MAKEFILE)
+$(TARGET_DIR)/%.o: %.s $(DUMMY_DIR_FILE)
+	@echo Building $@
+	$(AS) -as $< -o $@
+
+#%.o: %.c $(MAKEFILE)
+$(TARGET_DIR)/%.o: %.c $(DUMMY_DIR_FILE)
+	@echo Building $(notdir $@)
+	-@rm -f $(@:.o=.d)
+	$(CC_DEP) -M $(CFLAGS_DEP) -c -o $(@:.o=.d) $<
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+#	$(CC) -v -x c -E -
+
+#%.o: %.cpp $(MAKEFILE)
+$(TARGET_DIR)/%.o: %.cpp $(DUMMY_DIR_FILE)
+	@echo Building $@
+	-@rm -f $(@:.o=.d)
+	$(CC) -M $(CPPFLAGS) -c -o $(TARGET_DIR)$(@:.o=.d) $<
+	$(CC) $(CPPFLAGS) -c -o $(TARGET_DIR)$@ $<
+#	$(CC) --version
+
+$(DUMMY_DIR_FILE):
+	-mkdir $(TARGET_DIR)
+	echo Dummy file >$@
+
+targetdir:
+	-mkdir $(sort $(dir $(OBJECTS)))
+
+##################################################################
+# cleaning rule
+##################################################################
 
 clean:
-	rm -f vectors.o blinker02.gcc.thumb.o blinker02.gcc.thumb2.o blinker02.gcc.thumb.bin blinker02.gcc.thumb2.bin
-	rm -f gpio.o
-	rm -f blinker02.gcc.thumb.elf blinker02.gcc.thumb.list
+	rm -f $(addprefix $(TARGET_DIR), *.o *.d *~ $(TARGET))
+	rm -f $(OBJECTS)
+	rm -f $(OBJECTS:.o=.d)
+	rm -f version.h
+	rm -r $(TARGET_DIR)
+
+dep_test:
+	@echo DEPFILES=$(DEPFILES)
+	@echo wildcard=$(wildcard $(DEPFILES))
+
+include version.mk
+#$(TARGET_ELF): version.h
+
+include $(wildcard $(DEPFILES))
