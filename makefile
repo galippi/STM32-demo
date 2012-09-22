@@ -39,7 +39,7 @@ CPPFILES =
 #CPPFILES+=
 
 CFILES   = 
-CFILES  += blinker02.c
+CFILES  += main.c
 CFILES  += adc.c
 CFILES  += adc_app.c
 CFILES  += dac.c
