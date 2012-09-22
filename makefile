@@ -44,6 +44,7 @@ CFILES  += adc.c
 CFILES  += adc_app.c
 CFILES  += dac.c
 CFILES  += gpio.c
+CFILES  += tasks.c
 CFILES  += timer.c
 CFILES  += util.c
 #CFILES  += 

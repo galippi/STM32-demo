@@ -8,6 +8,8 @@
 #include "timer.h"
 #include "util.h"
 
+#include "tasks.h"
+
 #include "stm32f0xx_rcc.h"
 
 #define VDD 3.0 /* Volt */
@@ -25,11 +27,6 @@ void CAT_Error(uint8_t code)
   (void)code;
   while(1)
     ; /* endless loop */
-}
-
-void Task_1ms(void)
-{
-
 }
 
 void Scheduler(void)
