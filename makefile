@@ -44,11 +44,12 @@ CFILES  += adc.c
 CFILES  += adc_app.c
 CFILES  += dac.c
 CFILES  += gpio.c
+CFILES  += timer.c
 CFILES  += util.c
 #CFILES  += 
 
 SFILES  =
-SFILES += vectors.s
+#SFILES += vectors.s
 
 TARGET_ELF = $(TARGET_DIR)/$(TARGET).elf
 TARGET_BIN = $(TARGET_DIR)/$(TARGET).bin
