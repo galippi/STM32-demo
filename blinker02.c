@@ -4,6 +4,7 @@
 #include "gpio_app.h"
 #include "adc.h"
 #include "adc_app.h"
+#include "util.h"
 
 #include "stm32f0xx_rcc.h"
 
@@ -19,6 +20,7 @@ TIM_TypeDef * const tim3 = TIM3;
 
 void CAT_Error(uint8_t code)
 {
+  (void)code;
   while(1)
     ; /* endless loop */
 }
