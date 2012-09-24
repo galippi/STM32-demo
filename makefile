@@ -38,7 +38,7 @@ DUMMY_DIR_FILE = $(TARGET_DIR)/dummy
 CPPFILES =
 #CPPFILES+=
 
-CFILES   = 
+CFILES   = reset.c
 CFILES  += main.c
 CFILES  += adc.c
 CFILES  += adc_app.c

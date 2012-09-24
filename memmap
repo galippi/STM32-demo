@@ -1,12 +1,15 @@
 MEMORY
 {
-    ram : ORIGIN = 0x20000400, LENGTH = 8k
+    ram : ORIGIN = 0x20000410, LENGTH = 8k
 }
 
 SECTIONS
 {
     .text : 
     {
+      /* startup module */
+      bin/reset.o
+
       *(.text*);
       *(.rodata*);
     } > ram
