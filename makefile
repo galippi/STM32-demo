@@ -1,13 +1,32 @@
-all: blinker02.gcc.thumb.bin
-
+##################################################################
 CFLAGS_DEBUG = -gdwarf-2 -I./ST_lib
+
+WARNINGS = -Wall -Wextra
+WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
+WARNINGS += -Wundef
+WARNINGS += -Wmissing-declarations
+
 CFLAGS_OPTIM = -O1
 #CFLAGS_OPTIM = -O3
 
 ARMGNU := arm-none-eabi
+
+CC = $(ARMGNU)-gcc
+LL = $(ARMGNU)-ld
+
 CFLAGS := -mthumb
 #CFLAGS += -mcpu=cortex-m0
 #CFLAGS += -march=armv7-m
+
+#LDFLAGS_STRIP_DEBUG_INFO = -s
+LDFLAGS  = $(LDFLAGS_STRIP_DEBUG_INFO)
+
+LDLIBS :=
+LDLIBS += -lgcc
+
+TARGET_ELF = $(TARGET_DIR)$(TARGET).elf
+TARGET_ELF = $(TARGET_DIR)$(TARGET).bin
+all : $(TARGET_BIN)
 
 CFLAGS += -Wall $(CFLAGS_DEBUG) $(CFLAGS_OPTIM)
 
@@ -42,7 +61,47 @@ blinker02.gcc.thumb2.bin : memmap vectors.o blinker02.gcc.thumb2.o
 	$(ARMGNU)-objdump -D blinker02.gcc.thumb2.elf > blinker02.gcc.thumb2.list
 	$(ARMGNU)-objcopy blinker02.gcc.thumb2.elf blinker02.gcc.thumb2.bin -O binary
 
+$(TARGET_ELF) : $(OBJECTS)
+	$(LL) $(LDFLAGS) $(addprefix $(TARGET_DIR),$(OBJECTS)) $(LDLIBS) -o $@
+
+#%.o: %.c $(MAKEFILE)
+%.o: %.c $(DUMMY_DIR_FILE)
+	@echo Building $@
+	$(CC) $(CFLAGS) -c -o $(TARGET_DIR)$@ $<
+	-@rm -f $(@:.o=.d)
+	$(CC) -M $(CFLAGS) -c -o $(TARGET_DIR)$(@:.o=.d) $<
+
+#%.o: %.cpp $(MAKEFILE)
+%.o: %.cpp $(DUMMY_DIR_FILE)
+	@echo Building $@
+	$(CC) $(CPPFLAGS) -c -o $(TARGET_DIR)$@ $<
+	-@rm -f $(@:.o=.d)
+	$(CC) -M $(CPPFLAGS) -c -o $(TARGET_DIR)$(@:.o=.d) $<
+#	$(CC) --version
+
+$(DUMMY_DIR_FILE):
+	-mkdir $(TARGET_DIR)
+	echo Dummy file >$@
+
+targetdir:
+	-mkdir $(sort $(dir $(OBJECTS)))
+
+##################################################################
+# cleaning rule
+##################################################################
+
 clean:
-	rm -f vectors.o blinker02.gcc.thumb.o blinker02.gcc.thumb2.o blinker02.gcc.thumb.bin blinker02.gcc.thumb2.bin
-	rm -f gpio.o
-	rm -f blinker02.gcc.thumb.elf blinker02.gcc.thumb.list
+	rm -f $(addprefix $(TARGET_DIR), *.o *.d *~ $(TARGET))
+	rm -f $(OBJECTS)
+	rm -f $(OBJECTS:.o=.d)
+	rm -f version.h
+	rm -r $(TARGET_DIR)
+
+dep_test:
+	@echo DEPFILES=$(DEPFILES)
+	@echo wildcard=$(wildcard $(DEPFILES))
+
+include version.mk
+$(TARGET).o: version.h
+
+include $(wildcard $(DEPFILES))
