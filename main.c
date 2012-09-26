@@ -15,6 +15,7 @@
 #define VDD 3.0 /* Volt */
 
 GPIO_TypeDef * const gpioa = GPIOA;
+GPIO_TypeDef * const gpiob = GPIOB;
 GPIO_TypeDef * const gpioc = GPIOC;
 RCC_TypeDef * const rcc = RCC;
 SysTick_Type * const systick = SysTick;
@@ -77,6 +78,7 @@ int main(void)
   SysTick_Init();
   LED3_Init();
   LED4_Init();
+  PB13_Init();
   Button1_Init();
   DAC_Init();
   DAC_Set((uint16_t)(1.1/VDD * 4096));

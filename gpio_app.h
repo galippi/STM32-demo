@@ -14,6 +14,9 @@
 #define BUTTON1_PORT GPIOA
 #define BUTTON1_PIN_NUM 0
 
+#define PB13_PORT GPIOB
+#define PB13_PIN_NUM 13
+
 static inline void Button1_Init(void)
 {
   GPIO_PortInit_In(BUTTON1_PORT, BUTTON1_PIN_NUM);
@@ -53,6 +56,27 @@ static inline void LED4_Set(uint8_t val)
   }else
   {
     LED3_PORT->ODR &= ~(1 << LED4_PIN_NUM);
+  }
+}
+
+static inline void PB13_Init(void)
+{
+  GPIO_PortInit_Out(PB13_PORT, PB13_PIN_NUM);
+}
+
+static inline uint16_t PB13_Get(void)
+{
+  return (PB13_PORT->IDR & (1 << PB13_PIN_NUM)); // does not work
+}
+
+static inline void PB13_Set(uint32_t val)
+{
+  if (val)
+  {
+    PB13_PORT->ODR |= (1 << PB13_PIN_NUM);
+  }else
+  {
+    PB13_PORT->ODR &= ~(1 << PB13_PIN_NUM);
   }
 }
 
