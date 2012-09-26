@@ -6,6 +6,14 @@
 
 void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum)
 {
+  if (gpio == GPIOB)
+  {
+    /* enable the GPIO-B, if it was not enabled */
+    if (!(RCC->AHBENR & RCC_AHBENR_GPIOBEN))
+    {
+      RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
+    }
+  }else
   if (gpio == GPIOC)
   {
     /* enable the GPIO-C, if it was not enabled */
