@@ -72,9 +72,62 @@ static uint16_t SysTick_App_Get(void)
   return val;
 }
 
+uint32_t StartUpCounter;
+
+static void PLL_Init(void)
+{
+  /* Enable HSE - high speed external oscillator */
+  RCC->CR |= (uint32_t)(RCC_CR_HSEON | RCC_CR_HSEBYP);
+
+  StartUpCounter = 0;
+  /* Wait till HSE is ready and if Time out is reached exit */
+  while(((RCC->CR & RCC_CR_HSERDY) == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT))
+  {
+    StartUpCounter++;
+  }
+  if ((RCC->CR & RCC_CR_HSERDY))
+  {
+    /* Enable Prefetch Buffer and set Flash Latency */
+    FLASH->ACR = FLASH_ACR_PRFTBE | FLASH_ACR_LATENCY;
+
+    /* HCLK = SYSCLK */
+    RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
+
+    /* PCLK = HCLK */
+    RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE_DIV1;
+
+
+    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
+    //RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1 | RCC_CFGR_PLLMULL6); /* PLL configuration = HSE * 6 = 48 MHz */
+    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1_Div2 | RCC_CFGR_PLLMULL2); /* PLL configuration = HSE * 2 = 16 MHz */
+
+    /* Enable PLL */
+    RCC->CR |= RCC_CR_PLLON;
+
+    /* Wait till PLL is ready */
+    while((RCC->CR & RCC_CR_PLLRDY) == 0)
+    {
+    }
+
+    /* Select PLL as system clock source */
+    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
+    RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
+
+    /* Wait till PLL is used as system clock source */
+    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)RCC_CFGR_SWS_PLL)
+    {
+    }
+  }
+  else
+  { /* If HSE fails to start-up, the application will have wrong clock
+         configuration. User can add here some code to deal with this error */
+  }
+}
+
 int main(void)
 {
   uint8_t led3 = 0;
+  PLL_Init();
   SysTick_Init();
   LED3_Init();
   LED4_Init();
