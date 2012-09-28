@@ -7,6 +7,8 @@
 #include "dac.h"
 #include "timer.h"
 #include "util.h"
+#include "system_conf.h"
+#include "timer_conf.h"
 
 #include "tasks.h"
 
@@ -59,7 +61,7 @@ void TIM3_CC1IF_PollHandler(void)
   if (TIM3_SR_CC1IF_Get())
   {
     TIM3_SR_CC1IF_Reset();
-    TIM3_CCR1_Set(TIM3_CCR1_Get() + 1000);
+    TIM3_CCR1_Set(TIM3_CCR1_Get() + TIM3_FREQ); /* set next interrupt to the next 1ms slot */
     TIM3_CC1IF_Callback();
   }
 }
@@ -113,8 +115,8 @@ static void PLL_Init(void)
 
 
     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
-    //RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1 | RCC_CFGR_PLLMULL6); /* PLL configuration = HSE * 6 = 48 MHz */
-    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1_Div2 | RCC_CFGR_PLLMULL2); /* PLL configuration = HSE * 2 = 16 MHz */
+    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1 | RCC_CFGR_PLLMULL6); /* PLL configuration = HSE * 6 = 48 MHz */
+    //RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1_Div2 | RCC_CFGR_PLLMULL2); /* PLL configuration = HSE * 2 = 16 MHz */
 
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
@@ -165,7 +167,7 @@ int main(void)
     }
   }
   TIM3_Init();
-  TIM3_CCR1_Set(TIM3_Cnt_Get() + 1000); /* set the first scheduler interrupt to 1ms */
+  TIM3_CCR1_Set(TIM3_Cnt_Get() + TIM3_FREQ); /* set the first scheduler interrupt to 1ms */
 
   while (Button1_Get())
   {
