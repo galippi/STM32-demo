@@ -7,13 +7,17 @@ const uint16_t *TS_CAL1 = (uint16_t*)0x1FFFF7B8; /* ADC value of temp. sensor at
 const uint16_t *TS_CAL2 = (uint16_t*)0x1FFFF7C2; /* ADC value of temp. sensor at 110C */
 const uint16_t *VREFINT_CAL = (uint16_t*)0x1FFFF7BA; /* ADC value of reference voltage at 30C */
 
+uint8_t ADC_calibration = 64; /* calibration factor - default value -> no calibration */
+
 void ADC_Init(void)
 {
   if (!(RCC->APB2ENR & RCC_APB2Periph_ADC1))
-  {
+  { /* enable the ADC1 */
     RCC->APB2ENR |= RCC_APB2Periph_ADC1;
   }
-  RCC->CR2 |= RCC_CR2_HSI14ON;
+  RCC->CR2 |= RCC_CR2_HSI14ON; /* enable ADC-HSI14 oscillator */
+  while (!(RCC->CR2 & RCC_CR2_HSI14RDY)) { /*wait to HSI14 staring */ }
+  RCC->CFGR3 &= ~(RCC_CFGR3_ADCSW); /* ADC clock source to HSI14 */
   if (ADC1->CR & ADC_CR_ADEN)
   {
     ADC1->CR |= ADC_CR_ADSTP;
@@ -31,6 +35,7 @@ void ADC_Init(void)
     ADC1->CR = ADC_CR_ADCAL;
     while (ADC1->CR & ADC_CR_ADCAL)
     { /* wait the end of the calibration */ }
+    ADC_calibration = (uint8_t)(ADC_Get() & 0x003F);
     ADC1->CR = ADC_CR_INIT & (ADC_CR_ADEN);
   }else
   {

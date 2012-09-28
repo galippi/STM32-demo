@@ -7,6 +7,8 @@ extern const uint16_t *TS_CAL1; /* ADC value of temp. sensor at 30C */
 extern const uint16_t *TS_CAL2; /* ADC value of temp. sensor at 110C */
 extern const uint16_t *VREFINT_CAL; /* ADC value of reference voltage at 30C */
 
+extern uint8_t ADC_calibration; /* calibration factor */
+
 void ADC_Init(void);
 
 static inline void ADC_Start(void)
@@ -16,6 +18,7 @@ static inline void ADC_Start(void)
 
 static inline uint16_t ADC_Get(void)
 {
+  //return ((ADC1->DR * ADC_calibration) >> 6);
   return ADC1->DR;
 }
 
