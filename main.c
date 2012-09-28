@@ -35,7 +35,7 @@ void Scheduler(void)
   Task_1ms();
 }
 
-inline void TIM3_UIF_Callback(void)
+static inline void TIM3_UIF_Callback(void)
 { /* call back function of TIM3 UIF - counter underflow */
   Scheduler();
 }
@@ -46,6 +46,21 @@ void TIM3_UIF_PollHandler(void)
   {
     TIM3_SR_UIF_Reset();
     TIM3_UIF_Callback();
+  }
+}
+
+static inline void TIM3_CC1IF_Callback(void)
+{ /* call back function of TIM3 UIF - counter underflow */
+  Scheduler();
+}
+
+void TIM3_CC1IF_PollHandler(void)
+{
+  if (TIM3_SR_CC1IF_Get())
+  {
+    TIM3_SR_CC1IF_Reset();
+    TIM3_CCR1_Set(TIM3_CCR1_Get() + 1000);
+    TIM3_CC1IF_Callback();
   }
 }
 
@@ -150,8 +165,9 @@ int main(void)
     }
   }
   TIM3_Init();
+  TIM3_CCR1_Set(TIM3_Cnt_Get() + 1000); /* set the first scheduler interrupt to 1ms */
 
-  while (!Button1_Get())
+  while (Button1_Get())
   {
     LED3_Set(led3);
     led3 = !led3;

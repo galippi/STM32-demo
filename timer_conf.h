@@ -1,7 +1,7 @@
 #ifndef _TIMER_CONF_H_
 #define _TIMER_CONF_H_
 
-#define TIM3_CR1_INIT 0x10 /* down counter mode */
+#define TIM3_CR1_INIT 0x00 /* up counter mode */
 #define TIM3_CR2_INIT 0x0
 #define TIM3_PSC_INIT  7 /* 8MHz / (7+1) -> 1MHz */
 #define TIM3_ARR_INIT 1000 /* 1MHz / 1000 -> 1ms timebase */
