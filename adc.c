@@ -13,6 +13,7 @@ void ADC_Init(void)
   {
     RCC->APB2ENR |= RCC_APB2Periph_ADC1;
   }
+  RCC->CR2 |= RCC_CR2_HSI14ON;
   if (ADC1->CR & ADC_CR_ADEN)
   {
     ADC1->CR |= ADC_CR_ADSTP;
