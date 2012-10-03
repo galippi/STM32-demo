@@ -1,8 +1,7 @@
 #include "gpio_app.h"
+#include "uart.h"
 
 #include "tasks.h"
-
-void UART2_TX(uint8_t data);
 
 void Task_1ms(void)
 {

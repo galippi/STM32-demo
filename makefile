@@ -44,6 +44,7 @@ CFILES  += adc.c
 CFILES  += adc_app.c
 CFILES  += dac.c
 CFILES  += gpio.c
+CFILES  += uart.c
 CFILES  += tasks.c
 CFILES  += timer.c
 CFILES  += util.c
@@ -85,6 +86,7 @@ $(TARGET_DIR)/%.o: %.c $(DUMMY_DIR_FILE)
 	$(CC_DEP) -M $(CFLAGS_DEP) -c -o $(@:.o=.d) $<
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+#	$(CC) -MD $(CFLAGS) -c -o $@ $<
 #	$(CC) -v -x c -E -
 
 #%.o: %.cpp $(MAKEFILE)
