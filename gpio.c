@@ -34,6 +34,43 @@ void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum)
   BitfieldSet(gpio->PUPDR, portnum * 2, 2, GPIO_PuPd_NOPULL);
 }
 
+void GPIO_PortInit_AFOut(GPIO_TypeDef * const gpio, uint8_t portnum, uint8_t AFR_val)
+{
+  if (gpio == GPIOA)
+  {
+    /* enable the GPIO-A, if it was not enabled */
+    if (!(RCC->AHBENR & RCC_AHBENR_GPIOAEN))
+    {
+      RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+    }
+  }else
+  if (gpio == GPIOB)
+  {
+    /* enable the GPIO-B, if it was not enabled */
+    if (!(RCC->AHBENR & RCC_AHBENR_GPIOBEN))
+    {
+      RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
+    }
+  }else
+    CAT_Error(1);
+
+  //gpio->OSPEEDR = GPIO_Speed_50MHz << (portnum * 2);
+  BitfieldSet(gpio->OSPEEDR, portnum * 2, 2, GPIO_Speed_50MHz);
+  //gpio->OTYPER = GPIO_OType_PP << portnum;
+  BitfieldSet(gpio->OTYPER, portnum, 1, GPIO_OType_PP);
+  //gpio->MODER = GPIO_Mode_OUT << (portnum * 2);
+  BitfieldSet(gpio->MODER, portnum * 2, 2, GPIO_Mode_AF);
+  //gpio->PUPDR = GPIO_PuPd_NOPULL << (portnum * 2);
+  BitfieldSet(gpio->PUPDR, portnum * 2, 2, GPIO_PuPd_NOPULL);
+  if (portnum <= 7)
+  {
+    BitfieldSet(gpio->AFR[0], portnum * 4, 4, AFR_val);
+  }else
+  {
+    BitfieldSet(gpio->AFR[1], (portnum - 8) * 4, 4, AFR_val);
+  }
+}
+
 void GPIO_PortInit_In(GPIO_TypeDef * const gpio, uint8_t portnum)
 {
   if (gpio == GPIOA)
