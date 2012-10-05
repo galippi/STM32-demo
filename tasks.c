@@ -3,11 +3,17 @@
 
 #include "tasks.h"
 
+void Task_Init(void)
+{
+  DebugOut_Init();
+}
+
 void Task_1ms(void)
 {
   PB13_Set(!PB13_Get()); /* toggling debug port */
-  {
-    static uint8_t val;
-    UART2_TX(val++);
-  }
+}
+
+void Task_10ms(void)
+{
+  DebugOut();
 }

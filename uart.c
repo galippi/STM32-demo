@@ -19,6 +19,9 @@ void UART2_Init(void)
 #error "USART2_BRR must be adapted for system frquency!"
 #endif
   USART2->CR2 = 0; /* 1 stop bit */
-  USART2->CR3 = 0; /* default value */
+  USART2->CR3 = 0x80; /* DMA is enabled for the channel */
   USART2->CR1 |= USART_CR1_UE; /* USART2 is enabled */
+  /* configuring DMA for USART2-TX */
+  DMA1_Channel4->CPAR = &(USART2->TDR);
+  DMA1_Channel4->CCR = DMA_CCR_DIR | DMA_CCR_MINC; /* mem2per, no-circ, no-per-inc, mem-inc, psize=8, memsize=8,ch-prio=low, no-mem2mem */
 }

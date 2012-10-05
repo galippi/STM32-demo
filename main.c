@@ -37,6 +37,20 @@ void CAT_Error(uint8_t code)
 void Scheduler(void)
 {
   Task_1ms();
+  {
+    static uint8_t TaskTimer;
+    if (TaskTimer == 9)
+    {
+      Task_10ms();
+    }
+    if (TaskTimer < 9)
+    {
+      TaskTimer++
+    }else
+    {
+      TaskTimer = 0;
+    }
+  }
 }
 
 static inline void TIM3_UIF_Callback(void)
@@ -155,20 +169,8 @@ int main(void)
   DAC_Init();
   DAC_Set((uint16_t)(1.1/VDD * 4096));
   ADC_HandlerInit();
-  memset(timer, 0, sizeof(timer));
-  timer_brake = 0;
-  {
-    uint16_t val = 0;
-    while(val < 4096)
-    {
-      DAC_Set(val);
-      ADC_Handler();
-      while (!ADC_GetStatus())
-      {/* wait the end of the conversion */}
-      val = (val << 1) | 1;
-    }
-  }
   UART2_Init();
+  Task_Init();
   TIM3_Init();
   TIM3_CCR1_Set(TIM3_Cnt_Get() + TIM3_FREQ); /* set the first scheduler interrupt to 1ms */
 
