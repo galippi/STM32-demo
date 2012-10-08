@@ -12,7 +12,8 @@ static inline uint32_t UART2_TXE_Get(void)
 
 static inline void UART2_TX(const uint8_t *data, uint32_t len)
 {
-  DMA1_Channel4->CMAR = data;
+  DMA1_Channel4->CCR &= ~DMA_CCR_EN;
+  DMA1_Channel4->CMAR = (uint32_t)data;
   DMA1_Channel4->CNDTR = len;
   DMA1_Channel4->CCR |= DMA_CCR_EN;
 }
