@@ -26,6 +26,8 @@ DAC_TypeDef * const dac = DAC;
 ADC_TypeDef * const adc1 = ADC1;
 TIM_TypeDef * const tim3 = TIM3;
 USART_TypeDef * const uart2 = USART2;
+DMA_TypeDef * const dma1 = DMA1;
+DMA_Channel_TypeDef * const dma1_4 = DMA1_Channel4;
 
 void CAT_Error(uint8_t code)
 {
@@ -45,7 +47,7 @@ void Scheduler(void)
     }
     if (TaskTimer < 9)
     {
-      TaskTimer++
+      TaskTimer++;
     }else
     {
       TaskTimer = 0;
