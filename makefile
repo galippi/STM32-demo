@@ -1,5 +1,6 @@
 ##################################################################
-CFLAGS_DEBUG = -gdwarf-2 -I./ST_lib
+CFLAGS_DEBUG = -gdwarf-2
+SUBDIRS := ST_lib
 
 WARNINGS = -Wall -Wextra
 WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
@@ -35,6 +36,8 @@ TARGET=blinker02.gcc.thumb
 TARGET_DIR=bin
 DUMMY_DIR_FILE = $(TARGET_DIR)/dummy
 
+VPATH := $(TARGET_DIR)
+
 CPPFILES =
 #CPPFILES+=
 
@@ -60,14 +63,15 @@ TARGET_LIST = $(TARGET_DIR)/$(TARGET).list
 
 all : $(TARGET_BIN) $(TARGET_LIST)
 
-OBJECTS = $(addprefix $(TARGET_DIR)/,$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o))
+OBJECTS = $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 DEPFILES = $(addprefix $(TARGET_DIR)/,$(CPPFILES:.cpp=.d) $(CFILES:.c=.d))
+INCDIRS = $(addprefix -I./,$(SUBDIRS))
 
-CFLAGS = $(CFLAGS_TARGET) $(WARNINGS) $(CFLAGS_DEBUG) $(CFLAGS_OPTIM)
-CFLAGS_DEP = $(WARNINGS) $(CFLAGS_DEBUG) $(CFLAGS_OPTIM)
+CFLAGS = $(CFLAGS_TARGET) $(WARNINGS) $(CFLAGS_DEBUG) $(INCDIRS) $(CFLAGS_OPTIM)
+CFLAGS_DEP = $(WARNINGS) $(CFLAGS_DEBUG) $(INCDIRS) $(CFLAGS_OPTIM)
 
 $(TARGET_ELF) : $(OBJECTS)
-	$(LL) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	$(LL) $(LDFLAGS) -o $@ $(addprefix $(TARGET_DIR)/,$(OBJECTS)) $(LDLIBS)
 
 $(TARGET_BIN) : $(TARGET_ELF)
 	$(OBJCOPY) $^ $@ -O binary
@@ -76,26 +80,26 @@ $(TARGET_LIST) : $(TARGET_ELF)
 	$(OBJDUMP) -D $^ > $@
 
   #%.o: %.s $(MAKEFILE)
-$(TARGET_DIR)/%.o: %.s $(DUMMY_DIR_FILE)
+%.o: %.s $(DUMMY_DIR_FILE)
 	@echo Building $@
-	$(AS) -as $< -o $@
+	$(AS) -as $< -o $(TARGET_DIR)/$@
 
 #%.o: %.c $(MAKEFILE)
-$(TARGET_DIR)/%.o: %.c $(DUMMY_DIR_FILE)
+%.o: %.c $(DUMMY_DIR_FILE)
 	@echo Building $(notdir $@)
 	-@rm -f $(@:.o=.d)
-	$(CC_DEP) -M $(CFLAGS_DEP) -c -o $(@:.o=.d) $<
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC_DEP) -M $(CFLAGS_DEP) -c -o $(TARGET_DIR)/$(@:.o=.d) $<
+	$(CC) $(CFLAGS) -c -o $(TARGET_DIR)/$@ $<
 
 #	$(CC) -MD $(CFLAGS) -c -o $@ $<
 #	$(CC) -v -x c -E -
 
 #%.o: %.cpp $(MAKEFILE)
-$(TARGET_DIR)/%.o: %.cpp $(DUMMY_DIR_FILE)
+%.o: %.cpp $(DUMMY_DIR_FILE)
 	@echo Building $@
 	-@rm -f $(@:.o=.d)
-	$(CC) -M $(CPPFLAGS) -c -o $(TARGET_DIR)$(@:.o=.d) $<
-	$(CC) $(CPPFLAGS) -c -o $(TARGET_DIR)$@ $<
+	$(CC) -M $(CPPFLAGS) -c -o $(TARGET_DIR)/$(TARGET_DIR)$(@:.o=.d) $<
+	$(CC) $(CPPFLAGS) -c -o $(TARGET_DIR)/$(TARGET_DIR)$@ $<
 #	$(CC) --version
 
 $(DUMMY_DIR_FILE):
