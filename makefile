@@ -43,6 +43,7 @@ CFILES  += main.c
 CFILES  += adc.c
 CFILES  += adc_app.c
 CFILES  += dac.c
+CFILES  += debug.c
 CFILES  += gpio.c
 CFILES  += uart.c
 CFILES  += tasks.c
