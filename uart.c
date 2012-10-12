@@ -23,7 +23,7 @@ void UART2_Init(void)
   USART2->CR3 = 0x80; /* DMA is enabled for the channel */
   /* configuring DMA for USART2-TX */
   DMA_Init();
-  DMA1_Channel4->CPAR = &(USART2->TDR);
+  DMA1_Channel4->CPAR = (uint32_t)&(USART2->TDR);
   DMA1_Channel4->CCR = DMA_CCR_DIR | DMA_CCR_MINC; /* mem2per, no-circ, no-per-inc, mem-inc, psize=8, memsize=8,ch-prio=low, no-mem2mem */
   USART2->CR1 |= USART_CR1_UE; /* USART2 is enabled */
 }

@@ -6,6 +6,8 @@ WARNINGS = -Wall -Wextra
 WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
 WARNINGS += -Wundef
 WARNINGS += -Wmissing-declarations
+# stop at warnings
+WARNINGS += -Werror
 
 CFLAGS_OPTIM = -O1
 #CFLAGS_OPTIM = -O3
@@ -48,6 +50,7 @@ CFILES  += adc_app.c
 CFILES  += dac.c
 CFILES  += debug.c
 CFILES  += gpio.c
+CFILES  += scheduler_preemptive.c
 CFILES  += uart.c
 CFILES  += tasks.c
 CFILES  += timer.c

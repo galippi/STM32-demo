@@ -1,5 +1,6 @@
 #include "stm32f0xx_gpio.h"
 
+#include "FaultHandler.h"
 #include "bitfield_lib.h"
 
 #include "gpio.h"

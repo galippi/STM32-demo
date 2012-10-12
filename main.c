@@ -9,7 +9,9 @@
 #include "util.h"
 #include "system_conf.h"
 #include "timer_conf.h"
+#include "timer_app.h"
 #include "uart.h"
+#include "scheduler_preemptive.h"
 
 #include "tasks.h"
 
@@ -28,84 +30,6 @@ TIM_TypeDef * const tim3 = TIM3;
 USART_TypeDef * const uart2 = USART2;
 DMA_TypeDef * const dma1 = DMA1;
 DMA_Channel_TypeDef * const dma1_4 = DMA1_Channel4;
-
-void CAT_Error(uint8_t code)
-{
-  (void)code;
-  while(1)
-    ; /* endless loop */
-}
-
-void Scheduler(void)
-{
-  Task_1ms();
-  {
-    static uint8_t TaskTimer;
-    if (TaskTimer == 9)
-    {
-      Task_10ms();
-    }
-    if (TaskTimer < 9)
-    {
-      TaskTimer++;
-    }else
-    {
-      TaskTimer = 0;
-    }
-  }
-}
-
-static inline void TIM3_UIF_Callback(void)
-{ /* call back function of TIM3 UIF - counter underflow */
-  Scheduler();
-}
-
-void TIM3_UIF_PollHandler(void)
-{
-  if (TIM3_SR_UIF_Get())
-  {
-    TIM3_SR_UIF_Reset();
-    TIM3_UIF_Callback();
-  }
-}
-
-static inline void TIM3_CC1IF_Callback(void)
-{ /* call back function of TIM3 UIF - counter underflow */
-  Scheduler();
-}
-
-void TIM3_CC1IF_PollHandler(void)
-{
-  if (TIM3_SR_CC1IF_Get())
-  {
-    TIM3_SR_CC1IF_Reset();
-    TIM3_CCR1_Set(TIM3_CCR1_Get() + TIM3_FREQ); /* set next interrupt to the next 1ms slot */
-    TIM3_CC1IF_Callback();
-  }
-}
-
-uint8_t timer[128];
-#define SIZE_TIMER (sizeof(timer)/sizeof(timer[0]))
-#define MAX_TIMER 255
-uint8_t timer_brake;
-
-static uint16_t SysTick_App_Get(void)
-{
-  uint16_t val = SysTick_Get();
-  if (!timer_brake)
-  {
-    uint16_t idx = val + (SIZE_TIMER / 2);
-    if (idx < SIZE_TIMER)
-    {
-      timer[idx] ++;
-      if (timer[idx] == MAX_TIMER)
-      {
-        timer_brake = 1;
-      }
-    }
-  }
-  return val;
-}
 
 uint32_t StartUpCounter;
 
@@ -161,7 +85,6 @@ static void PLL_Init(void)
 
 int main(void)
 {
-  uint8_t led3 = 0;
   PLL_Init();
   SysTick_Init();
   LED3_Init();
@@ -176,57 +99,11 @@ int main(void)
   TIM3_Init();
   TIM3_CCR1_Set(TIM3_Cnt_Get() + TIM3_FREQ); /* set the first scheduler interrupt to 1ms */
 
-  while (Button1_Get())
+  while (1)
   {
-    LED3_Set(led3);
-    led3 = !led3;
+    ADC_Handler();
+    TIM3_UIF_PollHandler();
   }
-  LED4_Set(1);
-  {
-    uint8_t state = 0;
-    uint16_t dac_val = 0;
-    DAC_Set(dac_val);
-    uint16_t dac_t = SysTick_App_Get();
-#define FSYS 8000000
-    while (1)
-    {
-#if 0
-      SysTick_App_Get();
-#elif 0
-      uint16_t dac_t_new = SysTick_App_Get();
-      uint16_t dt = dac_t_new - dac_t;
-      while ((dt = dac_t_new - dac_t) > (FSYS / 1000))
-      {
-        dac_t += (FSYS / 1000);
-      }
-      if (dt > ((FSYS / 1000) / 2))
-      {
-        dac_val = 4095 - ((4095 * (uint32_t)dt) / ((FSYS / 1000) / 2));
-      }else
-      {
-        dac_val = (4095 * (uint32_t)dt) / ((FSYS / 1000) / 2);
-      }
-      DAC_Set(dac_val);
-#elif 1
-      dac_val = (SysTick_App_Get() >> 3) & 0x1FFF;
-      if (dac_val >= 0x1000)
-      {
-        DAC_Set(0x1FFF - dac_val);
-      }else
-      {
-        DAC_Set(dac_val);
-      }
-#else
-      LED3_Set(1);
-      while (SysTick_App_Get() > 32767)
-        ;
-      LED3_Set(0);
-      while (SysTick_App_Get() <= 32767)
-        ;
-#endif
-      ADC_Handler();
-      TIM3_UIF_PollHandler();
-    }
-  }
+
   return 0;
 }
