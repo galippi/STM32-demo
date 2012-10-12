@@ -9,15 +9,16 @@ uint16_t ADC_values[ADC_Ch_Num];
 int16_t Temperature = -32768;
 int16_t Temperature_raw = -32768;
 
+static uint8_t adc_idx;
 void ADC_HandlerInit(void)
 {
+  adc_idx = 0;
   ADC_Init();
   ADC_Start();
 }
 
 void ADC_Handler(void)
 {
-  static uint8_t adc_idx = 0;
   if (ADC_GetStatus())
   {
     ADC_values[adc_idx] = ADC_Get();
