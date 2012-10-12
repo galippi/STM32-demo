@@ -1,6 +1,7 @@
 #include "gpio_app.h"
 #include "debug.h"
 #include "dac.h"
+#include "adc_app.h"
 
 #include "tasks.h"
 
@@ -14,18 +15,29 @@ void Task_1ms(void)
   PB13_Set(!PB13_Get()); /* toggling debug port */
   {
     static uint16_t dac_val = 0;
-#if 0
-    if (dac_val >= 0x1000)
+    static uint16_t t_ug;
+    t_ug++;
+    if (t_ug > 1950)
     {
-      DAC_Set(0x1FFF - dac_val);
+      DAC_Set(0);
+      if (t_ug > 2000)
+      {
+        t_ug = 0;
+      }
     }else
     {
+      if (ADC_values[ADC_IN5_Ub] > (uint32_t)(0.7 * 4095/3.3))
+      {
+        dac_val++;
+      }else
+      {
+        if (dac_val > 0)
+        {
+          dac_val--;
+        }
+      }
       DAC_Set(dac_val);
     }
-#else
-    DAC_Set(dac_val >> 1);
-#endif
-    dac_val = (dac_val + 1) & 0x1FFF; /* 1sec rising / 1sec falling edge */
   }
 }
 
