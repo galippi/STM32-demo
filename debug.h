@@ -17,7 +17,8 @@
 
 extern uint8_t DebugId;
 
-#define TEST_BUFFER_LEN 12 /* 2 byte ID, 8 byte data, 2 byte checksum */
+//#define TEST_BUFFER_LEN 12 /* 2 byte ID, 8 byte data, 2 byte checksum */
+#define TEST_BUFFER_LEN 202 /* 2 byte ID, 8 byte data, 2 byte checksum */
 extern uint8_t TestBuffer[TEST_BUFFER_LEN];
 
 void DebugOut_Init(void);

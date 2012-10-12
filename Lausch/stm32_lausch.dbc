@@ -1,0 +1,50 @@
+VERSION "HIPBNYYYYYYYYYYYYYYYYYYYYYYYYYYYNNNNNNNNNN/4/%%%/4/'%**4NNN///"
+
+
+NS_ : 
+
+NS_DESC_
+CM_
+BA_DEF_
+BA_
+VAL_
+CAT_DEF_
+CAT_
+FILTER
+BA_DEF_DEF_
+EV_DATA_
+ENVVAR_DATA_
+SGTYPE_
+SGTYPE_VAL_
+BA_DEF_SGTYPE_
+BA_SGTYPE_
+SIG_TYPE_REF_
+VAL_TABLE_
+SIG_GROUP_
+SIG_VALTYPE_
+SIGTYPE_VALTYPE_
+
+
+BS_:
+
+BU_:  ISCLW ISC TILT CFC TESTRVI ACC ISCMAX ISCFIELD EBS SYSTEM WSS ABS COOR VALACT SM CAN ESP ATC BM DLL PPLAU TLH
+
+BO_ 2147495936 EBS_0x3000: 8 EBS
+ SG_ Data00 : 0|8@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data01 : 8|8@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data02 : 16|8@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data03 : 24|8@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data04 : 32|8@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data05 : 40|8@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data06 : 48|8@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data07 : 56|8@1+ (1,0) [0|0] "dig" Vector__XXX
+
+BO_ 2147495937 EBS_0x3001: 8 EBS
+ SG_ Data10 : 0|8@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data11 : 8|8@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data12 : 16|8@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data13 : 24|8@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data14 : 32|8@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data15 : 40|8@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data16 : 48|8@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data17 : 56|8@1+ (1,0) [0|0] "dig" Vector__XXX
