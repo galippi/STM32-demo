@@ -21,7 +21,7 @@ void Task_1ms(void)
     {
       DAC_Set(dac_val);
     }
-    dac_val = (dac_val + 4) & 0x1FFF; /* 1sec rising / 1sec falling edge */
+    dac_val = (dac_val + 1) & 0x1FFF; /* 1sec rising / 1sec falling edge */
   }
 }
 

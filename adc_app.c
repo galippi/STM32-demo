@@ -1,5 +1,6 @@
 #include "util.h"
 #include "adc.h"
+#include "debug.h"
 
 #include "adc_app.h"
 
@@ -38,6 +39,11 @@ void ADC_Handler(void)
       //Temperature = (int8_t)DivI32_I32I32(((v_sensor - (int16_t)*TS_CAL1) * (int16_t)(110 - 30)), (*TS_CAL2 - *TS_CAL1)) + 30;
       Temperature = (int16_t)DivI32_I32I32(((v_sensor - (int32_t)*TS_CAL1) * ((int32_t)(110 - 30) * TEMP_SCALE)), (*TS_CAL2 - *TS_CAL1)) + (30 * TEMP_SCALE);
       Temperature_raw = (int16_t)DivI32_I32I32(((ADC_values[ADC_TemperatureSensor] - (int32_t)*TS_CAL1) * ((int32_t)(110 - 30) * TEMP_SCALE)), (*TS_CAL2 - *TS_CAL1)) + (30 * TEMP_SCALE);
+
+      DebugOut_Set_u16(0, 0, ADC_values[ADC_IN4_DAC]);
+      DebugOut_Set_u16(0, 2, ADC_values[ADC_IN5_Ub]);
+      DebugOut_Set_u16(0, 4, ADC_values[ADC_IN6_Ib]);
+      DebugOut_Set_u16(0, 6, ADC_values[ADC_TemperatureSensor]);
     }
     ADC_Start();
   }

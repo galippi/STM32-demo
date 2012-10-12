@@ -4,6 +4,8 @@
 enum e_ADC_values
 {
   ADC_IN4_DAC,
+  ADC_IN5_Ub,
+  ADC_IN6_Ib,
   ADC_TemperatureSensor,
   ADC_Vref,
   ADC_VBat,

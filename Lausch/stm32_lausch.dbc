@@ -30,14 +30,10 @@ BS_:
 BU_:  ISCLW ISC TILT CFC TESTRVI ACC ISCMAX ISCFIELD EBS SYSTEM WSS ABS COOR VALACT SM CAN ESP ATC BM DLL PPLAU TLH
 
 BO_ 2147495936 EBS_0x3000: 8 EBS
- SG_ Data00 : 0|8@1+ (1,0) [0|0] "dig" Vector__XXX
- SG_ Data01 : 8|8@1+ (1,0) [0|0] "dig" Vector__XXX
- SG_ Data02 : 16|8@1+ (1,0) [0|0] "dig" Vector__XXX
- SG_ Data03 : 24|8@1+ (1,0) [0|0] "dig" Vector__XXX
- SG_ Data04 : 32|8@1+ (1,0) [0|0] "dig" Vector__XXX
- SG_ Data05 : 40|8@1+ (1,0) [0|0] "dig" Vector__XXX
- SG_ Data06 : 48|8@1+ (1,0) [0|0] "dig" Vector__XXX
- SG_ Data07 : 56|8@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data00 : 0|16@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data02 : 16|16@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data04 : 32|16@1+ (1,0) [0|0] "dig" Vector__XXX
+ SG_ Data06 : 48|16@1+ (1,0) [0|0] "dig" Vector__XXX
 
 BO_ 2147495937 EBS_0x3001: 8 EBS
  SG_ Data10 : 0|8@1+ (1,0) [0|0] "dig" Vector__XXX
