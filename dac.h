@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "stm32f0xx.h"
+#include "controller.h"
 
 void DAC_Init(void);
 

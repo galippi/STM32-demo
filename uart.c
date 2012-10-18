@@ -6,6 +6,7 @@
 
 void UART2_Init(void)
 {
+#if CPU_TYPE == CPU_TYPE_STM32F0
   GPIO_PortInit_AFOut(GPIOA, 2, 1); /* GPIOA_AFRL.2 = 0001 -> PA2 USART2_TX */
   GPIO_PortInit_AFOut(GPIOA, 3, 1); /* GPIOA_AFRL.3 = 0001 -> PA3 USART2_RX */
   /* enable the USART2, if it was not enabled */
@@ -26,4 +27,5 @@ void UART2_Init(void)
   DMA1_Channel4->CPAR = (uint32_t)&(USART2->TDR);
   DMA1_Channel4->CCR = DMA_CCR_DIR | DMA_CCR_MINC; /* mem2per, no-circ, no-per-inc, mem-inc, psize=8, memsize=8,ch-prio=low, no-mem2mem */
   USART2->CR1 |= USART_CR1_UE; /* USART2 is enabled */
+#endif /* CPU_TYPE == CPU_TYPE_STM32F0 */
 }

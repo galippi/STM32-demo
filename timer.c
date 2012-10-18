@@ -1,4 +1,6 @@
-#include "stm32f0xx_rcc.h"
+#include "controller.h"
+
+#include STM32_RCC_HEADER
 
 #include "timer_conf.h"
 

@@ -1,7 +1,7 @@
 #ifndef _ADC_H_
 #define _ADC_H_
 
-#include "stm32f0xx.h"
+#include "controller.h"
 
 extern const uint16_t *TS_CAL1; /* ADC value of temp. sensor at 30C */
 extern const uint16_t *TS_CAL2; /* ADC value of temp. sensor at 110C */
@@ -13,7 +13,9 @@ void ADC_Init(void);
 
 static inline void ADC_Start(void)
 {
+#if TARGET_ECU == TARGET_ECU_STM32F0DISCOVERY
   ADC1->CR |= ADC_CR_ADSTART;
+#endif
 }
 
 static inline uint16_t ADC_Get(void)
@@ -24,7 +26,11 @@ static inline uint16_t ADC_Get(void)
 
 static inline char ADC_GetStatus(void)
 {
+#if TARGET_ECU == TARGET_ECU_STM32F0DISCOVERY
   return (ADC1->ISR & ADC_ISR_EOC) != 0; /* give back the state of the end of conversion flag */
+#else
+  return 0;
+#endif
 }
 
 #endif /* _ADC_H_ */

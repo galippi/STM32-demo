@@ -15,7 +15,7 @@
 
 #include "tasks.h"
 
-#include "stm32f0xx_rcc.h"
+//#include "stm32f0xx_rcc.h"
 
 #define VDD 3.0 /* Volt */
 
@@ -29,12 +29,15 @@ ADC_TypeDef * const adc1 = ADC1;
 TIM_TypeDef * const tim3 = TIM3;
 USART_TypeDef * const uart2 = USART2;
 DMA_TypeDef * const dma1 = DMA1;
-DMA_Channel_TypeDef * const dma1_4 = DMA1_Channel4;
+//DMA_Channel_TypeDef * const dma1_4 = DMA1_Channel4;
 
 uint32_t StartUpCounter;
 
 static void PLL_Init(void)
 {
+#if !defined(TARGET_ECU)
+#error "Error: TARGET ECU is not defined!"
+#elif TARGET_ECU == TARGET_ECU_STM32F0DISCOVERY
   /* Enable HSE - high speed external oscillator */
   RCC->CR |= (uint32_t)(RCC_CR_HSEON | RCC_CR_HSEBYP);
 
@@ -81,6 +84,7 @@ static void PLL_Init(void)
   { /* If HSE fails to start-up, the application will have wrong clock
          configuration. User can add here some code to deal with this error */
   }
+#endif
 }
 
 int main(void)
@@ -89,6 +93,8 @@ int main(void)
   SysTick_Init();
   LED3_Init();
   LED4_Init();
+  LED5_Init();
+  LED6_Init();
   PB13_Init();
   Button1_Init();
   DAC_Init();

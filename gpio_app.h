@@ -3,14 +3,30 @@
 
 #include <stdint.h>
 
-#include "stm32f0xx.h"
-
 #include "gpio.h"
 
+#if TARGET_ECU == TARGET_ECU_STM32F0DISCOVERY
+/* port definition for STM32F0-discovery board */
 #define LED3_PORT GPIOC
 #define LED3_PIN_NUM 9
 #define LED4_PORT GPIOC
 #define LED4_PIN_NUM 8
+
+#elif TARGET_ECU == TARGET_ECU_STM32F4DISCOVERY
+/* port definition for STM32F0-discovery board */
+#define LED3_PORT GPIOD
+#define LED3_PIN_NUM 13
+#define LED4_PORT GPIOD
+#define LED4_PIN_NUM 12
+#define LED5_PORT GPIOD
+#define LED5_PIN_NUM 14
+#define LED6_PORT GPIOD
+#define LED6_PIN_NUM 15
+
+#else
+#error "Error: TARGET_ECU is invalid!"
+#endif
+
 #define BUTTON1_PORT GPIOA
 #define BUTTON1_PIN_NUM 0
 
@@ -27,37 +43,45 @@ static inline uint8_t Button1_Get(void)
   return (BUTTON1_PORT->IDR & (1 << BUTTON1_PIN_NUM)) ? 1 : 0;
 }
 
-static inline void LED3_Init(void)
-{
-  GPIO_PortInit_Out(LED3_PORT, LED3_PIN_NUM);
-}
-
-static inline void LED3_Set(uint8_t val)
-{
-  if (val)
-  {
-    LED3_PORT->ODR |= (1 << LED3_PIN_NUM);
-  }else
-  {
-    LED3_PORT->ODR &= ~(1 << LED3_PIN_NUM);
+#define LEDx_Init(x) \
+  static inline void LED##x##_Init(void)\
+  { \
+    GPIO_PortInit_Out(LED##x##_PORT, LED##x##_PIN_NUM); \
   }
-}
 
-static inline void LED4_Init(void)
-{
-  GPIO_PortInit_Out(LED4_PORT, LED4_PIN_NUM);
-}
-
-static inline void LED4_Set(uint8_t val)
-{
-  if (val)
-  {
-    LED3_PORT->ODR |= (1 << LED4_PIN_NUM);
-  }else
-  {
-    LED3_PORT->ODR &= ~(1 << LED4_PIN_NUM);
+#define LEDx_Set(x) \
+  static inline void LED##x##_Set(uint8_t val) \
+  { \
+    if (val) \
+    { \
+      LED##x##_PORT->ODR |= (1 << LED##x##_PIN_NUM); \
+    }else \
+    { \
+      LED##x##_PORT->ODR &= ~(1 << LED##x##_PIN_NUM); \
+    } \
   }
-}
+
+LEDx_Init(3)
+LEDx_Set(3)
+
+LEDx_Init(4)
+LEDx_Set(4)
+
+#ifdef LED5_PORT
+LEDx_Init(5)
+LEDx_Set(5)
+#else
+#define LED5_Init() {/* do nothing */}
+#define LED5_Set(x) {/* do nothing */}
+#endif
+
+#ifdef LED6_PORT
+LEDx_Init(6)
+LEDx_Set(6)
+#else
+#define LED6_Init() {/* do nothing */}
+#define LED6_Set(x) {/* do nothing */}
+#endif
 
 static inline void PB13_Init(void)
 {

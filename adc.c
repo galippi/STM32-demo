@@ -1,7 +1,10 @@
-#include "stm32f0xx_rcc.h"
-
 #include "adc.h"
 #include "adc_conf.h"
+
+#include STM32_RCC_HEADER
+
+//#include CONTROLLER_BASE_NAME#_rcc_h
+//#include CONTROLLER_BASE_NAME"_rcc.h"
 
 const uint16_t *TS_CAL1 = (uint16_t*)0x1FFFF7B8; /* ADC value of temp. sensor at 30C */
 const uint16_t *TS_CAL2 = (uint16_t*)0x1FFFF7C2; /* ADC value of temp. sensor at 110C */
@@ -11,6 +14,7 @@ uint8_t ADC_calibration = 64; /* calibration factor - default value -> no calibr
 
 void ADC_Init(void)
 {
+#if TARGET_ECU == TARGET_ECU_STM32F0DISCOVERY
   if (!(RCC->APB2ENR & RCC_APB2Periph_ADC1))
   { /* enable the ADC1 */
     RCC->APB2ENR |= RCC_APB2Periph_ADC1;
@@ -48,4 +52,5 @@ void ADC_Init(void)
   ADC1->CHSELR = ADC_CHSELR_INIT;
   ADC1->IER = ADC_IER_INIT;
   ADC->CCR = ADC_CCR_INIT;
+#endif
 }

@@ -1,30 +1,50 @@
-#include "stm32f0xx_gpio.h"
-
 #include "FaultHandler.h"
 #include "bitfield_lib.h"
 
 #include "gpio.h"
 
-void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum)
+#include STM32_GPIO_HEADER
+
+static inline void GPIO_PortEnable(GPIO_TypeDef * const gpio)
 {
+  if (gpio == GPIOA)
+  { /* enable the GPIO-B */
+#if CPU_TYPE == CPU_TYPE_STM32F0
+    RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+#elif CPU_TYPE == CPU_TYPE_STM32F4
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+#endif
+  }else
   if (gpio == GPIOB)
-  {
-    /* enable the GPIO-B, if it was not enabled */
-    if (!(RCC->AHBENR & RCC_AHBENR_GPIOBEN))
-    {
-      RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
-    }
+  { /* enable the GPIO-B */
+#if CPU_TYPE == CPU_TYPE_STM32F0
+    RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
+#elif CPU_TYPE == CPU_TYPE_STM32F4
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
+#endif
   }else
   if (gpio == GPIOC)
-  {
-    /* enable the GPIO-C, if it was not enabled */
-    if (!(RCC->AHBENR & RCC_AHBENR_GPIOCEN))
-    {
-      RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
-    }
+  { /* enable the GPIO-C */
+#if CPU_TYPE == CPU_TYPE_STM32F0
+    RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+#elif CPU_TYPE == CPU_TYPE_STM32F4
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+#endif
+  }else
+  if (gpio == GPIOD)
+  { /* enable the GPIO-D */
+#if CPU_TYPE == CPU_TYPE_STM32F0
+    RCC->AHBENR |= RCC_AHBENR_GPIODEN;
+#elif CPU_TYPE == CPU_TYPE_STM32F4
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
+#endif
   }else
     CAT_Error(1);
+}
 
+void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum)
+{
+  GPIO_PortEnable(gpio);
   //gpio->OSPEEDR = GPIO_Speed_50MHz << (portnum * 2);
   BitfieldSet(gpio->OSPEEDR, portnum * 2, 2, GPIO_Speed_50MHz);
   //gpio->OTYPER = GPIO_OType_PP << portnum;
@@ -37,23 +57,7 @@ void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum)
 
 void GPIO_PortInit_AFOut(GPIO_TypeDef * const gpio, uint8_t portnum, uint8_t AFR_val)
 {
-  if (gpio == GPIOA)
-  {
-    /* enable the GPIO-A, if it was not enabled */
-    if (!(RCC->AHBENR & RCC_AHBENR_GPIOAEN))
-    {
-      RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
-    }
-  }else
-  if (gpio == GPIOB)
-  {
-    /* enable the GPIO-B, if it was not enabled */
-    if (!(RCC->AHBENR & RCC_AHBENR_GPIOBEN))
-    {
-      RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
-    }
-  }else
-    CAT_Error(1);
+  GPIO_PortEnable(gpio);
 
   //gpio->OSPEEDR = GPIO_Speed_50MHz << (portnum * 2);
   BitfieldSet(gpio->OSPEEDR, portnum * 2, 2, GPIO_Speed_50MHz);
@@ -74,15 +78,7 @@ void GPIO_PortInit_AFOut(GPIO_TypeDef * const gpio, uint8_t portnum, uint8_t AFR
 
 void GPIO_PortInit_In(GPIO_TypeDef * const gpio, uint8_t portnum)
 {
-  if (gpio == GPIOA)
-  {
-    /* enable the GPIO-A, if it was not enabled */
-    if (!(RCC->AHBENR & RCC_AHBENR_GPIOAEN))
-    {
-      RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
-    }
-  }else
-    CAT_Error(1);
+  GPIO_PortEnable(gpio);
 
   //gpio->OSPEEDR = GPIO_Speed_50MHz << (portnum * 2);
   BitfieldSet(gpio->OSPEEDR, portnum * 2, 2, GPIO_Speed_50MHz);
@@ -96,15 +92,7 @@ void GPIO_PortInit_In(GPIO_TypeDef * const gpio, uint8_t portnum)
 
 void GPIO_PortInit_Analog(GPIO_TypeDef * const gpio, uint8_t portnum)
 {
-  if (gpio == GPIOA)
-  {
-    /* enable the GPIO-A, if it was not enabled */
-    if (!(RCC->AHBENR & RCC_AHBENR_GPIOAEN))
-    {
-      RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
-    }
-  }else
-    CAT_Error(1);
+  GPIO_PortEnable(gpio);
 
   //gpio->OSPEEDR = GPIO_Speed_50MHz << (portnum * 2);
   BitfieldSet(gpio->OSPEEDR, portnum * 2, 2, GPIO_Speed_50MHz);
