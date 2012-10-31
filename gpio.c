@@ -60,7 +60,11 @@ void GPIO_PortInit_AFOut(GPIO_TypeDef * const gpio, uint8_t portnum, uint8_t AFR
   GPIO_PortEnable(gpio);
 
   //gpio->OSPEEDR = GPIO_Speed_50MHz << (portnum * 2);
+#if CPU_TYPE == CPU_TYPE_STM32F0
   BitfieldSet(gpio->OSPEEDR, portnum * 2, 2, GPIO_Speed_50MHz);
+#elif CPU_TYPE == CPU_TYPE_STM32F4
+  BitfieldSet(gpio->OSPEEDR, portnum * 2, 2, GPIO_Speed_100MHz);
+#endif
   //gpio->OTYPER = GPIO_OType_PP << portnum;
   BitfieldSet(gpio->OTYPER, portnum, 1, GPIO_OType_PP);
   //gpio->MODER = GPIO_Mode_OUT << (portnum * 2);
