@@ -61,15 +61,24 @@ static inline uint8_t Button1_Get(void)
     } \
   }
 
+#define LEDx_Get(x) \
+  static inline uint16_t LED##x##_Get(void) \
+  { \
+    return (LED##x##_PORT->ODR & (1 << LED##x##_PIN_NUM)); \
+  }
+
 LEDx_Init(3)
 LEDx_Set(3)
+LEDx_Get(3)
 
 LEDx_Init(4)
 LEDx_Set(4)
+LEDx_Get(4)
 
 #ifdef LED5_PORT
 LEDx_Init(5)
 LEDx_Set(5)
+LEDx_Get(5)
 #else
 #define LED5_Init() {/* do nothing */}
 #define LED5_Set(x) {/* do nothing */}
@@ -78,6 +87,7 @@ LEDx_Set(5)
 #ifdef LED6_PORT
 LEDx_Init(6)
 LEDx_Set(6)
+LEDx_Get(6)
 #else
 #define LED6_Init() {/* do nothing */}
 #define LED6_Set(x) {/* do nothing */}
