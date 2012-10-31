@@ -4900,15 +4900,19 @@ typedef struct
 
 /*!< MCO1 configuration */
 #define  RCC_CFGR_MCO1                       ((uint32_t)0x00600000)
-#define  RCC_CFGR_MCO1_0                     ((uint32_t)0x00200000)
-#define  RCC_CFGR_MCO1_1                     ((uint32_t)0x00400000)
+#define  RCC_CFGR_MCO1_HSI                   ((uint32_t)0x00000000)
+#define  RCC_CFGR_MCO1_LSE                   ((uint32_t)0x00200000)
+#define  RCC_CFGR_MCO1_HSE                   ((uint32_t)0x00400000)
+#define  RCC_CFGR_MCO1_PLL                   ((uint32_t)0x00600000)
 
 #define  RCC_CFGR_I2SSRC                     ((uint32_t)0x00800000)
 
 #define  RCC_CFGR_MCO1PRE                    ((uint32_t)0x07000000)
-#define  RCC_CFGR_MCO1PRE_0                  ((uint32_t)0x01000000)
-#define  RCC_CFGR_MCO1PRE_1                  ((uint32_t)0x02000000)
+#define  RCC_CFGR_MCO1PRE_1                  ((uint32_t)0x00000000)
 #define  RCC_CFGR_MCO1PRE_2                  ((uint32_t)0x04000000)
+#define  RCC_CFGR_MCO1PRE_3                  ((uint32_t)0x05000000)
+#define  RCC_CFGR_MCO1PRE_4                  ((uint32_t)0x06000000)
+#define  RCC_CFGR_MCO1PRE_5                  ((uint32_t)0x07000000)
 
 #define  RCC_CFGR_MCO2PRE                    ((uint32_t)0x38000000)
 #define  RCC_CFGR_MCO2PRE_0                  ((uint32_t)0x08000000)

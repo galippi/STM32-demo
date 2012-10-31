@@ -1,10 +1,11 @@
 MEMORY
 {
-    ram : ORIGIN = 0x20000410, LENGTH = 8k
+    ram : ORIGIN = 0x20001000, LENGTH = 4k
 }
 
 SECTIONS
 {
+    _SP_INIT = .;
     .text : 
     {
       /* startup module */

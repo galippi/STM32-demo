@@ -38,7 +38,7 @@ static void PLL_Init(void)
 #if !defined(TARGET_ECU)
 #error "Error: TARGET ECU is not defined!"
 #elif TARGET_ECU == TARGET_ECU_STM32F0DISCOVERY
-  /* Enable HSE - high speed external oscillator */
+  /* Enable HSE - high speed external input */
   RCC->CR |= (uint32_t)(RCC_CR_HSEON | RCC_CR_HSEBYP);
 
   StartUpCounter = 0;
@@ -84,17 +84,88 @@ static void PLL_Init(void)
   { /* If HSE fails to start-up, the application will have wrong clock
          configuration. User can add here some code to deal with this error */
   }
+#elif TARGET_ECU == TARGET_ECU_STM32F4DISCOVERY
+  /* Enable HSE - high speed external oscillator */
+  RCC->CR |= (uint32_t)(RCC_CR_HSEON);
+
+  StartUpCounter = 0;
+  /* Wait till HSE is ready and if Time out is reached exit */
+  while(((RCC->CR & RCC_CR_HSERDY) == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT))
+  {
+    StartUpCounter++;
+  }
+  if ((RCC->CR & RCC_CR_HSERDY))
+  {
+    /* Select HSI as system clock source */
+    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
+    /* Disable PLL */
+    RCC->CR &= ~(RCC_CR_PLLON);
+
+    /* Configure Flash prefetch, Instruction cache, Data cache and wait state */
+    FLASH->ACR = FLASH_ACR_ICEN |FLASH_ACR_DCEN |FLASH_ACR_LATENCY_5WS;
+
+    /* HCLK = SYSCLK */
+    RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
+
+    /* PCLK2 = HCLK / 2*/
+    RCC->CFGR |= RCC_CFGR_PPRE2_DIV2;
+
+    /* PCLK1 = HCLK / 2*/
+    RCC->CFGR |= RCC_CFGR_PPRE1_DIV2;
+
+    /* Configure the main PLL: VCO_in=(HSE / 4) -> 2MHz, VCO_out=VCO_in*48 -> 96MHz, fgen = (VCO_out/2) -> 48MHz, f_USB = (VCO_out/2) -> 48MHz */
+    RCC->PLLCFGR &= (uint32_t)((uint32_t)~(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLN |
+                                                                RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ));
+    RCC->PLLCFGR |= (uint32_t)(RCC_PLLCFGR_PLLSRC_HSE | (RCC_PLLCFGR_PLLM_0 * 4) | (RCC_PLLCFGR_PLLN_0 * 96) | /* VCO configuration = HSE / 4 * 96 = 192 MHz */
+                                                        (RCC_PLLCFGR_PLLP_0 * 1) | (RCC_PLLCFGR_PLLQ_0 * 4)); /* PLLP = 1 -> div by 4, PLLQ = 4 -> div by 4*/
+
+    /* Enable PLL */
+    RCC->CR |= RCC_CR_PLLON;
+
+    /* Wait till PLL is ready */
+    while((RCC->CR & RCC_CR_PLLRDY) == 0)
+    {
+    }
+
+    /* Select PLL as system clock source */
+    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
+    RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
+
+    /* Wait till PLL is used as system clock source */
+    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)RCC_CFGR_SWS_PLL)
+    {
+    }
+    /* enable MCO1 - HSE - no div */
+    RCC->CFGR |= (uint32_t)(RCC_CFGR_MCO1_PLL | RCC_CFGR_MCO1PRE_4);
+#define GPIO_AF_MCO 0
+    GPIO_PortInit_AFOut(GPIOA, 8, GPIO_AF_MCO);
+  }
+  else
+  { /* If HSE fails to start-up, the application will have wrong clock
+         configuration. User can add here some code to deal with this error */
+  }
 #endif
 }
+
+extern uint32_t SP_INIT;
+
 
 int main(void)
 {
   PLL_Init();
   SysTick_Init();
   LED3_Init();
+  LED3_Set(0);
+  LED3_Set(1);
   LED4_Init();
+  LED4_Set(0);
+  LED4_Set(1);
   LED5_Init();
+  LED5_Set(0);
+  LED5_Set(1);
   LED6_Init();
+  LED6_Set(0);
+  LED6_Set(1);
   PB13_Init();
   Button1_Init();
   DAC_Init();
