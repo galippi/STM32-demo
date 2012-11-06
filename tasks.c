@@ -33,4 +33,20 @@ void Task_10ms(void)
 {
   LED4_Set(!LED4_Get());
   DebugOut();
+  {
+    static uint8_t t_500ms = 0;
+    if (t_500ms >= 49)
+    {
+      t_500ms = 0;
+      Task_500ms();
+    }else
+    {
+      t_500ms++;
+    }
+  }
+}
+
+void Task_500ms(void)
+{
+  LED5_Set(!LED5_Get());
 }
