@@ -15,33 +15,22 @@ void Task_1ms(void)
   PB13_Set(!PB13_Get()); /* toggling debug port */
   {
     static uint16_t dac_val = 0;
-    static uint16_t t_ug;
-    t_ug++;
-    if (t_ug > 1950)
+    if (dac_val >= 0x1000)
     {
-      DAC_Set(0);
-      if (t_ug > 2000)
-      {
-        t_ug = 0;
-      }
+      DAC_Set(0x1FFF - dac_val);
     }else
     {
-      if (ADC_values[ADC_IN5_Ub] > (uint32_t)(0.7 * 4095/3.3))
-      {
-        dac_val++;
-      }else
-      {
-        if (dac_val > 0)
-        {
-          dac_val--;
-        }
-      }
       DAC_Set(dac_val);
     }
+    dac_val = (dac_val + 4) & 0x1FFF; /* 1sec rising / 1sec falling edge */
+  }
+  {
+    LED3_Set(!LED3_Get());
   }
 }
 
 void Task_10ms(void)
 {
+  LED4_Set(!LED4_Get());
   DebugOut();
 }
