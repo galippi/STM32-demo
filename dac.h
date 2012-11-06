@@ -7,9 +7,16 @@
 
 void DAC_Init(void);
 
-static inline void DAC_Set(uint16_t val)
+static inline void DAC_1_Set(uint16_t val)
 {
   DAC->DHR12R1 = val;
 }
+
+#if CPU_TYPE == CPU_TYPE_STM32F4
+static inline void DAC_2_Set(uint16_t val)
+{
+  DAC->DHR12R2 = val;
+}
+#endif
 
 #endif /* _DAC_H_ */

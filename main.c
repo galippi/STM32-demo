@@ -169,7 +169,7 @@ int main(void)
   PB13_Init();
   Button1_Init();
   DAC_Init();
-  DAC_Set((uint16_t)(1.1/VDD * 4096));
+  DAC_1_Set((uint16_t)(1.1/VDD * 4096));
   ADC_HandlerInit();
   UART2_Init();
   Task_Init();

@@ -17,10 +17,10 @@ void Task_1ms(void)
     static uint16_t dac_val = 0;
     if (dac_val >= 0x1000)
     {
-      DAC_Set(0x1FFF - dac_val);
+      DAC_1_Set(0x1FFF - dac_val);
     }else
     {
-      DAC_Set(dac_val);
+      DAC_1_Set(dac_val);
     }
     dac_val = (dac_val + 4) & 0x1FFF; /* 1sec rising / 1sec falling edge */
   }
