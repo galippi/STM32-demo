@@ -6,6 +6,7 @@ WARNINGS = -Wall -Wextra
 WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
 WARNINGS += -Wundef
 WARNINGS += -Wmissing-declarations
+WARNINGS += -Wmissing-prototypes -Wstrict-prototypes
 # stop at warnings
 WARNINGS += -Werror
 
@@ -55,6 +56,7 @@ CFILES  += uart.c
 CFILES  += tasks.c
 CFILES  += timer.c
 CFILES  += util.c
+CFILES  += vector.c
 #CFILES  += 
 
 SFILES  =

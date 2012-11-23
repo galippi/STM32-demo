@@ -15,6 +15,8 @@
 
 #include "tasks.h"
 
+#include "main.h"
+
 //#include "stm32f0xx_rcc.h"
 
 #define VDD 3.0 /* Volt */
@@ -183,4 +185,16 @@ int main(void)
   }
 
   return 0;
+}
+
+void ExceptionHandler(void)
+{
+  while(1)
+    ; /* endless loop */
+}
+
+void ISR_Invalid(void)
+{
+  while(1)
+    ; /* endless loop */
 }
