@@ -31,7 +31,6 @@ void Task_1ms(void)
 
 void Task_10ms(void)
 {
-  LED4_Set(!LED4_Get());
   DebugOut();
   {
     static uint8_t t_500ms = 0;
@@ -48,5 +47,13 @@ void Task_10ms(void)
 
 void Task_500ms(void)
 {
-  LED5_Set(!LED5_Get());
+  static uint8_t port;
+  if ((port == 0) || (port & (port - 1)) || (port > 4))
+  { /* invalid port value -> reinit it */
+    port = 1;
+  }
+  LED4_Set(port & 1);
+  LED5_Set(port & 2);
+  LED6_Set(port & 4);
+  port = port << 1;
 }
