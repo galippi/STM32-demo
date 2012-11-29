@@ -13,7 +13,7 @@
 #define LED4_PIN_NUM 8
 
 #elif TARGET_ECU == TARGET_ECU_STM32F4DISCOVERY
-/* port definition for STM32F0-discovery board */
+/* port definition for STM32F4-discovery board */
 #define LED3_PORT GPIOD
 #define LED3_PIN_NUM 13
 #define LED4_PORT GPIOD
