@@ -3,20 +3,24 @@
 
 #include <stdint.h>
 
-#include "controller.h"
+#include "dac_conf.h"
 
+#if (defined(DAC_1_ENABLED) || defined(DAC_2_ENABLED))
 void DAC_Init(void);
+#endif /* (defined(DAC_1_ENABLED) || defined(DAC_2_ENABLED)) */
 
+#if defined(DAC_1_ENABLED)
 static inline void DAC_1_Set(uint16_t val)
 {
   DAC->DHR12R1 = val;
 }
+#endif /* DAC_1_ENABLED */
 
-#if CPU_TYPE == CPU_TYPE_STM32F4
+#if defined(DAC_2_ENABLED)
 static inline void DAC_2_Set(uint16_t val)
 {
   DAC->DHR12R2 = val;
 }
-#endif
+#endif /* DAC_2_ENABLED */
 
 #endif /* _DAC_H_ */

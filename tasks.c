@@ -18,14 +18,13 @@ void Task_1ms(void)
     if (dac_val >= 0x1000)
     {
       DAC_1_Set(0x1FFF - dac_val);
+      DAC_2_Set(dac_val - 0x1000);
     }else
     {
       DAC_1_Set(dac_val);
+      DAC_2_Set(0x1000 - 1 - dac_val);
     }
     dac_val = (dac_val + 4) & 0x1FFF; /* 1sec rising / 1sec falling edge */
-  }
-  {
-    LED3_Set(!LED3_Get());
   }
 }
 
@@ -48,12 +47,13 @@ void Task_10ms(void)
 void Task_500ms(void)
 {
   static uint8_t port;
-  if ((port == 0) || (port & (port - 1)) || (port > 4))
+  if ((port == 0) || (port & (port - 1)) || (port > 8))
   { /* invalid port value -> reinit it */
     port = 1;
   }
-  LED4_Set(port & 1);
+  LED3_Set(port & 1);
   LED5_Set(port & 2);
   LED6_Set(port & 4);
+  LED4_Set(port & 8);
   port = port << 1;
 }
