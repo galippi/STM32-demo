@@ -14,7 +14,7 @@ uint8_t ADC_calibration = 64; /* calibration factor - default value -> no calibr
 
 void ADC_Init(void)
 {
-#if TARGET_ECU == TARGET_ECU_STM32F0DISCOVERY
+#if CPU_TYPE == CPU_TYPE_STM32F0
   if (!(RCC->APB2ENR & RCC_APB2Periph_ADC1))
   { /* enable the ADC1 */
     RCC->APB2ENR |= RCC_APB2Periph_ADC1;
@@ -52,5 +52,12 @@ void ADC_Init(void)
   ADC1->CHSELR = ADC_CHSELR_INIT;
   ADC1->IER = ADC_IER_INIT;
   ADC->CCR = ADC_CCR_INIT;
+#elif CPU_TYPE == CPU_TYPE_STM32F4
+/* Handler for STM32F4 */
+  if (!(RCC->APB2ENR & RCC_APB2ENR_ADC1EN))
+  { /* enable the ADC1 */
+    RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;
+  }
+  ADC->CCR = (ADC->CCR & 0xFF3C10E0) | ADC_CCR_INIT;
 #endif
 }
