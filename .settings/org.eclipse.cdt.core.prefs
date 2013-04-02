@@ -1,7 +1,6 @@
-#Thu Jun 21 16:17:02 CEST 2012
 eclipse.preferences.version=1
 environment/project/cdt.managedbuild.toolchain.gnu.cygwin.base.1437079084/PATH/delimiter=;
 environment/project/cdt.managedbuild.toolchain.gnu.cygwin.base.1437079084/PATH/operation=replace
-environment/project/cdt.managedbuild.toolchain.gnu.cygwin.base.1437079084/PATH/value=C\:\\DEVENV\\CYGWIN\\V1_7_9\\bin;C\:\\Programs\\Sourcery G++ Lite\\bin;C\:/Program Files/Java/jre6/bin/client;C\:/Program Files/Java/jre6/bin;C\:/Program Files/Java/jre6/lib/i386;C\:\\WINDOWS\\system32;C\:\\WINDOWS;C\:\\WINDOWS\\System32\\Wbem;C\:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0;C\:\\Data\\Liptak\\bat;C\:\\Program Files\\Eclipse
+environment/project/cdt.managedbuild.toolchain.gnu.cygwin.base.1437079084/PATH/value=C\:/KBApps/DevEnv/Cygwin/V1_7_9_advanced/bin;C\:\\KBApps\\yagarto\\bin;C\:/Program Files/Java/jre6/bin/client;C\:/Program Files/Java/jre6/bin;C\:/Program Files/Java/jre6/lib/i386;C\:\\WINDOWS\\system32;C\:\\WINDOWS;C\:\\WINDOWS\\System32\\Wbem;C\:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0;C\:\\Users\\Liptak\\bat;C\:\\Program Files\\Eclipse
 environment/project/cdt.managedbuild.toolchain.gnu.cygwin.base.1437079084/append=true
 environment/project/cdt.managedbuild.toolchain.gnu.cygwin.base.1437079084/appendContributed=true

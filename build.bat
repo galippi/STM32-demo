@@ -1,9 +1,9 @@
 @echo off
 rem echo 1=%1 2=%2
 rem path=C:\Programs\cygwin\bin;%PATH%
-path=C:\DEVENV\CYGWIN\V1_7_9\bin;%PATH%
+path=C:\KBApps\DevEnv\Cygwin\V1_7_9_advanced\bin;%PATH%
 ::path=C:\Programs\Sourcery G++ Lite\bin;%PATH%
-path=C:\Programs\yagarto\bin;%PATH%
+path=C:\KBApps\yagarto\bin;%PATH%
 rem set TMPDIR=c:\tmp
 set WORK_ROOT=%CD%
 
