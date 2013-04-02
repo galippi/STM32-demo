@@ -37,6 +37,8 @@
                         (16 << 15) /* ADC_TemperatureSensor*/ | \
                         (17 << 20) /* ADC_Vref */ | \
                         (18 << 25) /* ADC_VBat */ )
+#elif CPU_TYPE == CPU_TYPE_STM32F4
+#define ADC_CR_INIT     (ADC_CR_ADCAL | ADC_CR_ADEN)/* ADC calibration and enable it */
 #else
 #error "Error: TARGET_ECU is invalid!"
 #endif

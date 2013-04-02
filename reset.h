@@ -2,7 +2,7 @@
  *
  * \file
  * \ingroup RESET
- * \brief   ISR vector table
+ * \brief   Header file for reset module
  *
  * \details Fill me
  *
@@ -12,15 +12,8 @@
  ******************************************************************************/
 
 
-#ifndef _VECTOR_H_
-#define _VECTOR_H_
+#ifndef _RESET_H_
+#define _RESET_H_
+void reset(void);
 
-extern const uint32_t const *SP_INIT;
-
-typedef void (*t_func_ptr)(void);
-
-extern const t_func_ptr ISR_VectorTable[];
-
-void PendSV_Handler(void);
-
-#endif /* _VECTOR_H_ */
+#endif /* _RESET_H_ */

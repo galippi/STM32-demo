@@ -6,7 +6,7 @@
 //#include CONTROLLER_BASE_NAME#_rcc_h
 //#include CONTROLLER_BASE_NAME"_rcc.h"
 
-const uint16_t *TS_CAL1 = (uint16_t*)0x1FFFF7B8; /* ADC value of temp. sensor at 30C */
+const uint16_t const *TS_CAL1 = (uint16_t*)0x1FFFF7B8; /* ADC value of temp. sensor at 30C */
 const uint16_t *TS_CAL2 = (uint16_t*)0x1FFFF7C2; /* ADC value of temp. sensor at 110C */
 const uint16_t *VREFINT_CAL = (uint16_t*)0x1FFFF7BA; /* ADC value of reference voltage at 30C */
 
@@ -58,6 +58,7 @@ void ADC_Init(void)
   { /* enable the ADC1 */
     RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;
   }
+#if 0
   ADC->CCR = (ADC->CCR & 0xFF3C10E0) | ADC_CCR_INIT;
   ADC1->CR1 = (ADC1->CR1 & 0xF83F0000) | ADC1_CR1_INIT;
   ADC1->CR2 = (ADC1->CR2 & 0x8080F0FC) | (ADC1_CR2_INIT & (~ADC_CR2_ADON));
@@ -70,5 +71,6 @@ void ADC_Init(void)
   {
     ADC1->CR2 = ADC1->CR2 | ADC_CR2_ADON;
   }
+#endif
 #endif
 }

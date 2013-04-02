@@ -1,10 +1,11 @@
 
 #include "main.h"
+#include "ram_init.h"
 
-extern void reset(void);
-
+#include "reset.h"
 
 void reset(void)
 {
+  RAM_Init();
   main();
 }

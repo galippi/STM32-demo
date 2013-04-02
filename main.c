@@ -12,6 +12,7 @@
 #include "timer_app.h"
 #include "uart.h"
 #include "scheduler_preemptive.h"
+#include "vector.h"
 
 #include "tasks.h"
 
@@ -32,6 +33,8 @@ TIM_TypeDef * const tim3 = TIM3;
 USART_TypeDef * const uart2 = USART2;
 DMA_TypeDef * const dma1 = DMA1;
 //DMA_Channel_TypeDef * const dma1_4 = DMA1_Channel4;
+SCB_Type * const scb = SCB;
+NVIC_Type * const nvic = NVIC;
 
 uint32_t StartUpCounter;
 
@@ -149,8 +152,10 @@ static void PLL_Init(void)
 #endif
 }
 
-extern uint32_t SP_INIT;
+volatile uint32_t PendSV_Ctr;
 
+uint32_t BASEPRI_st_task[8];
+uint8_t BASEPRI_st_task_ctr = 0;
 
 int main(void)
 {
@@ -179,10 +184,28 @@ int main(void)
   TIM3_Init();
   TIM3_CCR1_Set(TIM3_Cnt_Get() + TIM3_FREQ); /* set the first scheduler interrupt to 1ms */
 
+#define VECT_TAB_OFFSET ((uint32_t)(&ISR_VectorTable[0]) & 0x1FFFFF80)
+  SCB->VTOR = SRAM_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM */
+  PendSV_Ctr = 0;
+  SCB->SHP[8] = 192;
+  SCB->SHP[9] = 164;
+  SCB->SHP[10] = 253;
+  SCB->SHP[11] = 252;
+  BASEPRI_st_task_ctr = 0;
+  BASEPRI_st_task[BASEPRI_st_task_ctr & 0x07] = __get_BASEPRI();
+  BASEPRI_st_task_ctr++;
+  {
+    uint32_t i;
+    for (i = 0; i < 32; i++) NVIC->IP[i] = 250 - (2 * i);
+  }
+
   while (1)
   {
     ADC_Handler();
     TIM3_UIF_PollHandler();
+    BASEPRI_st_task[BASEPRI_st_task_ctr & 0x07] = __get_BASEPRI();
+    BASEPRI_st_task_ctr++;
+    SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
   }
 
   return 0;
@@ -198,4 +221,53 @@ void ISR_Invalid(void)
 {
   while(1)
     ; /* endless loop */
+}
+
+#if       (__CORTEX_M >= 0x03)
+//#error _CORTEX_M >= 3
+static __INLINE uint32_t  __get_BASEPRI2(void)
+{
+  register uint32_t __regBasePri         __ASM("basepri");
+  return(__regBasePri);
+}
+#else
+#error _CORTEX_M < 3
+#endif
+
+uint32_t ICSR_st[8];
+uint32_t BASEPRI_st[8];
+uint32_t BASEPRI_st2[8];
+uint32_t BASEPRI_st3[8];
+void PendSV_Handler(void)
+{
+  uint32_t ctr;
+  PendSV_Ctr++;
+  ctr = PendSV_Ctr;
+  //ICSR_st[ctr % (sizeof(ICSR_st)/sizeof(ICSR_st[0]))] = SCB->ICSR;
+  ICSR_st[ctr & 0x07] = SCB->ICSR;
+  BASEPRI_st[ctr & 0x07] = __get_BASEPRI();
+  if ((ctr & 0x01) == 0)
+  {
+    SCB->SHP[8] -= 16;
+    SCB->SHP[9] -= 16;
+    SCB->SHP[10] -= 16;
+    SCB->SHP[11] -= 16;
+    {
+      uint32_t i;
+      for (i = 0; i < 32; i++) NVIC->IP[i] -= 8;
+    }
+    BASEPRI_st2[ctr & 0x07] = __get_BASEPRI();
+    SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+    BASEPRI_st3[ctr & 0x07] = __get_BASEPRI();
+    while (ctr == PendSV_Ctr)
+      ;
+    {
+      uint32_t i;
+      for (i = 0; i < 32; i++) NVIC->IP[i] += 8;
+    }
+    SCB->SHP[8] += 16;
+    SCB->SHP[9] += 16;
+    SCB->SHP[10] += 16;
+    SCB->SHP[11] += 16;
+  }
 }

@@ -1,26 +1,20 @@
 /******************************************************************************
  *
  * \file
- * \ingroup RESET
- * \brief   ISR vector table
+ * \ingroup RAM_INIT
+ * \brief   Template sourcefile of Template Component.
  *
  * \details Fill me
  *
  ******************************************************************************/
-/** \addtogroup RESET
+/** \addtogroup RAM_INIT
  *  @{
  ******************************************************************************/
 
 
-#ifndef _VECTOR_H_
-#define _VECTOR_H_
+#ifndef _RAM_INIT_H_
+#define _RAM_INIT_H_
 
-extern const uint32_t const *SP_INIT;
+void RAM_Init(void);
 
-typedef void (*t_func_ptr)(void);
-
-extern const t_func_ptr ISR_VectorTable[];
-
-void PendSV_Handler(void);
-
-#endif /* _VECTOR_H_ */
+#endif /* _RAM_INIT_H_ */
