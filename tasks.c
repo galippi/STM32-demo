@@ -31,15 +31,19 @@ void Task_1ms(void)
   }
 }
 
+#include "scheduler_preemptive.h"
+
+volatile uint8_t Task_10ms_ctr;
+
 void Task_10ms(void)
 {
+  Task_10ms_ctr++;
   DebugOut();
   {
     uint8_t old_u8 = Task_1ms_ctr;
     while (old_u8 == Task_1ms_ctr)
     {
       /* wait the activity of the 1ms task - testing nested/preemptive interrupt */
-#include "scheduler_preemptive.h"
       SchedulerPre_TaskTableUpdate(); /* simulating 1ms timer */
     }
   }
@@ -57,4 +61,9 @@ void Task_500ms(void)
   LED6_Set(port & 4);
   LED4_Set(port & 8);
   port = port << 1;
+  uint8_t old_u8 = Task_10ms_ctr;
+  while ((Task_10ms_ctr - old_u8) < 5)
+  {
+    SchedulerPre_TaskTableUpdate(); /* simulating 1ms timer */
+  }
 }
