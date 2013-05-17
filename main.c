@@ -261,18 +261,12 @@ static __INLINE uint32_t  __get_BASEPRI2(void)
 extern void svc_ret(void);
 void svc_ret(void)
 {
-# if 1
   // ???????????????????????????????
-  __ASM("CPSIE i"); /* enable interrupts to allow SVCall exception*/
+  //__ASM("CPSIE i"); /* enable interrupts to allow SVCall exception*/
   /*
    * FPU handling
    */
   __ASM("SVC #0");
-#else
-  __ASM("MOVS r0,#0x6");
-  __ASM("MVNS r0,r0"); /* r0:=~0x6=0xFFFFFFF9 */
-  __ASM("BX r0"); /* exception-return to the scheduler */
-#endif
 }
 
 /* INTERRUPT */ void PendSV_Handler(void)
