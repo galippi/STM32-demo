@@ -10,11 +10,6 @@ static inline void TIM3_UIF_PollHandler(void)
   }
 }
 
-static inline void TIM3_CC1IF_Callback(void)
-{ /* call back function of TIM3 UIF - counter underflow */
-  Scheduler();
-}
-
 static inline void TIM3_CC1IF_PollHandler(void)
 {
   if (TIM3_SR_CC1IF_Get())

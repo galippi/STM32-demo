@@ -10,8 +10,11 @@ void Task_Init(void)
   DebugOut_Init();
 }
 
+volatile uint8_t Task_1ms_ctr;
+
 void Task_1ms(void)
 {
+  Task_1ms_ctr++;
   PB13_Set(!PB13_Get()); /* toggling debug port */
   {
     static uint16_t dac_val = 0;
@@ -32,14 +35,12 @@ void Task_10ms(void)
 {
   DebugOut();
   {
-    static uint8_t t_500ms = 0;
-    if (t_500ms >= 49)
+    uint8_t old_u8 = Task_1ms_ctr;
+    while (old_u8 == Task_1ms_ctr)
     {
-      t_500ms = 0;
-      Task_500ms();
-    }else
-    {
-      t_500ms++;
+      /* wait the activity of the 1ms task - testing nested/preemptive interrupt */
+#include "scheduler_preemptive.h"
+      SchedulerPre_TaskTableUpdate(); /* simulating 1ms timer */
     }
   }
 }

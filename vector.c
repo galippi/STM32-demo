@@ -22,16 +22,16 @@ t_func_ptr const ISR_VectorTable[] =
 {
   (const t_func_ptr) &SP_INIT, /* stack top address */
   reset,             /* 1 Reset */
-  ExceptionHandler,  /* 2 NMI */
-  ExceptionHandler,  /* 3 HardFault */
-  ExceptionHandler,  /* 4 MemManage */
-  ExceptionHandler,  /* 5 BusFault */
-  ExceptionHandler,  /* 6 UsageFault */
+  ExceptionHandler_0,/* 2 NMI */
+  ExceptionHandler_1,/* 3 HardFault */
+  ExceptionHandler_2,/* 4 MemManage */
+  ExceptionHandler_3,/* 5 BusFault */
+  ExceptionHandler_4,/* 6 UsageFault */
   ISR_Invalid,       /* 7 RESERVED */
   ISR_Invalid,       /* 8 RESERVED */
   ISR_Invalid,       /* 9 RESERVED*/
   ISR_Invalid,       /* 10 RESERVED */
-  ISR_Invalid,       /* 11 SVCall */
+  SVC_Handler,       /* 11 SVCall */
   ISR_Invalid,       /* 12 Debug Monitor */
   ISR_Invalid,       /* 13 RESERVED */
   PendSV_Handler,    /* 14 PendSV */

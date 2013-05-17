@@ -13,6 +13,7 @@
 #include "uart.h"
 #include "scheduler_preemptive.h"
 #include "vector.h"
+#include "FaultHandler.h"
 
 #include "tasks.h"
 
@@ -187,10 +188,14 @@ int main(void)
 #define VECT_TAB_OFFSET ((uint32_t)(&ISR_VectorTable[0]) & 0x1FFFFF80)
   SCB->VTOR = SRAM_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM */
   PendSV_Ctr = 0;
-  SCB->SHP[8] = 192;
-  SCB->SHP[9] = 164;
-  SCB->SHP[10] = 253;
-  SCB->SHP[11] = 252;
+#if CPU_TYPE == CPU_TYPE_STM32F4
+  /* set PENDSV prio to 0xFF */
+  SCB->SHP[14-4] = 0xFF;
+  /* set SVC prio to 0x00 */
+  SCB->SHP[11-4] = 0x00;
+#else
+#error CPU type is not supported yet!
+#endif
   BASEPRI_st_task_ctr = 0;
   BASEPRI_st_task[BASEPRI_st_task_ctr & 0x07] = __get_BASEPRI();
   BASEPRI_st_task_ctr++;
@@ -205,16 +210,35 @@ int main(void)
     TIM3_UIF_PollHandler();
     BASEPRI_st_task[BASEPRI_st_task_ctr & 0x07] = __get_BASEPRI();
     BASEPRI_st_task_ctr++;
-    SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+    //SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
   }
 
   return 0;
 }
 
-void ExceptionHandler(void)
+void ExceptionHandler_0(void)
 {
-  while(1)
-    ; /* endless loop */
+  CAT_Error(CAT_Exception_0);
+}
+
+void ExceptionHandler_1(void)
+{
+  CAT_Error(CAT_Exception_1);
+}
+
+void ExceptionHandler_2(void)
+{
+  CAT_Error(CAT_Exception_2);
+}
+
+void ExceptionHandler_3(void)
+{
+  CAT_Error(CAT_Exception_3);
+}
+
+void ExceptionHandler_4(void)
+{
+  CAT_Error(CAT_Exception_4);
 }
 
 void ISR_Invalid(void)
@@ -234,40 +258,50 @@ static __INLINE uint32_t  __get_BASEPRI2(void)
 #error _CORTEX_M < 3
 #endif
 
-uint32_t ICSR_st[8];
-uint32_t BASEPRI_st[8];
-uint32_t BASEPRI_st2[8];
-uint32_t BASEPRI_st3[8];
-void PendSV_Handler(void)
+extern void svc_ret(void);
+void svc_ret(void)
 {
-  uint32_t ctr;
-  PendSV_Ctr++;
-  ctr = PendSV_Ctr;
-  //ICSR_st[ctr % (sizeof(ICSR_st)/sizeof(ICSR_st[0]))] = SCB->ICSR;
-  ICSR_st[ctr & 0x07] = SCB->ICSR;
-  BASEPRI_st[ctr & 0x07] = __get_BASEPRI();
-  if ((ctr & 0x01) == 0)
-  {
-    SCB->SHP[8] -= 16;
-    SCB->SHP[9] -= 16;
-    SCB->SHP[10] -= 16;
-    SCB->SHP[11] -= 16;
-    {
-      uint32_t i;
-      for (i = 0; i < 32; i++) NVIC->IP[i] -= 8;
-    }
-    BASEPRI_st2[ctr & 0x07] = __get_BASEPRI();
-    SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
-    BASEPRI_st3[ctr & 0x07] = __get_BASEPRI();
-    while (ctr == PendSV_Ctr)
-      ;
-    {
-      uint32_t i;
-      for (i = 0; i < 32; i++) NVIC->IP[i] += 8;
-    }
-    SCB->SHP[8] += 16;
-    SCB->SHP[9] += 16;
-    SCB->SHP[10] += 16;
-    SCB->SHP[11] += 16;
-  }
+# if 1
+  // ???????????????????????????????
+  __ASM("CPSIE i"); /* enable interrupts to allow SVCall exception*/
+  /*
+   * FPU handling
+   */
+  __ASM("SVC #0");
+#else
+  __ASM("MOVS r0,#0x6");
+  __ASM("MVNS r0,r0"); /* r0:=~0x6=0xFFFFFFF9 */
+  __ASM("BX r0"); /* exception-return to the scheduler */
+#endif
+}
+
+/* INTERRUPT */ void PendSV_Handler(void)
+{
+  //PendSV_Ctr++;
+  //SchedulerPre_TaskManagement();
+  __ASM("MOVS r3,#1");
+  __ASM("LSLS r3,r3,#24"); /* r3:=(1 << 24), set the T bit (new xpsr) */
+  __ASM("LDR r2,=SchedulerPre_TaskManagement"); /* address of the QK scheduler (new pc) */
+  __ASM("LDR r1,=svc_ret"); /* return address after the call (new lr) */
+  __ASM("PUSH {r1-r3}"); /* push xpsr,pc,lr */
+  __ASM("SUB sp,sp,#(4*4)"); /* don't care for r12,r3,r2,r1 */
+  __ASM("PUSH {r0}"); /* push the prio argument (new r0) */
+  __ASM("MOVS r0,#0x6");
+  __ASM("MVNS r0,r0"); /* r0:=~0x6=0xFFFFFFF9 */
+  __ASM("BX r0"); /* exception-return to the scheduler */
+}
+
+/* INTERRUPT */ void SVC_Handler(void)
+{
+  //__ASM("ADD sp,sp,#(1*4)"); /* pop the pushed stack */
+#if 1
+  /* remove one 8-register exception frame */
+  __ASM("ADD sp,sp,#(8*4)");
+#else
+  /* remove one 8-register exception frame */
+  /* plus the "aligner" from the stack */
+  __ASM("ADD sp,sp,#(9*4)");
+#endif
+  /* return to the preempted task */
+  __ASM("BX lr"); /* exception-return to the scheduler */
 }

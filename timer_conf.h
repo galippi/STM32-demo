@@ -13,9 +13,15 @@
 #define TIM3_CCMR1_INIT 0x0000
 #define TIM3_CCMR2_INIT 0x0000
 
+static inline void TIM3_CC1IF_Callback(void)
+{ /* call back function of TIM3 UIF - counter underflow */
+  SchedulerPre_TaskTableUpdate();
+}
+
+
 static inline void TIM3_UIF_Callback(void)
 { /* call back function of TIM3 UIF - counter underflow */
-  Scheduler();
+  SchedulerPre_TaskTableUpdate();
 }
 
 #endif /* _TIMER_CONF_H_ */

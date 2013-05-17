@@ -35,4 +35,6 @@
 //#define RCC_HEADER STM32_HEADER("_rcc.h")
 //#define RCC_HEADER RCC_HEADER_
 
+#define INTERRUPT __attribute__((__interrupt__))
+
 #endif /* _CONTROLLER_H_ */
