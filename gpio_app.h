@@ -5,6 +5,17 @@
 
 #include "gpio.h"
 
+static inline void GPIO_Set(GPIO_TypeDef *port, uint32_t pin_num, uint32_t val)
+{
+  if (val)
+  {
+    port->ODR |= (1 << pin_num);
+  }else
+  {
+    port->ODR &= ~(1 << pin_num);
+  }
+}
+
 #if TARGET_ECU == TARGET_ECU_STM32F0DISCOVERY
 /* port definition for STM32F0-discovery board */
 #define LED3_PORT GPIOC
