@@ -9,16 +9,12 @@ typedef enum {
   CAT_Exception_2,
   CAT_Exception_3,
   CAT_Exception_4,
+  CAT_InvalidISR,
   CAT_TaskOverrun_1ms,
   CAT_TaskOverrun_10ms,
   CAT_TaskOverrun_500ms,
-}t_CAN_ErrorCode;
+}t_CAT_ErrorCode;
 
-static inline void CAT_Error(t_CAN_ErrorCode code)
-{
-  (void)code;
-  while(1)
-    ; /* endless loop */
-}
+void CAT_Error(t_CAT_ErrorCode _code);
 
 #endif /* _FAULTHANDLER_H_ */

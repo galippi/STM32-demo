@@ -51,6 +51,7 @@ CFILES  += main.c
 CFILES  += adc.c
 CFILES  += adc_app.c
 CFILES  += dac.c
+CFILES  += FaultHandler.c
 CFILES  += debug.c
 CFILES  += gpio.c
 CFILES  += ram_init.c
