@@ -42,12 +42,11 @@ t_func_ptr const ISR_VectorTable[] =
   ISR_Invalid,       /* 19 */
   ISR_Invalid,       /* 20 */
   ISR_Invalid,       /* 21 */
-  ISR_Invalid,       /* 22 */
-  ISR_Invalid,       /* 23 External Interrupt(0) */
-  ISR_Invalid,       /* 24 External Interrupt(1) */
-  ISR_Invalid,       /* 25 External Interrupt(2) */
-  ISR_Invalid,       /* 26 External Interrupt(3) */
-  ISR_Invalid,       /* 27 External Interrupt(4) */
+  ISR_Invalid,       /* 22 External Interrupt(0) */
+  ISR_Invalid,       /* 23 External Interrupt(1) */
+  ISR_Invalid,       /* 24 External Interrupt(2) */
+  ISR_Invalid,       /* 25 External Interrupt(3) */
+  ISR_Invalid,       /* 26 External Interrupt(4) */
   ISR_Invalid,       /*  DMA1 */
   ISR_Invalid,       /*  DMA1 */
   ISR_Invalid,       /*  DMA1 */
@@ -66,7 +65,7 @@ t_func_ptr const ISR_VectorTable[] =
   ISR_Invalid,       /*  TIM1 */
   ISR_Invalid,       /*  TIM1 */
   ISR_Invalid,       /*  TIM2 */
-  ISR_Invalid,       /*  TIM3 */
+  TIM3_ISR,          /*  TIM3 */
   ISR_Invalid,       /*  TIM4 */
   ISR_Invalid,       /*  I2C1 */
   ISR_Invalid,       /*  I2C1 */

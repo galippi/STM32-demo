@@ -32,5 +32,6 @@ void TIM3_Init(void)
   TIM3->CCMR1 = TIM3_CCMR1_INIT;
   TIM3->CCMR2 = TIM3_CCMR2_INIT;
   TIM3->SR = 0x0000; /* clear all IT requests */
+  TIM3->DIER = (TIM3->DIER & 0xA0A0) | 0x0001; /* enable update interrupt */
   TIM3->CR1 |= 1; /* enable timer */
 }

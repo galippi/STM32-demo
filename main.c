@@ -182,8 +182,6 @@ int main(void)
   ADC_HandlerInit();
   UART2_Init();
   Task_Init();
-  TIM3_Init();
-  TIM3_CCR1_Set(TIM3_Cnt_Get() + TIM3_FREQ); /* set the first scheduler interrupt to 1ms */
 
 #define VECT_TAB_OFFSET ((uint32_t)(&ISR_VectorTable[0]) & 0x1FFFFF80)
   SCB->VTOR = SRAM_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM */
@@ -196,18 +194,23 @@ int main(void)
 #else
 #error CPU type is not supported yet!
 #endif
+  NVIC->ISER[29/32] = NVIC->ISER[29/32] | (1 << (29%32)); /* enable TIM3 interrupt */
+  NVIC->IP[29] = 128; /* set TIM3 interrupt priority to medium */
+  TIM3_Init();
+  //TIM3_CCR1_Set(TIM3_Cnt_Get() + TIM3_FREQ); /* set the first scheduler interrupt to 1ms */
+
   BASEPRI_st_task_ctr = 0;
   BASEPRI_st_task[BASEPRI_st_task_ctr & 0x07] = __get_BASEPRI();
   BASEPRI_st_task_ctr++;
   {
-    uint32_t i;
-    for (i = 0; i < 32; i++) NVIC->IP[i] = 250 - (2 * i);
+    //uint32_t i;
+    //for (i = 0; i < 26; i++) NVIC->IP[i] = 250 - (2 * i);
   }
 
   while (1)
   {
     ADC_Handler();
-    TIM3_UIF_PollHandler();
+    //TIM3_UIF_PollHandler();
     BASEPRI_st_task[BASEPRI_st_task_ctr & 0x07] = __get_BASEPRI();
     BASEPRI_st_task_ctr++;
     //SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
@@ -241,10 +244,41 @@ void ExceptionHandler_4(void)
   CAT_Error(CAT_Exception_4);
 }
 
+INTERRUPT void TIM3_ISR(void)
+{
+  if (TIM3_SR_UIF_Get())
+  {
+    TIM3_SR_UIF_Reset();
+    TIM3_UIF_Callback();
+  }else
+  {
+    CAT_Error(CAT_InvalidISR);
+  }
+}
+
+void ISR_Invalid0(void)
+{
+  CAT_Error(CAT_InvalidISR);
+}
+
+void ISR_Invalid1(void)
+{
+  CAT_Error(CAT_InvalidISR);
+}
+
+void ISR_Invalid2(void)
+{
+  CAT_Error(CAT_InvalidISR);
+}
+
+void ISR_Invalid3(void)
+{
+  CAT_Error(CAT_InvalidISR);
+}
+
 void ISR_Invalid(void)
 {
-  while(1)
-    ; /* endless loop */
+  CAT_Error(CAT_InvalidISR);
 }
 
 #if       (__CORTEX_M >= 0x03)
