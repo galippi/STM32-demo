@@ -34,7 +34,7 @@ LDLIBS :=
 LDLIBS += -lgcc
 
 ##################################################################
-TARGET=blinker02.gcc.thumb
+TARGET=demo1
 TARGET_DIR=bin
 DUMMY_DIR_FILE = $(TARGET_DIR)/dummy
 
