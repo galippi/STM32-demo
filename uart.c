@@ -18,7 +18,7 @@ void UART2_Init(void)
 #if F_SYSTEM == 48000
   USART2->BRR = 192; /* 48MHz / 250kBaud */
 #else
-#error "USART2_BRR must be adapted for system frquency!"
+#error "USART2_BRR must be adapted for system frequency!"
 #endif
   USART2->CR2 = 0; /* 1 stop bit */
   USART2->CR3 = 0x80; /* DMA is enabled for the channel */
