@@ -16,6 +16,8 @@
 
 #include "stm32f0xx.h"
 #define CONTROLLER_BASE_NAME stm32f0xx
+#define STM32_RCC_HEADER "stm32f0xx_rcc.h"
+#define STM32_GPIO_HEADER "stm32f0xx_gpio.h"
 
 #elif TARGET_ECU == TARGET_ECU_STM32F4DISCOVERY
 
