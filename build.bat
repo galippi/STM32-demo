@@ -1,11 +1,6 @@
 @echo off
-rem echo 1=%1 2=%2
-rem path=C:\Programs\cygwin\bin;%PATH%
-path=C:\DEVENV\CYGWIN\V1_7_9\bin;%PATH%
-::path=C:\Programs\Sourcery G++ Lite\bin;%PATH%
-path=C:\Programs\yagarto\bin;%PATH%
-rem set TMPDIR=c:\tmp
+path=C:\Programok\cygwin64\bin;%PATH%
+path=C:\Programok\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\bin;%PATH%
 set WORK_ROOT=%CD%
 
-::bash -i -c "make -d -r -C $WORK_ROOT %1 %2 %3 %4"
-bash -i -c "make -r -C $WORK_ROOT %1 %2 %3 %4"
+bash -i -c "make -r -C $WORK_ROOT %*"
