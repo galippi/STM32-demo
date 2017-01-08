@@ -5,6 +5,7 @@
 
 #include STM32_GPIO_HEADER
 
+#if (CPU_TYPE == CPU_TYPE_STM32F0) || (CPU_TYPE == CPU_TYPE_STM32F4)
 static inline void GPIO_PortEnable(GPIO_TypeDef * const gpio)
 {
   if (gpio == GPIOA)
@@ -103,3 +104,58 @@ void GPIO_PortInit_Analog(GPIO_TypeDef * const gpio, uint8_t portnum)
   //gpio->PUPDR = GPIO_PuPd_NOPULL << (portnum * 2);
   BitfieldSet(gpio->PUPDR, portnum * 2, 2, GPIO_PuPd_NOPULL);
 }
+#elif (CPU_TYPE == CPU_TYPE_STM32F1)
+
+static inline void GPIO_PortEnable(GPIO_TypeDef * const gpio)
+{
+  RCC->APB1ENR |= RCC_APB1ENR_PWREN;
+  if (gpio == GPIOA)
+  { /* enable the GPIO-A */
+    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
+  }else
+  if (gpio == GPIOB)
+  { /* enable the GPIO-B */
+    RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
+  }else
+  if (gpio == GPIOC)
+  { /* enable the GPIO-C */
+    RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
+  }else
+  if (gpio == GPIOD)
+  { /* enable the GPIO-D */
+    RCC->APB2ENR |= RCC_APB2ENR_IOPDEN;
+  }else
+    CAT_Error(1);
+}
+
+void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum)
+{
+  GPIO_PortEnable(gpio);
+  if (portnum < 8)
+  {
+  	// the port is set to push-pull output with 50MHz
+    BitfieldSet(gpio->CRL, portnum * 4, 4, ((GPIO_Mode_Out_PP & 0x0F) | GPIO_Speed_50MHz));
+  }else
+  {
+  	// the port is set to push-pull output with 50MHz
+    BitfieldSet(gpio->CRH, (portnum - 8) * 4, 4, ((GPIO_Mode_Out_PP & 0x0F) | GPIO_Speed_50MHz));
+  }
+}
+
+void GPIO_PortInit_In(GPIO_TypeDef * const gpio, uint8_t portnum)
+{
+  GPIO_PortEnable(gpio);
+  if (portnum < 8)
+  {
+  	// the port is set to floating input
+    BitfieldSet(gpio->CRL, portnum * 4, 4, GPIO_Mode_IN_FLOATING);
+  }else
+  {
+  	// the port is set to floating input
+    BitfieldSet(gpio->CRH, (portnum - 8) * 4, 4, GPIO_Mode_IN_FLOATING);
+  }
+}
+
+#else
+#error Not implemented CPU type!
+#endif
