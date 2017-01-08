@@ -29,6 +29,18 @@
 #define STM32_ADC_HEADER "stm32f4xx_adc.h"
 #define STM32_GPIO_HEADER "stm32f4xx_gpio.h"
 
+#elif TARGET_ECU == TARGET_ECU_STM32F103C8_ARDUINO
+
+#define CPU_TYPE CPU_TYPE_STM32F1
+
+#define STM32F10X_MD 1 /* Medium-density devices */
+
+#include "stm32f10x.h"
+#define CONTROLLER_BASE_NAME "stm32f10x"
+#define STM32_RCC_HEADER "stm32f10x_rcc.h"
+#define STM32_ADC_HEADER "stm32f10x_adc.h"
+#define STM32_GPIO_HEADER "stm32f10x_gpio.h"
+
 #endif
 
 //#define STM32_HEADER(ext) CONTROLLER_BASE_NAME##ext
