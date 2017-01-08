@@ -1,6 +1,5 @@
 #include "gpio_app.h"
 #include "debug.h"
-#include "dac.h"
 #include "adc_app.h"
 
 #include "tasks.h"
@@ -19,7 +18,6 @@ void Task_1ms(void)
     t_ug++;
     if (t_ug > 1950)
     {
-      DAC_Set(0);
       if (t_ug > 2000)
       {
         t_ug = 0;
@@ -36,7 +34,6 @@ void Task_1ms(void)
           dac_val--;
         }
       }
-      DAC_Set(dac_val);
     }
   }
 }
