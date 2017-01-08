@@ -3,11 +3,6 @@
 
 #include <stdint.h>
 
-static inline void CAT_Error(uint8_t code)
-{
-  (void)code;
-  while(1)
-    ; /* endless loop */
-}
+void CAT_Error(uint8_t code);
 
 #endif /* _FAULTHANDLER_H_ */
