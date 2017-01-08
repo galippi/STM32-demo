@@ -44,4 +44,23 @@ void Task_1ms(void)
 void Task_10ms(void)
 {
   DebugOut();
+  {
+	  static uint8_t timer = 200;
+	  if (timer == 0)
+	  {
+		  static uint8_t l3;
+		  LED3_Set(l3);
+		  l3 = !l3;
+		  timer = 200;
+	  }else
+	  {
+		  if ((timer == 50) || (timer == 150))
+		  {
+		    static uint8_t l4;
+        LED4_Set(l4);
+        l4 = !l4;
+		  }
+		  timer--;
+	  }
+  }
 }
