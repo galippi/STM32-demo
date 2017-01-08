@@ -2,6 +2,8 @@
 
 #include "dac.h"
 
+DAC_TypeDef * const dac = DAC;
+
 void DAC_Init(void)
 {
   /* enable the DAC, if it was not enabled */
