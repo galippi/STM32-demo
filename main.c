@@ -4,7 +4,6 @@
 #include "gpio_app.h"
 #include "adc.h"
 #include "adc_app.h"
-#include "dac.h"
 #include "timer.h"
 #include "util.h"
 #include "system_conf.h"
@@ -15,8 +14,6 @@
 
 #include "tasks.h"
 
-//#include "stm32f0xx_rcc.h"
-
 #define VDD 3.0 /* Volt */
 
 GPIO_TypeDef * const gpioa = GPIOA;
@@ -24,7 +21,6 @@ GPIO_TypeDef * const gpiob = GPIOB;
 GPIO_TypeDef * const gpioc = GPIOC;
 RCC_TypeDef * const rcc = RCC;
 SysTick_Type * const systick = SysTick;
-DAC_TypeDef * const dac = DAC;
 ADC_TypeDef * const adc1 = ADC1;
 TIM_TypeDef * const tim3 = TIM3;
 USART_TypeDef * const uart2 = USART2;
@@ -84,6 +80,54 @@ static void PLL_Init(void)
   { /* If HSE fails to start-up, the application will have wrong clock
          configuration. User can add here some code to deal with this error */
   }
+#elif TARGET_ECU == TARGET_ECU_STM32F103C8_ARDUINO
+  /* Enable HSE - high speed external oscillator */
+  RCC->CR |= (uint32_t)(RCC_CR_HSEON);
+
+  StartUpCounter = 0;
+  /* Wait till HSE is ready and if Time out is reached exit */
+  while(((RCC->CR & RCC_CR_HSERDY) == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT))
+  {
+    StartUpCounter++;
+  }
+  if ((RCC->CR & RCC_CR_HSERDY))
+  {
+    /* Enable Prefetch Buffer and set Flash Latency */
+    FLASH->ACR = FLASH_ACR_PRFTBE | FLASH_ACR_LATENCY;
+
+    /* HCLK = SYSCLK = 48MHz*/
+    RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
+
+    /* PCLK = HCLK / 2 = 24 MHz */
+    RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2;
+
+
+    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
+    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL12); /* PLL configuration = HSE / 2 * 12 = 48 MHz */
+
+    /* Enable PLL */
+    RCC->CR |= RCC_CR_PLLON;
+
+    /* Wait till PLL is ready */
+    while((RCC->CR & RCC_CR_PLLRDY) == 0)
+    {
+    }
+
+    /* Select PLL as system clock source */
+    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
+    RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
+
+    /* Wait till PLL is used as system clock source */
+    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)RCC_CFGR_SWS_PLL)
+    {
+    }
+  }
+  else
+  { /* If HSE fails to start-up, the application will have wrong clock
+         configuration. User can add here some code to deal with this error */
+  }
+#else
+#error CPU type is not yet implemented!
 #endif
 }
 
@@ -92,13 +136,17 @@ int main(void)
   PLL_Init();
   SysTick_Init();
   LED3_Init();
+  LED3_Set(0);
+  LED3_Set(1);
+  LED3_Set(0);
+  LED3_Set(1);
+  LED3_Set(0);
+  LED3_Set(1);
   LED4_Init();
   LED5_Init();
   LED6_Init();
   PB13_Init();
   Button1_Init();
-  DAC_Init();
-  DAC_Set((uint16_t)(1.1/VDD * 4096));
   ADC_HandlerInit();
   UART2_Init();
   Task_Init();
