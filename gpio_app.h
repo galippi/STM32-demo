@@ -12,6 +12,11 @@
 #define LED4_PORT GPIOC
 #define LED4_PIN_NUM 8
 
+#elif TARGET_ECU == TARGET_ECU_STM32F103C8_ARDUINO
+/* port definition for STM32F103C8 Arduino board */
+#define LED3_PORT GPIOC
+#define LED3_PIN_NUM 13
+
 #elif TARGET_ECU == TARGET_ECU_STM32F4DISCOVERY
 /* port definition for STM32F4-discovery board */
 #define LED3_PORT GPIOD
@@ -50,7 +55,7 @@ static inline uint8_t Button1_Get(void)
   }
 
 #define LEDx_Set(x) \
-  static inline void LED##x##_Set(uint8_t val) \
+  static /*inline*/ void LED##x##_Set(uint8_t val) \
   { \
     if (val) \
     { \
@@ -64,8 +69,13 @@ static inline uint8_t Button1_Get(void)
 LEDx_Init(3)
 LEDx_Set(3)
 
+#ifdef LED4_PORT
 LEDx_Init(4)
 LEDx_Set(4)
+#else
+#define LED4_Init() {/* do nothing */}
+#define LED4_Set(x) {/* do nothing */}
+#endif
 
 #ifdef LED5_PORT
 LEDx_Init(5)
