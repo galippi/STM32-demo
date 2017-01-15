@@ -4,4 +4,4 @@
 load
 monitor reset
 monitor halt
-set $pc = (0x20000050)
+#set $pc = (0x20000050)
