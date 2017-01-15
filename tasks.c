@@ -116,8 +116,8 @@ void Task_500ms(void)
 		  pulseTimer = 2;
 			break;
 		default:
-			CAT_Error(2);
-			break;
+                  CAT_Error(CAT_VarInvalidValue, 0);
+                  break;
 		}
 	}else
 	{

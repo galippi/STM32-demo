@@ -15,6 +15,7 @@ typedef enum {
   CAT_TaskOverrun_10ms,
   CAT_TaskOverrun_500ms,
   CAT_InvalidParameter,
+  CAT_VarInvalidValue,
 }t_CAT_ErrorCode;
 
 void CAT_Error(t_CAT_ErrorCode Code, uint32_t SubCode);

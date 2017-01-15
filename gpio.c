@@ -40,7 +40,7 @@ static inline void GPIO_PortEnable(GPIO_TypeDef * const gpio)
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
 #endif
   }else
-    CAT_Error(1);
+    CAT_Error(CAT_InvalidParameter, 0);
 }
 
 void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum)
@@ -125,7 +125,7 @@ static inline void GPIO_PortEnable(GPIO_TypeDef * const gpio)
   { /* enable the GPIO-D */
     RCC->APB2ENR |= RCC_APB2ENR_IOPDEN;
   }else
-    CAT_Error(1);
+    CAT_Error(CAT_InvalidParameter, 1);
 }
 
 void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum)
