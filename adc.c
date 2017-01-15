@@ -6,9 +6,9 @@
 //#include CONTROLLER_BASE_NAME#_rcc_h
 //#include CONTROLLER_BASE_NAME"_rcc.h"
 
-const uint16_t *TS_CAL1 = (uint16_t*)0x1FFFF7B8; /* ADC value of temp. sensor at 30C */
-const uint16_t *TS_CAL2 = (uint16_t*)0x1FFFF7C2; /* ADC value of temp. sensor at 110C */
-const uint16_t *VREFINT_CAL = (uint16_t*)0x1FFFF7BA; /* ADC value of reference voltage at 30C */
+const uint16_t * const TS_CAL1 = (uint16_t*)0x1FFFF7B8; /* ADC value of temp. sensor at 30C */
+const uint16_t * const TS_CAL2 = (uint16_t*)0x1FFFF7C2; /* ADC value of temp. sensor at 110C */
+const uint16_t * const VREFINT_CAL = (uint16_t*)0x1FFFF7BA; /* ADC value of reference voltage at 30C */
 
 uint8_t ADC_calibration = 64; /* calibration factor - default value -> no calibration */
 

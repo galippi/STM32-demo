@@ -3,9 +3,9 @@
 
 #include "controller.h"
 
-extern const uint16_t *TS_CAL1; /* ADC value of temp. sensor at 30C */
-extern const uint16_t *TS_CAL2; /* ADC value of temp. sensor at 110C */
-extern const uint16_t *VREFINT_CAL; /* ADC value of reference voltage at 30C */
+extern const uint16_t * const TS_CAL1; /* ADC value of temp. sensor at 30C */
+extern const uint16_t * const TS_CAL2; /* ADC value of temp. sensor at 110C */
+extern const uint16_t * const VREFINT_CAL; /* ADC value of reference voltage at 30C */
 
 extern uint8_t ADC_calibration; /* calibration factor */
 
