@@ -27,7 +27,8 @@ OBJDUMP = $(ARMGNU)objdump
 
 CFLAGS_TARGET := -mthumb
 #CFLAGS_TARGET += -mcpu=cortex-m0
-CFLAGS_TARGET += -mcpu=cortex-m4
+CFLAGS_TARGET += -mcpu=cortex-m3
+#CFLAGS_TARGET += -mcpu=cortex-m4
 #CFLAGS_TARGET += -march=armv7-m
 
 #LDFLAGS_STRIP_DEBUG_INFO = -s
@@ -67,11 +68,12 @@ SFILES  =
 #SFILES += vectors.s
 
 TARGET_ELF = $(TARGET_DIR)/$(TARGET).elf
+TARGET_S19 = $(TARGET_DIR)/$(TARGET).s19
 TARGET_BIN = $(TARGET_DIR)/$(TARGET).bin
 TARGET_LIST = $(TARGET_DIR)/$(TARGET).list
 TARGET_MAP = $(TARGET_DIR)/$(TARGET).map
 
-all : $(TARGET_BIN) $(TARGET_LIST)
+all : $(TARGET_S19) $(TARGET_BIN) $(TARGET_LIST)
 
 OBJECTS = $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 DEPFILES = $(addprefix $(TARGET_DIR)/,$(CPPFILES:.cpp=.d) $(CFILES:.c=.d))
@@ -85,6 +87,9 @@ $(TARGET_ELF) : $(OBJECTS) $(MEMMAP_FILE)
 
 $(TARGET_BIN) : $(TARGET_ELF)
 	$(OBJCOPY) $^ $@ -O binary
+
+$(TARGET_S19) : $(TARGET_ELF)
+	$(OBJCOPY) $^ $@ -O srec
 
 $(TARGET_LIST) : $(TARGET_ELF)
 	$(OBJDUMP) -D $^ > $@
