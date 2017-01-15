@@ -56,6 +56,8 @@ CFILES  += tasks.c
 CFILES  += timer.c
 CFILES  += util.c
 CFILES  += FaultHandler.c
+CFILES  += ram_init.c
+CFILES  += vector.c
 #CFILES  += 
 
 SFILES  =
@@ -74,7 +76,7 @@ INCDIRS = $(addprefix -I./,$(SUBDIRS))
 CFLAGS = $(CFLAGS_TARGET) $(WARNINGS) $(CFLAGS_DEBUG) $(INCDIRS) $(CFLAGS_OPTIM)
 CFLAGS_DEP = $(WARNINGS) $(CFLAGS_DEBUG) $(INCDIRS) $(CFLAGS_OPTIM)
 
-$(TARGET_ELF) : $(OBJECTS)
+$(TARGET_ELF) : $(OBJECTS) memmap
 	$(LL) $(LDFLAGS) -o $@ $(addprefix $(TARGET_DIR)/,$(OBJECTS)) $(LDLIBS)
 
 $(TARGET_BIN) : $(TARGET_ELF)

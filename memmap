@@ -1,20 +1,70 @@
 MEMORY
 {
-    ram : ORIGIN = 0x20000410, LENGTH = 8k
+    /* ram : ORIGIN = 0x20001000, LENGTH = 4k */
+    //ROM (rwx) : ORIGIN = 0x20000000, LENGTH = 8k
+    ROM (rwx) : ORIGIN = 0x08000000, LENGTH = 8k
+    RAM (rwx) : ORIGIN = 0x20002000, LENGTH = 12k
 }
 
 SECTIONS
 {
-    .text : 
+    .rodata :
+    {
+      /* vector table -> must be located on multiple of 0x200 */
+      . = ALIGN(0x200);
+      bin/vector.o (.rodata);
+      *(.rodata*);
+    } > ROM
+    .text :
     {
       /* startup module */
-      bin/reset.o
+      bin/reset.o (.text);
 
       *(.text*);
-      *(.rodata*);
-    } > ram
+    } > ROM
+
+    .data_init ALIGN(4):
+    {
+    } > ROM
+
+    .data :
+    {
+      . = ALIGN(4);
+      __data_load = LOADADDR(.data);
+      __data_start = .;
+      *(.data);
+      . = ALIGN (4);
+      __data_end = .;
+    } > RAM AT > ROM
+
     .bss :
     {
-      *(.bss*);
-    } > ram
+      . = ALIGN(4);
+      __bss_start = .;
+      *(.bss);
+      *(COMMON);
+      . = ALIGN (4);
+      __bss_end = .;
+      __HeapLimit = .;
+    } > RAM
+
+	/* .stack_dummy section doesn't contains any symbols. It is only
+	 * used for linker to calculate size of stack sections, and assign
+	 * values to stack symbols later */
+	.stack_dummy (COPY):
+	{
+		*(.stack*)
+	} > RAM
+
+	/* Set stack top to end of RAM, and stack limit move down by
+	 * size of stack_dummy section */
+	__StackTop = ORIGIN(RAM) + LENGTH(RAM);
+        /* SP_INIT = .; */
+        SP_INIT = __StackTop - 16;
+  	__StackLimit = __StackTop - SIZEOF(.stack_dummy);
+	PROVIDE(__stack = __StackTop);
+	
+	/* Check if data + heap + stack exceeds RAM limit */
+	ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
+
 }

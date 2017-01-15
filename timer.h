@@ -12,6 +12,33 @@ static inline uint16_t SysTick_Get(void)
   return (~SysTick->VAL) & 0xFFFF;
 }
 
+void TIM2_Init(void);
+
+static inline uint32_t TIM2_Cnt_Get(void)
+{
+  return TIM2->CNT;
+}
+
+static inline uint32_t TIM2_SR_CC3IF_Get(void)
+{
+  return (TIM2->SR & TIM_SR_CC3IF);
+}
+
+static inline void TIM2_SR_CC3IF_Reset(void)
+{
+  TIM2->SR = ~(TIM_SR_CC3IF); /* reset the CC1-InterrupFlag */
+}
+
+static inline uint32_t TIM2_CCR3_Get(void)
+{
+  return TIM2->CCR3;
+}
+
+static inline void TIM2_CCR3_Set(uint32_t new_val)
+{
+  TIM2->CCR3 = new_val;
+}
+
 void TIM3_Init(void);
 
 static inline uint32_t TIM3_SR_UIF_Get(void)

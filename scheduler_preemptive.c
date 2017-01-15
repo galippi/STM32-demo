@@ -12,6 +12,17 @@ void Scheduler(void)
     if (TaskTimer == 9)
     {
       Task_10ms();
+  	  {
+      	static uint8_t taskTimer_500ms = 1;
+      	if (taskTimer_500ms == 0)
+    	  {
+      		taskTimer_500ms = 50;
+    	  	Task_500ms();
+    	  }else
+    	  {
+      		taskTimer_500ms--;
+    	  }
+  	  }
     }
     if (TaskTimer < 9)
     {
@@ -21,4 +32,8 @@ void Scheduler(void)
       TaskTimer = 0;
     }
   }
+}
+
+void SchedulerPre_TaskManagement(void)
+{
 }

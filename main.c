@@ -11,8 +11,10 @@
 #include "timer_app.h"
 #include "uart.h"
 #include "scheduler_preemptive.h"
-
 #include "tasks.h"
+#include "FaultHandler.h"
+
+#include "main.h"
 
 #define VDD 3.0 /* Volt */
 
@@ -160,4 +162,132 @@ int main(void)
   }
 
   return 0;
+}
+
+void ExceptionHandler_0(void)
+{
+  CAT_Error(CAT_Exception_0, 0);
+}
+
+void ExceptionHandler_1(void)
+{
+  CAT_Error(CAT_Exception_1, 0);
+}
+
+void ExceptionHandler_2(void)
+{
+  CAT_Error(CAT_Exception_2, 0);
+}
+
+void ExceptionHandler_3(void)
+{
+  CAT_Error(CAT_Exception_3, 0);
+}
+
+void ExceptionHandler_4(void)
+{
+  CAT_Error(CAT_Exception_4, 0);
+}
+
+uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
+/* INTERRUPT */ void TIM2_ISR(void)
+{
+  if (TIM2_SR_CC3IF_Get())
+  {
+    TIM2_SR_CC3IF_Reset();
+    TIM2_CC3IF_Callback();
+  }else
+  {
+    CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF));
+  }
+}
+
+/* INTERRUPT */ void TIM3_ISR(void)
+{
+  if (TIM3_SR_UIF_Get())
+  {
+    TIM3_SR_UIF_Reset();
+    TIM3_UIF_Callback();
+  }else
+  {
+    CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF));
+  }
+}
+
+void ISR_Invalid0(void)
+{
+  CAT_Error(CAT_InvalidISR, 1000 + (SCB->ICSR & 0x1FF));
+}
+
+void ISR_Invalid1(void)
+{
+  CAT_Error(CAT_InvalidISR, 2000 + (SCB->ICSR & 0x1FF));
+}
+
+void ISR_Invalid2(void)
+{
+  CAT_Error(CAT_InvalidISR, 3000 + (SCB->ICSR & 0x1FF));
+}
+
+void ISR_Invalid3(void)
+{
+  CAT_Error(CAT_InvalidISR, 4000 + (SCB->ICSR & 0x1FF));
+}
+
+void ISR_Invalid(void)
+{
+  CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF));
+}
+
+#if       (__CORTEX_M >= 0x03)
+//#error _CORTEX_M >= 3
+static __INLINE uint32_t  __get_BASEPRI2(void)
+{
+  register uint32_t __regBasePri         __ASM("basepri");
+  return(__regBasePri);
+}
+#else
+#error _CORTEX_M < 3
+#endif
+
+extern void svc_ret(void);
+void svc_ret(void)
+{
+  // ???????????????????????????????
+  //__ASM("CPSIE i"); /* enable interrupts to allow SVCall exception*/
+  /*
+   * FPU handling
+   */
+  __ASM("SVC #0");
+}
+
+/* INTERRUPT */ void PendSV_Handler(void)
+{
+  //PendSV_Ctr++;
+  //SchedulerPre_TaskManagement();
+  __ASM("MOVS r3,#1");
+//  __ASM("LSLS r3,r3,#24"); /* r3:=(1 << 24), set the T bit (new xpsr) */
+  __ASM("LDR r2,=SchedulerPre_TaskManagement"); /* address of the QK scheduler (new pc) */
+  __ASM("LDR r1,=svc_ret"); /* return address after the call (new lr) */
+  __ASM("PUSH {r1-r3}"); /* push xpsr,pc,lr */
+  __ASM("SUB sp,sp,#(4*4)"); /* don't care for r12,r3,r2,r1 */
+  __ASM("PUSH {r0}"); /* push the prio argument (new r0) */
+  __ASM("MOVS r0,#0x6");
+//  __ASM("MVNS r0,r0"); /* r0:=~0x6=0xFFFFFFF9 */
+  __ASM("BX r0"); /* exception-return to the scheduler */
+}
+
+/* INTERRUPT */ void SVC_Handler(void)
+{
+  //__ASM("ADD sp,sp,#(1*4)"); /* pop the pushed stack */
+#if 1
+  /* remove one 8-register exception frame */
+  __ASM("ADD sp,sp,#(8*4)");
+#else
+  /* remove one 8-register exception frame */
+  /* plus the "aligner" from the stack */
+  __ASM("ADD sp,sp,#(9*4)");
+#endif
+  /* return to the preempted task */
+  __ASM("BX lr"); /* exception-return to the scheduler */
 }

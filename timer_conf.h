@@ -4,6 +4,11 @@
 #include "system_conf.h"
 #include "scheduler_preemptive.h"
 
+static inline void TIM2_CC3IF_Callback(void)
+{ /* call back function of TIM2 CC1IF - capture compare event */
+}
+
+
 #define TIM3_CR1_INIT 0x00 /* up counter mode */
 #define TIM3_CR2_INIT 0x0
 #define TIM3_FREQ 1000 /* kHz */
