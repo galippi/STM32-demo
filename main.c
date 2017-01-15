@@ -266,14 +266,14 @@ void svc_ret(void)
   //PendSV_Ctr++;
   //SchedulerPre_TaskManagement();
   __ASM("MOVS r3,#1");
-//  __ASM("LSLS r3,r3,#24"); /* r3:=(1 << 24), set the T bit (new xpsr) */
+  __ASM("LSLS r3,r3,#24"); /* r3:=(1 << 24), set the T bit (new xpsr) */
   __ASM("LDR r2,=SchedulerPre_TaskManagement"); /* address of the QK scheduler (new pc) */
   __ASM("LDR r1,=svc_ret"); /* return address after the call (new lr) */
   __ASM("PUSH {r1-r3}"); /* push xpsr,pc,lr */
   __ASM("SUB sp,sp,#(4*4)"); /* don't care for r12,r3,r2,r1 */
   __ASM("PUSH {r0}"); /* push the prio argument (new r0) */
   __ASM("MOVS r0,#0x6");
-//  __ASM("MVNS r0,r0"); /* r0:=~0x6=0xFFFFFFF9 */
+  __ASM("MVNS r0,r0"); /* r0:=~0x6=0xFFFFFFF9 */
   __ASM("BX r0"); /* exception-return to the scheduler */
 }
 
