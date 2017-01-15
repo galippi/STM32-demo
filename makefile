@@ -6,6 +6,7 @@ WARNINGS = -Wall -Wextra
 WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
 WARNINGS += -Wundef
 WARNINGS += -Wmissing-declarations
+WARNINGS += -Wmissing-prototypes -Wstrict-prototypes
 # stop at warnings
 WARNINGS += -Werror
 
@@ -14,7 +15,8 @@ CFLAGS_OPTIM = -O1
 
 ARMGNU := arm-none-eabi-
 
-LDFLAGS = -L./lib -T memmap
+MEMMAP_FILE = memmap
+LDFLAGS = -L./lib -T $(MEMMAP_FILE) -Map $(TARGET_MAP)
 
 AS = $(ARMGNU)as
 CC = $(ARMGNU)gcc
@@ -24,8 +26,9 @@ OBJCOPY = $(ARMGNU)objcopy
 OBJDUMP = $(ARMGNU)objdump
 
 CFLAGS_TARGET := -mthumb
-#CFLAGS += -mcpu=cortex-m0
-#CFLAGS += -march=armv7-m
+#CFLAGS_TARGET += -mcpu=cortex-m0
+CFLAGS_TARGET += -mcpu=cortex-m4
+#CFLAGS_TARGET += -march=armv7-m
 
 #LDFLAGS_STRIP_DEBUG_INFO = -s
 LDFLAGS  += $(LDFLAGS_STRIP_DEBUG_INFO)
@@ -66,6 +69,7 @@ SFILES  =
 TARGET_ELF = $(TARGET_DIR)/$(TARGET).elf
 TARGET_BIN = $(TARGET_DIR)/$(TARGET).bin
 TARGET_LIST = $(TARGET_DIR)/$(TARGET).list
+TARGET_MAP = $(TARGET_DIR)/$(TARGET).map
 
 all : $(TARGET_BIN) $(TARGET_LIST)
 
@@ -76,7 +80,7 @@ INCDIRS = $(addprefix -I./,$(SUBDIRS))
 CFLAGS = $(CFLAGS_TARGET) $(WARNINGS) $(CFLAGS_DEBUG) $(INCDIRS) $(CFLAGS_OPTIM)
 CFLAGS_DEP = $(WARNINGS) $(CFLAGS_DEBUG) $(INCDIRS) $(CFLAGS_OPTIM)
 
-$(TARGET_ELF) : $(OBJECTS) memmap
+$(TARGET_ELF) : $(OBJECTS) $(MEMMAP_FILE)
 	$(LL) $(LDFLAGS) -o $@ $(addprefix $(TARGET_DIR)/,$(OBJECTS)) $(LDLIBS)
 
 $(TARGET_BIN) : $(TARGET_ELF)
