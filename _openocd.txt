@@ -1,0 +1,11 @@
+flash banks
+flash erase_sector 0 0 63
+flash write_image ./bin/demo1.s19
+program ./bin/demo1.s19
+reset
+
+reset init
+reset halt
+reset run
+
+resume
