@@ -152,6 +152,7 @@ int main(void)
   ADC_HandlerInit();
   UART2_Init();
   Task_Init();
+  SchedulerPre_Init();
   TIM3_Init();
   TIM3_CCR1_Set(TIM3_Cnt_Get() + TIM3_FREQ); /* set the first scheduler interrupt to 1ms */
   NVIC->ISER[29/32] = NVIC->ISER[29/32] | (1 << (29%32)); /* enable TIM3 interrupt */

@@ -4,7 +4,26 @@
 
 #include "scheduler_preemptive.h"
 
+void SchedulerPre_Init(void)
+{
+}
+
+static void SchedPreTask_ActivateTask(void)
+{
+  SchedulerPre_TaskManagement();
+}
+
 void Scheduler(void)
+{
+  SchedulerPre_TaskTableUpdate();
+}
+
+void SchedulerPre_TaskTableUpdate(void)
+{
+  SchedPreTask_ActivateTask();
+}
+
+void SchedulerPre_TaskManagement(void)
 {
   Task_1ms();
   {
@@ -12,17 +31,17 @@ void Scheduler(void)
     if (TaskTimer == 9)
     {
       Task_10ms();
-  	  {
-      	static uint8_t taskTimer_500ms = 1;
-      	if (taskTimer_500ms == 0)
-    	  {
-      		taskTimer_500ms = 50;
-    	  	Task_500ms();
-    	  }else
-    	  {
-      		taskTimer_500ms--;
-    	  }
-  	  }
+      {
+        static uint8_t taskTimer_500ms = 1;
+        if (taskTimer_500ms == 0)
+        {
+          taskTimer_500ms = 50;
+          Task_500ms();
+        }else
+        {
+          taskTimer_500ms--;
+        }
+      }
     }
     if (TaskTimer < 9)
     {
@@ -32,8 +51,4 @@ void Scheduler(void)
       TaskTimer = 0;
     }
   }
-}
-
-void SchedulerPre_TaskManagement(void)
-{
 }
