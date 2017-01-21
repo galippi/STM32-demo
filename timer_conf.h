@@ -17,6 +17,7 @@ static inline void TIM2_CC3IF_Callback(void)
 #define TIM3_CCER_INIT 0x01 /* enable CC1 out high */
 #define TIM3_CCMR1_INIT 0x0000
 #define TIM3_CCMR2_INIT 0x0000
+#define TIM3_DIER_INIT 0x0001 /* enable update interrupt */
 
 static inline void TIM3_UIF_Callback(void)
 { /* call back function of TIM3 UIF - counter underflow */
