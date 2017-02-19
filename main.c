@@ -28,6 +28,8 @@ TIM_TypeDef * const tim3 = TIM3;
 USART_TypeDef * const uart2 = USART2;
 DMA_TypeDef * const dma1 = DMA1;
 //DMA_Channel_TypeDef * const dma1_4 = DMA1_Channel4;
+SCB_Type * const scb = SCB;
+NVIC_Type * const nvic = NVIC;
 
 uint32_t StartUpCounter;
 
@@ -133,8 +135,33 @@ static void PLL_Init(void)
 #endif
 }
 
+static void RAM_StartCheck(void)
+{
+#define RAM_START_ADDR 0x20000000
+#define RAM_END_ADDR 0x20005000
+#define VECTOR_START_ADDR ((uint32_t *)RAM_START_ADDR)
+#define NUM_VECTOR_NUMBER 32
+#define VECTOR_END_ADDR (VECTOR_START_ADDR + NUM_VECTOR_NUMBER)
+  uint32_t *ptr;
+  for (ptr = VECTOR_START_ADDR; ptr < VECTOR_END_ADDR; ptr++)
+  {
+    if ((*ptr < RAM_START_ADDR) || (*ptr >= RAM_END_ADDR))
+    {
+      break;
+    }
+  }
+  if (ptr == VECTOR_END_ADDR)
+  { /* all vectors valid RAM-pointers -> start the RAM-function */
+    __set_PSP(*(uint32_t*)RAM_START_ADDR);
+    typedef void (*t_func_ptr)(void);
+    t_func_ptr RAM_main = (t_func_ptr)*(((uint32_t*)RAM_START_ADDR) + 1);
+    RAM_main();
+  }
+}
+
 int main(void)
 {
+  RAM_StartCheck();
   PLL_Init();
   SysTick_Init();
   LED3_Init();
@@ -156,7 +183,11 @@ int main(void)
   TIM3_Init();
   TIM3_CCR1_Set(TIM3_Cnt_Get() + TIM3_FREQ); /* set the first scheduler interrupt to 1ms */
   NVIC->ISER[29/32] = NVIC->ISER[29/32] | (1 << (29%32)); /* enable TIM3 interrupt */
-  NVIC->IP[29] = 128; /* set TIM3 interrupt priority to medium */
+  NVIC->IP[29] = 0x80; /* set TIM3 interrupt priority to medium */
+  /* set PENDSV prio to 0xFF */
+  SCB->SHP[14-4] = 0xFF; /* it shall be lower than the prio of the scheduler-timer interrupt */
+  /* set SVC prio to 0x00 */
+  SCB->SHP[11-4] = 0x10;
 
   while (1)
   {
@@ -210,7 +241,8 @@ uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
   if (TIM3_SR_UIF_Get())
   {
     TIM3_SR_UIF_Reset();
-    TIM3_UIF_Callback();
+    //TIM3_UIF_Callback();
+    SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; /* activate PendSV handler */
   }else
   {
     CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF));
