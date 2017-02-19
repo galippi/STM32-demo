@@ -135,6 +135,30 @@ static void PLL_Init(void)
 #endif
 }
 
+/** \brief  Set Stack Pointer
+
+    This function assigns the given value to the current Stack Pointer (SP).
+
+    \param [in]    topOfStack  Process Stack Pointer value to set
+ */
+__attribute__( ( always_inline ) ) static __INLINE void __set_SP(uint32_t topOfStack)
+{
+  __ASM volatile ("MOV sp, %0\n" : : "r" (topOfStack) );
+}
+/** \brief  Get PC
+
+    This function returns the current value of the PC register.
+
+    \return               PC register value
+ */
+__attribute__( ( always_inline ) ) static __INLINE uint32_t __get_PC(void)
+{
+  uint32_t result;
+
+  __ASM volatile ("MOV %0, pc" : "=r" (result) );
+  return(result);
+}
+
 static void RAM_StartCheck(void)
 {
 #define RAM_START_ADDR 0x20000000
@@ -143,6 +167,11 @@ static void RAM_StartCheck(void)
 #define NUM_VECTOR_NUMBER 32
 #define VECTOR_END_ADDR (VECTOR_START_ADDR + NUM_VECTOR_NUMBER)
   uint32_t *ptr;
+  uint32_t pc = __get_PC();
+  if ((pc >= RAM_START_ADDR) && (pc < RAM_END_ADDR))
+  { /* the program runs already in RAM */
+    return;
+  }
   for (ptr = VECTOR_START_ADDR; ptr < VECTOR_END_ADDR; ptr++)
   {
     if ((*ptr < RAM_START_ADDR) || (*ptr >= RAM_END_ADDR))
@@ -152,7 +181,7 @@ static void RAM_StartCheck(void)
   }
   if (ptr == VECTOR_END_ADDR)
   { /* all vectors valid RAM-pointers -> start the RAM-function */
-    __set_PSP(*(uint32_t*)RAM_START_ADDR);
+    __set_SP(*(uint32_t*)RAM_START_ADDR);
     typedef void (*t_func_ptr)(void);
     t_func_ptr RAM_main = (t_func_ptr)*(((uint32_t*)RAM_START_ADDR) + 1);
     RAM_main();
