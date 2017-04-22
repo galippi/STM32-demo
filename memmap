@@ -68,3 +68,5 @@ SECTIONS
 	ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
 
 }
+
+ENTRY(reset)
