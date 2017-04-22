@@ -10,6 +10,7 @@
 #include "timer_conf.h"
 #include "timer_app.h"
 #include "uart.h"
+#include "bluetooth_hc05.h"
 #include "scheduler_preemptive.h"
 #include "tasks.h"
 #include "FaultHandler.h"
@@ -196,16 +197,6 @@ void RAM_StartCheck(void)
   }
 }
 
-uint8_t Rx_buffer[256];
-uint8_t rxIdx;
-static void USART2_Handler(void)
-{
-  if (UART2_RXNE_Get())
-  {
-    Rx_buffer[rxIdx++] = USART2->DR;
-  }
-}
-
 int main(void)
 {
   PLL_Init();
@@ -223,7 +214,8 @@ int main(void)
   PB13_Init();
   Button1_Init();
   ADC_HandlerInit();
-  UART2_Init();
+  //UART2_Init();
+  Bluetooth_Init();
   Task_Init();
   SchedulerPre_Init();
   TIM3_Init();
@@ -240,7 +232,9 @@ int main(void)
   {
     ADC_Handler();
     //TIM3_UIF_PollHandler();
-    USART2_Handler();
+#if UART2_DMA == 0
+    UART2_Poll();
+#endif
   }
 
   return 0;

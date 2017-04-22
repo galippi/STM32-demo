@@ -2,12 +2,13 @@
 #include "debug.h"
 #include "adc_app.h"
 #include "FaultHandler.h"
+#include "bluetooth_hc05.h"
 
 #include "tasks.h"
 
 void Task_Init(void)
 {
-  DebugOut_Init();
+  //DebugOut_Init();
 }
 
 void Task_1ms(void)
@@ -41,7 +42,8 @@ void Task_1ms(void)
 
 void Task_10ms(void)
 {
-  DebugOut();
+  //DebugOut();
+  Bluetooth_Task_10ms();
   {
 	  static uint8_t timer = 200;
 	  if (timer == 0)
@@ -116,8 +118,8 @@ void Task_500ms(void)
 		  pulseTimer = 2;
 			break;
 		default:
-                  CAT_Error(CAT_VarInvalidValue, 0);
-                  break;
+      CAT_Error(CAT_VarInvalidValue, 0);
+      break;
 		}
 	}else
 	{

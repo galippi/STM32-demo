@@ -56,6 +56,7 @@ CFILES  += debug.c
 CFILES  += gpio.c
 CFILES  += scheduler_preemptive.c
 CFILES  += uart.c
+CFILES  += bluetooth_hc05.c
 CFILES  += tasks.c
 CFILES  += timer.c
 CFILES  += util.c
