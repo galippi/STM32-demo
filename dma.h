@@ -19,10 +19,12 @@
 
 static inline void DMA_Init(void)
 {
-#if CPU_TYPE == CPU_TYPE_STM32F0
+#if (CPU_TYPE == CPU_TYPE_STM32F0) || (CPU_TYPE == CPU_TYPE_STM32F1)
   RCC->AHBENR |= RCC_AHBENR_DMA1EN; /* enable the DMA */
 #elif CPU_TYPE == CPU_TYPE_STM32F4
   RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
+#else
+#error Not implemented processor!
 #endif
 }
 

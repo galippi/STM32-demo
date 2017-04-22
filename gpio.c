@@ -156,6 +156,18 @@ void GPIO_PortInit_In(GPIO_TypeDef * const gpio, uint8_t portnum)
   }
 }
 
+void GPIO_PortInit_AFOut(GPIO_TypeDef * const gpio, uint8_t portnum)
+{
+  GPIO_PortEnable(gpio);
+  if (portnum <= 7)
+  {
+    BitfieldSet(gpio->CRL, portnum * 4, 4, ((GPIO_Mode_AF_PP & 0x0F) | GPIO_Speed_50MHz));
+  }else
+  {
+    BitfieldSet(gpio->CRH, portnum * 4, 4, ((GPIO_Mode_AF_PP & 0x0F) | GPIO_Speed_50MHz));
+  }
+}
+
 #else
 #error Not implemented CPU type!
 #endif
