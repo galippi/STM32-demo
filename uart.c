@@ -73,8 +73,6 @@ void UART2_Init(uint32_t BaudRate)
   { /* wrong baud rate is specified -> error */
     USART2->BRR = USART2_BRR_9600;
   }
-
-  USART2->BRR = (uint16_t)(625.00*16); /* PCLK1 = 24MHz / 38.4kBaud */
 #else
 #error "USART2_BRR must be adapted for system frequency!"
 #endif
