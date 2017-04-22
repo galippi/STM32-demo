@@ -65,6 +65,7 @@ static inline void UART2_TX(const uint8_t *data, uint32_t len)
   {
     UART2_TxData = data;
     UART2_TxLen = len;
+    UART2_Poll();
   }
 #endif
 #else
