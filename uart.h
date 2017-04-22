@@ -3,12 +3,17 @@
 
 #include "controller.h"
 
-void UART2_Init(void);
+#define UART2_DMA 0
+
+void UART2_Init(uint32_t BaudRate);
+void UART2_Poll(void);
 
 static inline uint32_t UART2_TXE_Get(void)
 {
-#if TARGET_ECU == TARGET_ECU_STM32F0DISCOVERY
+#if CPU_TYPE == CPU_TYPE_STM32F0
   return USART2->ISR & USART_ISR_TXE;
+#elif CPU_TYPE == CPU_TYPE_STM32F1
+  return USART2->SR & USART_SR_TXE;
 #else
   return 0;
 #endif
@@ -27,6 +32,10 @@ static inline uint32_t UART2_RXNE_Get(void)
 #endif
 }
 
+#if UART2_DMA == 0
+extern const uint8_t *UART2_TxData;
+extern uint8_t UART2_TxLen;
+#endif
 uint8_t UART2_TxOverrun;
 static inline void UART2_TX(const uint8_t *data, uint32_t len)
 {
@@ -36,6 +45,7 @@ static inline void UART2_TX(const uint8_t *data, uint32_t len)
   DMA1_Channel4->CNDTR = len;
   DMA1_Channel4->CCR |= DMA_CCR_EN;
 #elif (CPU_TYPE == CPU_TYPE_STM32F1)
+#if UART2_DMA != 0
   if (DMA1_Channel7->CNDTR != 0)
   {
     UART2_TxOverrun++;
@@ -47,6 +57,16 @@ static inline void UART2_TX(const uint8_t *data, uint32_t len)
   DMA1_Channel7->CMAR = (uint32_t)data;
   DMA1_Channel7->CNDTR = len;
   DMA1_Channel7->CCR |= DMA_CCR1_EN;
+#else
+  if (UART2_TxLen != 0)
+  {
+    UART2_TxOverrun++;
+  }else
+  {
+    UART2_TxData = data;
+    UART2_TxLen = len;
+  }
+#endif
 #else
   (void)data;
   (void)len;
