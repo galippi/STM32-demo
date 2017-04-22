@@ -13,6 +13,7 @@
 #include "scheduler_preemptive.h"
 #include "tasks.h"
 #include "FaultHandler.h"
+#include "vector.h"
 
 #include "main.h"
 
@@ -102,9 +103,16 @@ static void PLL_Init(void)
     /* HCLK = SYSCLK = 48MHz*/
     RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
 
-    /* PCLK = HCLK / 2 = 24 MHz */
-    RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2;
-
+#if PCLK2 != 48000
+#error Wrong PCLK1 is defined!
+#endif
+    /* PCLK2 = HCLK = 48 MHz */
+    RCC->CFGR = (RCC->CFGR & RCC_CFGR_PPRE2) | RCC_CFGR_PPRE2_DIV1;
+#if PCLK1 != 24000
+#error Wrong PCLK1 is defined!
+#endif
+    /* PCLK1 = HCLK / 2 = 24 MHz */
+    RCC->CFGR = (RCC->CFGR & RCC_CFGR_PPRE1) | (RCC_CFGR_PPRE1_DIV2);
 
     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL12); /* PLL configuration = HSE / 2 * 12 = 48 MHz */
@@ -159,7 +167,7 @@ __attribute__( ( always_inline ) ) static __INLINE uint32_t __get_PC(void)
   return(result);
 }
 
-static void RAM_StartCheck(void)
+void RAM_StartCheck(void)
 {
 #define RAM_START_ADDR 0x20000000
 #define RAM_END_ADDR 0x20005000
@@ -188,9 +196,18 @@ static void RAM_StartCheck(void)
   }
 }
 
+uint8_t Rx_buffer[256];
+uint8_t rxIdx;
+static void USART2_Handler(void)
+{
+  if (UART2_RXNE_Get())
+  {
+    Rx_buffer[rxIdx++] = USART2->DR;
+  }
+}
+
 int main(void)
 {
-  RAM_StartCheck();
   PLL_Init();
   SysTick_Init();
   LED3_Init();
@@ -210,6 +227,7 @@ int main(void)
   Task_Init();
   SchedulerPre_Init();
   TIM3_Init();
+  SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
   TIM3_CCR1_Set(TIM3_Cnt_Get() + TIM3_FREQ); /* set the first scheduler interrupt to 1ms */
   NVIC->ISER[29/32] = NVIC->ISER[29/32] | (1 << (29%32)); /* enable TIM3 interrupt */
   NVIC->IP[29] = 0x80; /* set TIM3 interrupt priority to medium */
@@ -222,6 +240,7 @@ int main(void)
   {
     ADC_Handler();
     //TIM3_UIF_PollHandler();
+    USART2_Handler();
   }
 
   return 0;

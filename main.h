@@ -15,11 +15,10 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-#include "controller.h"
-
+void RAM_StartCheck(void);
 int main(void);
-/* INTERRUPT */ void TIM2_ISR(void);
-/* INTERRUPT */ void TIM3_ISR(void);
+void TIM2_ISR(void);
+void TIM3_ISR(void);
 void ExceptionHandler_0(void);
 void ExceptionHandler_1(void);
 void ExceptionHandler_2(void);
