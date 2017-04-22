@@ -8,6 +8,9 @@
 #define CLK_SOURCE CLK_SOURCE_HSE_EXT
 
 #define F_SYSTEM 48000 /* kHz */
+#define F_OSC     8000 /* kHz */
+#define PCLK1    24000 /* kHz */
+#define PCLK2    48000 /* kHz */
 
 #define TARGET_ECU_STM32F0DISCOVERY 0
 #define TARGET_ECU_STM32F4DISCOVERY 1
