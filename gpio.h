@@ -12,4 +12,15 @@ void GPIO_PortInit_AFOut(GPIO_TypeDef * const gpio, uint8_t portnum);
 void GPIO_PortInit_In(GPIO_TypeDef * const gpio, uint8_t portnum);
 void GPIO_PortInit_Analog(GPIO_TypeDef * const gpio, uint8_t portnum);
 
+static inline void GPIO_Set(GPIO_TypeDef *port, uint32_t pin_num, uint32_t val)
+{
+  if (val)
+  {
+    port->ODR |= (1 << pin_num);
+  }else
+  {
+    port->ODR &= ~(1 << pin_num);
+  }
+}
+
 #endif /* _GPIO_H_ */
