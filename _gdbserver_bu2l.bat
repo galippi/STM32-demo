@@ -1,0 +1,1 @@
+start C:\KBApps\ST-LINK_gdbserver\st-link_gdbserver.exe -e -s -d
