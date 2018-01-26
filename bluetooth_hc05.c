@@ -34,9 +34,18 @@ void Bluetooth_Init(void)
   }
 
   GPIO_Set(GPIOA, 0, 1); /* set Bluetooth reset to high - start the HW module again */
+  GPIO_PortInit_Out(GPIOA, 7); /* UART2-debug port */
 }
 
 static volatile uint8_t dummy_data;
+static void wait_us(uint32_t t_us)
+{
+  volatile uint32_t wait = t_us * 32;
+  while (wait > 0)
+  {
+    wait--;
+  }
+}
 
 void Bluetooth_Task_10ms(void)
 {
@@ -75,7 +84,7 @@ void Bluetooth_Task_10ms(void)
     dummy_data++;
     //UART2_Tx(TestData2, sizeof(TestData2));
   }else
-  if ((TestDataIdx >= 32) && ((TestDataIdx & 0x01) == 1))
+  if ((TestDataIdx >= 32) && ((TestDataIdx & 0x07) == 1))
   {
 #if 1
     static uint8_t idx;
@@ -87,6 +96,15 @@ void Bluetooth_Task_10ms(void)
     UART2_Tx((uint8_t*)string, sizeof(string));
 #endif
   }else
+  if ((TestDataIdx >= 32) && ((TestDataIdx & 0x07) == 6))
+  {
+    static const uint8_t buf[4] = { 0xA5, 0x5A, 0xEB, 0xFF};
+    GPIO_Set(GPIOA, 7, 0); /* toggle the UART debug pin */
+    wait_us(1);
+    GPIO_Set(GPIOA, 7, 1); /* toggle the UART debug pin */
+    UART2_Tx(buf, sizeof(buf));
+    GPIO_Set(GPIOA, 7, 0); /* toggle the UART debug pin */
+  }else
   { /* do nothing */
   }
   if (TestDataIdx < 255)
@@ -94,6 +112,7 @@ void Bluetooth_Task_10ms(void)
     TestDataIdx++;
   }else
   { /* repeat the "Hello world" sending */
-    TestDataIdx = 32;
+    //TestDataIdx = 32;
+    TestDataIdx = 0;
   }
 }

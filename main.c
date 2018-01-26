@@ -99,7 +99,28 @@ static void PLL_Init(void)
   if ((RCC->CR & RCC_CR_HSERDY))
   {
     /* Enable Prefetch Buffer and set Flash Latency */
-    FLASH->ACR = FLASH_ACR_PRFTBE | FLASH_ACR_LATENCY;
+    FLASH->ACR = FLASH_ACR_PRFTBE | FLASH_ACR_LATENCY_1;
+
+    /* start PLL */
+    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
+    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1_Div2 | RCC_CFGR_PLLMULL6); /* PLL configuration = HSE * 6 = 48 MHz */
+
+    /* Enable PLL */
+    RCC->CR |= RCC_CR_PLLON;
+
+    /* Wait till PLL is ready */
+    while((RCC->CR & RCC_CR_PLLRDY) == 0)
+    {
+    }
+
+    /* Select PLL as system clock source */
+    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
+    RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
+
+    /* Wait till PLL is used as system clock source */
+    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)RCC_CFGR_SWS_PLL)
+    {
+    }
 
     /* HCLK = SYSCLK = 48MHz*/
     RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
@@ -201,6 +222,7 @@ int main(void)
 {
   PLL_Init();
   SysTick_Init();
+  SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
   LED3_Init();
   LED3_Set(0);
   LED3_Set(1);
@@ -219,7 +241,6 @@ int main(void)
   Task_Init();
   SchedulerPre_Init();
   TIM3_Init();
-  SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
   TIM3_CCR1_Set(TIM3_Cnt_Get() + TIM3_FREQ); /* set the first scheduler interrupt to 1ms */
   NVIC->ISER[29/32] = NVIC->ISER[29/32] | (1 << (29%32)); /* enable TIM3 interrupt */
   NVIC->IP[29] = 0x80; /* set TIM3 interrupt priority to medium */
