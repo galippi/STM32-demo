@@ -223,6 +223,11 @@ int main(void)
   PLL_Init();
   SysTick_Init();
   SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
+  #if 1 // MCO out is turned on
+  GPIO_PortInit_AFOut(GPIOA, 8); /* Set Port A8 to AF */
+  RCC->CFGR &= RCC_CFGR_MCO;
+  RCC->CFGR |= RCC_CFGR_MCO_PLL; // MCO output is configured to PLL
+  #endif // MCO output
   LED3_Init();
   LED3_Set(0);
   LED3_Set(1);
