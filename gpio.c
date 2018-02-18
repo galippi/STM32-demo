@@ -164,7 +164,7 @@ void GPIO_PortInit_AFOut(GPIO_TypeDef * const gpio, uint8_t portnum)
     BitfieldSet(gpio->CRL, portnum * 4, 4, ((GPIO_Mode_AF_PP & 0x0F) | GPIO_Speed_50MHz));
   }else
   {
-    BitfieldSet(gpio->CRH, portnum * 4, 4, ((GPIO_Mode_AF_PP & 0x0F) | GPIO_Speed_50MHz));
+    BitfieldSet(gpio->CRH, (portnum - 8) * 4, 4, ((GPIO_Mode_AF_PP & 0x0F) | GPIO_Speed_50MHz));
   }
 }
 
