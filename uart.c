@@ -6,13 +6,13 @@
 #include "uart.h"
 
 #if (CPU_TYPE == CPU_TYPE_STM32F1)
-#if F_SYSTEM == 48000
+#if PCLK1 == 24000
 //#define USART2_BRR ((F_SYSTEM * 1000l * (8 * (2 - USART2_OVER8))) /  9600)
 //#define USART2_BRR (1000 << 4) /* testing clock generation of USART */
-#define USART2_BRR_9600   (((24000000/ 9600) << 4) + 4) /* testing clock generation of USART */
-#define USART2_BRR_19200  (((24000000/ 19200) << 4) + 2) /* testing clock generation of USART */
-#define USART2_BRR_38400  (((24000000/ 38400) << 4) + 0) /* testing clock generation of USART */
-#define USART2_BRR_115200 (((24000000/115200) << 4) + 0) /* testing clock generation of USART */
+#define USART2_BRR_9600   ((24000000/ 9600) + 4) /* testing clock generation of USART */
+#define USART2_BRR_19200  ((24000000/ 19200) + 2) /* testing clock generation of USART */
+#define USART2_BRR_38400  ((24000000/ 38400) + 0) /* testing clock generation of USART */
+#define USART2_BRR_115200 ((24000000/115200) + 0) /* testing clock generation of USART */
 #else
 #error Settings must be adapted for system configuration!
 #endif
@@ -52,7 +52,6 @@ void UART2_Init(uint32_t BaudRate)
     RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
   }
   USART2->CR1 = USART_CR1_TE | USART_CR1_RE; /* TX/RX are enabled */
-#if F_SYSTEM == 48000
   if (BaudRate == 9600)
   {
     USART2->BRR = USART2_BRR_9600;
@@ -73,9 +72,6 @@ void UART2_Init(uint32_t BaudRate)
   { /* wrong baud rate is specified -> error */
     USART2->BRR = USART2_BRR_9600;
   }
-#else
-#error "USART2_BRR must be adapted for system frequency!"
-#endif
   USART2->CR2 = 0; /* 1 stop bit */
 #if UART2_DMA == 0
   USART2->CR3 = 0x00; /* DMA is disabled (???) for the channel */
