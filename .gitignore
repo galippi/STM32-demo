@@ -4,4 +4,5 @@ bin/*
 *.elf
 *.list
 *.bin
-
+debug_log.txt
+build.bat

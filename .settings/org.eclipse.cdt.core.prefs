@@ -1,7 +1,11 @@
-#Thu Jun 21 16:17:02 CEST 2012
 eclipse.preferences.version=1
 environment/project/cdt.managedbuild.toolchain.gnu.cygwin.base.1437079084/PATH/delimiter=;
 environment/project/cdt.managedbuild.toolchain.gnu.cygwin.base.1437079084/PATH/operation=replace
 environment/project/cdt.managedbuild.toolchain.gnu.cygwin.base.1437079084/PATH/value=C\:\\DEVENV\\CYGWIN\\V1_7_9\\bin;C\:\\Programs\\Sourcery G++ Lite\\bin;C\:/Program Files/Java/jre6/bin/client;C\:/Program Files/Java/jre6/bin;C\:/Program Files/Java/jre6/lib/i386;C\:\\WINDOWS\\system32;C\:\\WINDOWS;C\:\\WINDOWS\\System32\\Wbem;C\:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0;C\:\\Data\\Liptak\\bat;C\:\\Program Files\\Eclipse
 environment/project/cdt.managedbuild.toolchain.gnu.cygwin.base.1437079084/append=true
 environment/project/cdt.managedbuild.toolchain.gnu.cygwin.base.1437079084/appendContributed=true
+environment/project/cdt.managedbuild.toolchain.gnu.cygwin.base.783648347/PATH/delimiter=;
+environment/project/cdt.managedbuild.toolchain.gnu.cygwin.base.783648347/PATH/operation=replace
+environment/project/cdt.managedbuild.toolchain.gnu.cygwin.base.783648347/PATH/value=C\:\\Programok\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\bin;${CYGWIN_HOME}\\bin;C\:/Program Files (x86)/Java/jre1.8.0_121/bin/client;C\:/Program Files (x86)/Java/jre1.8.0_121/bin;C\:/Program Files (x86)/Java/jre1.8.0_121/lib/i386;C\:\\ProgramData\\Oracle\\Java\\javapath;C\:\\Program Files (x86)\\Common Files\\Microsoft Shared\\Windows Live;c\:\\bat;C\:\\Windows\\system32;C\:\\Windows;C\:\\Windows\\System32\\Wbem;C\:\\Windows\\System32\\WindowsPowerShell\\v1.0\\;C\:\\Program Files (x86)\\ATI Technologies\\ATI.ACE\\Core-Static;C\:\\Program Files\\TortoiseSVN\\bin;C\:\\Program Files (x86)\\AMD\\ATI.ACE\\Core-Static;C\:\\Programok\\GnuPG.2.1.1\\pub;C\:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C\:\\Program Files\\Common Files\\Microsoft Shared\\Windows Live;D\:\\Gabor\\ARM-STM32\\STM32F103C8T6\\demo1
+environment/project/cdt.managedbuild.toolchain.gnu.cygwin.base.783648347/append=true
+environment/project/cdt.managedbuild.toolchain.gnu.cygwin.base.783648347/appendContributed=true
