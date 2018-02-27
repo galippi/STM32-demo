@@ -63,7 +63,6 @@ static void PLL_Init(void)
 
     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1 | RCC_CFGR_PLLMULL6); /* PLL configuration = HSE * 6 = 48 MHz */
-    //RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1_Div2 | RCC_CFGR_PLLMULL2); /* PLL configuration = HSE * 2 = 16 MHz */
 
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
@@ -101,44 +100,23 @@ static void PLL_Init(void)
     /* Enable Prefetch Buffer and set Flash Latency */
     FLASH->ACR = FLASH_ACR_PRFTBE | FLASH_ACR_LATENCY_1;
 
-    /* start PLL */
-    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
-    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1_Div2 | RCC_CFGR_PLLMULL6); /* PLL configuration = HSE * 6 = 48 MHz */
-
-    /* Enable PLL */
-    RCC->CR |= RCC_CR_PLLON;
-
-    /* Wait till PLL is ready */
-    while((RCC->CR & RCC_CR_PLLRDY) == 0)
-    {
-    }
-
-    /* Select PLL as system clock source */
-    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
-    RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
-
-    /* Wait till PLL is used as system clock source */
-    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)RCC_CFGR_SWS_PLL)
-    {
-    }
-
     /* HCLK = SYSCLK = 48MHz*/
     RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
 
 #if PCLK2 != 48000
-#error Wrong PCLK1 is defined!
+#error Wrong PCLK2 is defined!
 #endif
     /* PCLK2 = HCLK = 48 MHz */
-    RCC->CFGR = (RCC->CFGR & RCC_CFGR_PPRE2) | RCC_CFGR_PPRE2_DIV1;
+    RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PPRE2) | RCC_CFGR_PPRE2_DIV1;
     RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_ADCPRE) | RCC_CFGR_ADCPRE_DIV4; /* ADC clock is set to 48 (PCLK2) / 4 => 12MHz */
 #if PCLK1 != 24000
 #error Wrong PCLK1 is defined!
 #endif
     /* PCLK1 = HCLK / 2 = 24 MHz */
-    RCC->CFGR = (RCC->CFGR & RCC_CFGR_PPRE1) | (RCC_CFGR_PPRE1_DIV2);
+    RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PPRE1) | (RCC_CFGR_PPRE1_DIV2);
 
     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
-    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL12); /* PLL configuration = HSE / 2 * 12 = 48 MHz */
+    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1_Div2 | RCC_CFGR_PLLMULL12); /* PLL configuration = HSE / 2 * 12 = 48 MHz */
 
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
@@ -224,6 +202,12 @@ int main(void)
   PLL_Init();
   SysTick_Init();
   SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
+#if 0
+  // MCO out is turned on
+  GPIO_PortInit_AFOut(GPIOA, 8); /* Set Port A8 to AF */
+  RCC->CFGR &= RCC_CFGR_MCO;
+  RCC->CFGR |= RCC_CFGR_MCO_PLL; // MCO output is configured to PLL
+#endif
   LED3_Init();
   LED3_Set(0);
   LED3_Set(1);
