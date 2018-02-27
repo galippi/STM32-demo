@@ -9,10 +9,10 @@
 #if F_SYSTEM == 48000
 //#define USART2_BRR ((F_SYSTEM * 1000l * (8 * (2 - USART2_OVER8))) /  9600)
 //#define USART2_BRR (1000 << 4) /* testing clock generation of USART */
-#define USART2_BRR_9600   (((24000000/ 9600) << 4) + 4) /* testing clock generation of USART */
-#define USART2_BRR_19200  (((24000000/ 19200) << 4) + 2) /* testing clock generation of USART */
-#define USART2_BRR_38400  (((24000000/ 38400) << 4) + 0) /* testing clock generation of USART */
-#define USART2_BRR_115200 (((24000000/115200) << 4) + 0) /* testing clock generation of USART */
+#define USART2_BRR_9600   ((24000000/  9600) + 4) /* testing clock generation of USART */
+#define USART2_BRR_19200  ((24000000/ 19200) + 2) /* testing clock generation of USART */
+#define USART2_BRR_38400  ((24000000/ 38400) + 0) /* testing clock generation of USART */
+#define USART2_BRR_115200 ((24000000/115200) + 0) /* testing clock generation of USART */
 #else
 #error Settings must be adapted for system configuration!
 #endif
@@ -44,7 +44,7 @@ void UART2_Init(uint32_t BaudRate)
 #endif /* CPU_TYPE == CPU_TYPE_STM32F0 */
 #if (CPU_TYPE == CPU_TYPE_STM32F1)
   GPIO_PortInit_AFOut(GPIOA, 2); /* GPIOA_AFRL.2 = 0001 -> PA2 USART2_TX */
-  GPIO_PortInit_AFOut(GPIOA, 3); /* GPIOA_AFRL.3 = 0001 -> PA3 USART2_RX */
+  GPIO_PortInit_In(GPIOA, 3); /* GPIOA_AFRL.3 = 0001 -> PA3 USART2_RX */
   BitfieldSet(AFIO->MAPR, 3, 1, 0); /* AFIO_MAPR_USART2_REMAP */
   /* enable the USART2, if it was not enabled */
   if (!(RCC->APB1ENR & RCC_APB1ENR_USART2EN))
