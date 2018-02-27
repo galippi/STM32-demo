@@ -52,5 +52,35 @@ void ADC_Init(void)
   ADC1->CHSELR = ADC_CHSELR_INIT;
   ADC1->IER = ADC_IER_INIT;
   ADC->CCR = ADC_CCR_INIT;
+#elif (CPU_TYPE == CPU_TYPE_STM32F1)
+  /* ADC clock source: PCLK2 */
+  if (!(RCC->APB2ENR & RCC_APB2Periph_ADC1))
+  { /* enable the ADC1 */
+    RCC->APB2ENR |= RCC_APB2Periph_ADC1;
+  }
+  /* stop last conversions */
+  if (ADC1->CR2 & ADC_CR2_ADON)
+  {
+	  ADC1->CR2 = 0; /* stop ADC */
+    while (0)
+    { /* wait the end of the running conversion */ }
+  }
+  if ((ADC_CR2_INIT) & ADC_CR2_CAL)
+  {
+    ADC1->CR2 = ADC_CR2_CAL | ADC_CR2_ADON;
+    while (ADC1->CR2 & ADC_CR2_CAL)
+    { /* wait the end of the calibration */ }
+    ADC_calibration = (uint8_t)(ADC_Get() & 0x003F);
+  }
+  ADC1->CR1 = ADC_CR1_INIT;
+  ADC1->CR2 = (ADC_CR2_INIT) & (~(ADC_CR2_CAL));
+  ADC1->SMPR1 = ADC_SMPR1_INIT;
+  ADC1->SMPR2 = ADC_SMPR2_INIT;
+  ADC1->SQR1 = ADC_SQR1_INIT;
+  ADC1->SQR2 = ADC_SQR2_INIT;
+  ADC1->SQR3 = ADC_SQR3_INIT;
+
+#else
+#error Not supported target!
 #endif
 }

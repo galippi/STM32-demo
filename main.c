@@ -130,6 +130,7 @@ static void PLL_Init(void)
 #endif
     /* PCLK2 = HCLK = 48 MHz */
     RCC->CFGR = (RCC->CFGR & RCC_CFGR_PPRE2) | RCC_CFGR_PPRE2_DIV1;
+    RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_ADCPRE) | RCC_CFGR_ADCPRE_DIV4; /* ADC clock is set to 48 (PCLK2) / 4 => 12MHz */
 #if PCLK1 != 24000
 #error Wrong PCLK1 is defined!
 #endif

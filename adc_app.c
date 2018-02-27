@@ -1,5 +1,6 @@
 #include "util.h"
 #include "adc.h"
+#include "gpio.h"
 #include "debug.h"
 
 #include "adc_app.h"
@@ -13,10 +14,13 @@ static uint8_t adc_idx;
 void ADC_HandlerInit(void)
 {
   adc_idx = 0;
+  GPIO_PortInit_Analog(GPIOB, 0);
+  GPIO_PortInit_Analog(GPIOB, 1);
   ADC_Init();
   ADC_Start();
 }
 
+uint16_t ADC_ctr;
 void ADC_Handler(void)
 {
   if (ADC_GetStatus())
@@ -41,11 +45,20 @@ void ADC_Handler(void)
       Temperature = (int16_t)DivI32_I32I32(((v_sensor - (int32_t)*TS_CAL1) * ((int32_t)(110 - 30) * TEMP_SCALE)), (*TS_CAL2 - *TS_CAL1)) + (30 * TEMP_SCALE);
       Temperature_raw = (int16_t)DivI32_I32I32(((ADC_values[ADC_TemperatureSensor] - (int32_t)*TS_CAL1) * ((int32_t)(110 - 30) * TEMP_SCALE)), (*TS_CAL2 - *TS_CAL1)) + (30 * TEMP_SCALE);
 
+#if (CPU_TYPE == CPU_TYPE_STM32F0)
       DebugOut_Set_u16(0, 0, ADC_values[ADC_IN4_DAC]);
       DebugOut_Set_u16(0, 2, ADC_values[ADC_IN5_Ub]);
       DebugOut_Set_u16(0, 4, ADC_values[ADC_IN6_Ib]);
+#elif (CPU_TYPE == CPU_TYPE_STM32F1)
+      DebugOut_Set_u16(0,  0, ADC_values[ADC_IN0]);
+      DebugOut_Set_u16(0,  2, ADC_values[ADC_IN1]);
+      DebugOut_Set_u16(0,  4, ADC_values[ADC_IN8]);
+      DebugOut_Set_u16(0,  8, ADC_values[ADC_IN9]);
+      DebugOut_Set_u16(0, 10, ADC_values[ADC_Vref]);
+#endif
       DebugOut_Set_u16(0, 6, ADC_values[ADC_TemperatureSensor]);
     }
-    ADC_Start();
+    //ADC_Start();
+    ADC_ctr++;
   }
 }
