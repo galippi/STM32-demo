@@ -80,7 +80,7 @@ void UART2_Init(uint32_t BaudRate)
 #if UART2_DMA == 0
   USART2->CR3 = 0x00; /* DMA is disabled (???) for the channel */
 #else
-  USART2->CR3 = 0x80; /* DMA is enabled for the channel */
+  USART2->CR3 = 0xC0; /* DMA is enabled for the channel */
   /* configuring DMA for USART2-TX */
   DMA_Init(DMA1);
   DMA1_Channel7->CPAR = (uint32_t)&(USART2->DR);
