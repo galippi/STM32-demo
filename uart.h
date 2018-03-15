@@ -37,8 +37,10 @@ extern const uint8_t *UART2_TxData;
 extern uint8_t UART2_TxLen;
 #endif
 uint8_t UART2_TxOverrun;
+uint8_t UART2_TxCtr;
 static inline void UART2_TX(const uint8_t *data, uint32_t len)
 {
+  UART2_TxCtr++;
 #if (CPU_TYPE == CPU_TYPE_STM32F0)
   DMA1_Channel4->CCR &= ~DMA_CCR_EN;
   DMA1_Channel4->CMAR = (uint32_t)data;

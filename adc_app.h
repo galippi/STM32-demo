@@ -3,12 +3,21 @@
 
 enum e_ADC_values
 {
+#if TARGET_ECU == TARGET_ECU_STM32F0DISCOVERY
   ADC_IN4_DAC,
   ADC_IN5_Ub,
   ADC_IN6_Ib,
   ADC_TemperatureSensor,
   ADC_Vref,
   ADC_VBat,
+#elif (CPU_TYPE == CPU_TYPE_STM32F1)
+  ADC_PA0,
+  ADC_PA1,
+  ADC_PB0,
+  ADC_PB1,
+  ADC_TemperatureSensor,
+  ADC_Vref,
+#endif
   ADC_Ch_Num /* this must be the last one */
 };
 extern uint16_t ADC_values[ADC_Ch_Num];

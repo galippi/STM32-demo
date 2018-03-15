@@ -51,7 +51,7 @@ void UART2_Init(uint32_t BaudRate)
   {
     RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
   }
-  USART2->CR1 = USART_CR1_TE | USART_CR1_RE; /* TX/RX are enabled */
+  USART2->CR1 = USART_CR1_UE; /* USART2 is enabled */
   if (BaudRate == 9600)
   {
     USART2->BRR = USART2_BRR_9600;
@@ -82,7 +82,7 @@ void UART2_Init(uint32_t BaudRate)
   DMA1_Channel7->CPAR = (uint32_t)&(USART2->DR);
   DMA1_Channel7->CCR = DMA_CCR1_DIR | DMA_CCR1_MINC; /* mem2per, no-circ, no-per-inc, mem-inc, psize=8, memsize=8,ch-prio=low, no-mem2mem */
 #endif
-  USART2->CR1 |= USART_CR1_UE; /* USART2 is enabled */
+  USART2->CR1 |= (USART_CR1_TE | USART_CR1_RE); /* TX/RX are enabled */
 #endif /* CPU_TYPE == CPU_TYPE_STM32F0 */
 }
 
@@ -92,8 +92,10 @@ uint8_t UART2_TxLen = 0;
 #endif
 uint8_t Rx_buffer[256];
 uint8_t rxIdx;
+uint32_t Uart2PollCtr;
 void UART2_Poll(void)
 {
+  Uart2PollCtr++;
 #if UART2_DMA == 0
   if (UART2_RXNE_Get())
   {

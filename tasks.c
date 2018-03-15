@@ -15,7 +15,7 @@ void Task_1ms(void)
 {
   PB13_Set(!PB13_Get()); /* toggling debug port */
   {
-    static uint16_t dac_val = 0;
+    //static uint16_t dac_val = 0;
     static uint16_t t_ug;
     t_ug++;
     if (t_ug > 1950)
@@ -26,6 +26,7 @@ void Task_1ms(void)
       }
     }else
     {
+#if 0
       if (ADC_values[ADC_IN5_Ub] > (uint32_t)(0.7 * 4095/3.3))
       {
         dac_val++;
@@ -36,6 +37,7 @@ void Task_1ms(void)
           dac_val--;
         }
       }
+#endif
     }
   }
 }

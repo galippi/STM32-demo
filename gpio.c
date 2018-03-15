@@ -142,6 +142,20 @@ void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum)
   }
 }
 
+void GPIO_PortInit_Analog(GPIO_TypeDef * const gpio, uint8_t portnum)
+{
+  GPIO_PortEnable(gpio);
+  if (portnum < 8)
+  {
+    // the port is set to floating input
+    BitfieldSet(gpio->CRL, portnum * 4, 4, GPIO_Mode_AIN);
+  }else
+  {
+    // the port is set to floating input
+    BitfieldSet(gpio->CRH, (portnum - 8) * 4, 4, GPIO_Mode_AIN);
+  }
+}
+
 void GPIO_PortInit_In(GPIO_TypeDef * const gpio, uint8_t portnum)
 {
   GPIO_PortEnable(gpio);
