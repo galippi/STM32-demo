@@ -17,6 +17,6 @@
 
 #include "uart_app.h"
 
-#define UART2_DMA 0
+#define UART2_DMA 1
 
 #endif /* _UART_CONF_H_ */
