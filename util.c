@@ -1,5 +1,7 @@
-#include "util.h"
 #include <string.h> /* necessary for memset */
+
+#include "system_conf.h"
+#include "util.h"
 
 uint32_t DivU32_U32U32(uint32_t dividend, uint32_t divisor)
 {
@@ -105,4 +107,13 @@ void *memset(void *ptr_, int data, size_t size)
     size--;
   }
   return ptr_;
+}
+
+void wait_us_rough(uint32_t t_us)
+{
+  volatile uint32_t wait = t_us * (F_SYSTEM / 1000 / 2);
+  while (wait > 0)
+  {
+    wait--;
+  }
 }

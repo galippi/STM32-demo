@@ -23,4 +23,6 @@ static inline void *memset(void *ptr_, int data, size_t size)
 void *memset(void *ptr_, int data, size_t size);
 #endif
 
+void wait_us_rough(uint32_t t_us);
+
 #endif /* _UTIL_H_ */
