@@ -8,4 +8,31 @@ set $pc = 0x20000050 - set pc to xxx
 x/4 0x20000000 - dump the memory (4 words)
 stepi - step 1 instruction
 step - step 1 line
+next - step over
 print s_var - print variable s_var
+
+b main / fn - break point to main or fn
+b - break point to the current line
+b N - Put a breakpoint at line N
+b +N - Put a breakpoint N lines down from the current line
+d N - Delete breakpoint number N
+info break - list breakpoints
+r - Run the program until a breakpoint or error
+c - Continue running the program until the next breakpoint or error
+f - Run until the current function is finished
+s - Run the next line of the program
+s N - Run the next N lines of the program
+n - Like s, but it does not step into functions
+u N - Run until you get N lines in front of the current line
+p var - Print the current value of the variable "var"
+bt - Print a stack trace
+u - Goes up a level in the stack
+d - Goes down a level in the stack
+l - list 10 lines of code
+l 50/myfunc - list specific line/function
+set x = 3
+disply x - constantly display variable x
+undisplay x
+q - Quit gdb
+
+https://www.tutorialspoint.com/gnu_debugger/gnu_debugger_tutorial.pdf
