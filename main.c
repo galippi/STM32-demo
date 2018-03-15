@@ -238,7 +238,7 @@ int main(void)
   {
     ADC_Handler();
     //TIM3_UIF_PollHandler();
-#if UART2_DMA == 0
+#if 1 || (UART2_DMA == 0)
     UART2_Poll();
 #endif
   }
