@@ -1,3 +1,4 @@
+#include "dma.h"
 #include "adc.h"
 #include "adc_conf.h"
 
@@ -80,6 +81,21 @@ void ADC_Init(void)
   ADC1->SQR2 = ADC_SQR2_INIT;
   ADC1->SQR3 = ADC_SQR3_INIT;
 
+  DMA_Init(DMA1);
+  DMA1_Channel1->CCR &= ~DMA_CCR1_EN;
+  DMA1_Channel1->CPAR = (uint32_t)&(ADC1->DR);
+  DMA1_Channel1->CCR = \
+                       0 /* MEM2MEM */ | \
+                       DMA_CCR1_PL_1 /* priority high */ | \
+                       DMA_CCR1_MINC /* no-per-inc, mem-inc */ | \
+                       DMA_CCR1_CIRC /* circular mode */ | \
+                       DMA_CCR1_MSIZE_0 /* Memory size 16 bits */ | \
+                       DMA_CCR1_PSIZE_0 /* Peripheral size 16 bits */ | \
+                       0 /* per2mem - DMA_CCR1_DIR */ | \
+                       0;
+  DMA1_Channel1->CMAR = ADC1_DMA_CMAR;
+  DMA1_Channel1->CNDTR = ADC1_DMA_CNDTR;
+  DMA1_Channel1->CCR |= DMA_CCR1_EN; /* channel is enabled */
 #else
 #error Not supported target!
 #endif
