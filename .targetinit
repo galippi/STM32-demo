@@ -2,6 +2,5 @@
 # Initializing PC and stack pointer
 # RAM_START_ADDR is at 0x20000000
 load
-monitor reset
-monitor halt
+monitor reset halt
 #set $pc = (0x20000050)
