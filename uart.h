@@ -2,8 +2,7 @@
 #define _UART_H_
 
 #include "controller.h"
-
-#define UART2_DMA 0
+#include "uart_conf.h"
 
 void UART2_Init(uint32_t BaudRate);
 void UART2_Poll(void);

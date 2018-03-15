@@ -82,9 +82,16 @@ void UART2_Init(uint32_t BaudRate)
 #else
   USART2->CR3 = 0x80; /* DMA is enabled for the channel */
   /* configuring DMA for USART2-TX */
-  DMA_Init();
+  DMA_Init(DMA1);
   DMA1_Channel7->CPAR = (uint32_t)&(USART2->DR);
   DMA1_Channel7->CCR = DMA_CCR1_DIR | DMA_CCR1_MINC; /* mem2per, no-circ, no-per-inc, mem-inc, psize=8, memsize=8,ch-prio=low, no-mem2mem */
+  /* configuring DMA for USART2-RX */
+  DMA1_Channel6->CCR &= ~DMA_CCR1_EN;
+  DMA1_Channel6->CPAR = (uint32_t)&(USART2->DR);
+  DMA1_Channel6->CCR = DMA_CCR1_MINC | DMA_CCR1_CIRC; /* per2mem, circ, no-per-inc, mem-inc, psize=8, memsize=8, ch-prio=low, no-mem2mem */
+  DMA1_Channel6->CMAR = (uint32_t)Rx_buffer;
+  DMA1_Channel6->CNDTR = sizeof(Rx_buffer);
+  DMA1_Channel6->CCR |= DMA_CCR1_EN;
 #endif
   USART2->CR1 |= USART_CR1_UE; /* USART2 is enabled */
 #endif /* CPU_TYPE == CPU_TYPE_STM32F0 */
@@ -109,5 +116,7 @@ void UART2_Poll(void)
     UART2_TxData++;
     UART2_TxLen--;
   }
+#else
+  rxIdx = sizeof(Rx_buffer) - DMA1_Channel6->CNDTR;
 #endif
 }
