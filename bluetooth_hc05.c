@@ -5,6 +5,7 @@
 
 #include "bluetooth_hc05.h"
 
+#ifdef HC05_ResetPort
 static const uint8_t TestData0[4] = {'A', 'T', '\r', '\n'};
 static const uint8_t TestData1[13] = "AT+VERSION?\r\n";
 //static const uint8_t TestData2[18] = "AT\r\nHello World!\n\r";
@@ -12,6 +13,7 @@ static const uint8_t TestData2[10] = "AT+UART?\n\r";
 //static const uint8_t TestData2[8] = "AT+UART?";
 //static const uint8_t TestData3[19] = "AT+UART=19200,0,0\n\r";
 static const uint8_t TestData3[19] = "AT+UART=38400,0,0\n\r";
+#endif
 
 void Bluetooth_Init(void)
 {
@@ -52,6 +54,7 @@ static volatile uint8_t dummy_data;
 
 void Bluetooth_Task_10ms(void)
 {
+#ifdef HC05_KeyPort
   static uint8_t TestDataIdx = 0;
   if (TestDataIdx == 0)
   {
@@ -126,4 +129,5 @@ void Bluetooth_Task_10ms(void)
     //TestDataIdx = 32;
     TestDataIdx = 0;
   }
+#endif
 }

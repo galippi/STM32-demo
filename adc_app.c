@@ -1,6 +1,7 @@
 #include "util.h"
 #include "adc.h"
 #include "gpio.h"
+#include "uart.h"
 #include "debug.h"
 
 #include "adc_app.h"
@@ -61,4 +62,29 @@ void ADC_Handler(void)
     //ADC_Start();
     ADC_ctr++;
   }
+}
+
+void ADC_Handler_10ms(void)
+{
+  static uint8_t ctr = 0;
+  static char uart2Buffer[32];
+  int8_t U32_to_HexString(char *string, int len, uint32_t val, char leadingChar);
+  (void)U32_to_HexString(uart2Buffer, 2, ctr, '0');
+  uart2Buffer[2] = ' ';
+  (void)U32_to_HexString(uart2Buffer +  3, 3, ADC_values[ADC_IN0], ' ');
+  uart2Buffer[6] = ' ';
+  (void)U32_to_HexString(uart2Buffer +  7, 3, ADC_values[ADC_IN1], ' ');
+  uart2Buffer[10] = ' ';
+  (void)U32_to_HexString(uart2Buffer + 11, 3, ADC_values[ADC_IN8], ' ');
+  uart2Buffer[14] = ' ';
+  (void)U32_to_HexString(uart2Buffer + 15, 3, ADC_values[ADC_IN9], ' ');
+  uart2Buffer[18] = ' ';
+  (void)U32_to_HexString(uart2Buffer + 19, 3, ADC_values[ADC_Vref], ' ');
+  uart2Buffer[22] = ' ';
+  (void)U32_to_HexString(uart2Buffer + 23, 3, ADC_values[ADC_TemperatureSensor], ' ');
+  uart2Buffer[26] = ' ';
+  memset(uart2Buffer + 27, ' ', sizeof(uart2Buffer) - 27 - 1);
+  uart2Buffer[sizeof(uart2Buffer) - 1] = '\r';
+  UART2_TX((uint8_t*)uart2Buffer, sizeof(uart2Buffer));
+  ctr++;
 }

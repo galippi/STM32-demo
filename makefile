@@ -42,7 +42,7 @@ TARGET=demo1
 TARGET_DIR=bin
 DUMMY_DIR_FILE = $(TARGET_DIR)/dummy
 
-VPATH := $(TARGET_DIR)
+VPATH := $(TARGET_DIR) u32_to_hexstring
 
 CPPFILES =
 #CPPFILES+=
@@ -63,6 +63,7 @@ CFILES  += util.c
 CFILES  += FaultHandler.c
 CFILES  += ram_init.c
 CFILES  += vector.c
+CFILES  += u32_to_hexstring.c
 #CFILES  += 
 
 SFILES  =

@@ -46,6 +46,7 @@ void Task_10ms(void)
 {
   //DebugOut();
   Bluetooth_Task_10ms();
+  ADC_Handler_10ms();
   {
 	  static uint8_t timer = 200;
 	  if (timer == 0)

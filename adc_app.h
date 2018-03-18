@@ -29,5 +29,6 @@ extern int16_t Temperature_raw;
 
 void ADC_HandlerInit(void);
 void ADC_Handler(void);
+void ADC_Handler_10ms(void);
 
 #endif /* _ADC_APP_H_ */

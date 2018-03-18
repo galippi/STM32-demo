@@ -18,7 +18,7 @@
 #define ADC_CR1_INIT ( /* single channel, end of conversion interrupt is disabled */ \
     ADC_CR1_SCAN | \
     0 )
-#define ADC_CR2_INIT \
+#define ADC_CR2_INIT ( \
           ADC_CR2_ADON | \
           ADC_CR2_CONT | \
           ADC_CR2_CAL | \
@@ -26,7 +26,7 @@
           ADC_CR2_TSVREFE | /* enable temperature and Vref channels */ \
           ADC_CR2_EXTSEL | /* SWSTART is selected */ \
           ADC_CR2_DMA | /* DMA is configured */ \
-          0
+          0)
 #if 0
 		  ADC_CR2_CONT | \
 		  ADC_CR2_DMA | \
