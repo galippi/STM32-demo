@@ -15,6 +15,7 @@
 #include "tasks.h"
 #include "FaultHandler.h"
 #include "vector.h"
+#include "spi.h"
 
 #include "main.h"
 
@@ -241,6 +242,7 @@ int main(void)
 #if 1 || (UART2_DMA == 0)
     UART2_Poll();
 #endif
+    SPI_Poll();
   }
 
   return 0;

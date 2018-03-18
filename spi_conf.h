@@ -6,8 +6,8 @@
 #define SPI2_CR1_INIT ( \
                         0 /* SPI_CR1_CPHA */ | \
                         0 /* SPI_CR1_CPOL */ | \
-                        0 /* SPI_CR1_MSTR */ | \
-                        (0 << 3) /* baud rate */ | \
+                        SPI_CR1_MSTR /* SPI_CR1_MSTR */ | \
+                        (7 << 3) /* baud rate */ | \
                         0 /* SPI_CR1_SPE */ | \
                         0 /* SPI_CR1_LSBFIRST */ | \
                         0 /* SPI_CR1_SSI */ | \

@@ -1,6 +1,7 @@
 #include "gpio_app.h"
 #include "debug.h"
 #include "adc_app.h"
+#include "spi.h"
 #include "FaultHandler.h"
 #include "bluetooth_hc05.h"
 
@@ -8,6 +9,7 @@
 
 void Task_Init(void)
 {
+  SPI_Init();
   //DebugOut_Init();
 }
 
