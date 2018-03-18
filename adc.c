@@ -81,6 +81,11 @@ void ADC_Init(void)
   ADC1->SQR2 = ADC_SQR2_INIT;
   ADC1->SQR3 = ADC_SQR3_INIT;
 
+#ifdef ADC1_DMA_CMAR
+  {
+    extern char _compile_check[((ADC_CR2_INIT & ADC_CR2_DMA) == 0) ? -1 : 1]; /* ADC1_DMA_CMAR is set, but the DMA is not configured for ADC */
+    (void)_compile_check;
+  }
   DMA_Init(DMA1);
   DMA1_Channel1->CCR &= ~DMA_CCR1_EN;
   DMA1_Channel1->CPAR = (uint32_t)&(ADC1->DR);
@@ -96,6 +101,12 @@ void ADC_Init(void)
   DMA1_Channel1->CMAR = ADC1_DMA_CMAR;
   DMA1_Channel1->CNDTR = ADC1_DMA_CNDTR;
   DMA1_Channel1->CCR |= DMA_CCR1_EN; /* channel is enabled */
+#else
+  {
+    extern char _compile_check[((ADC_CR2_INIT & ADC_CR2_DMA) != 0) ? -1 : 1]; /* ADC-DMA is configured, but the DMA is not configured (ADC1_DMA_CMAR) */
+  }
+#endif
+
 #else
 #error Not supported target!
 #endif
