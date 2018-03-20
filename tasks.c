@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "gpio_app.h"
 #include "debug.h"
 #include "adc_app.h"
@@ -15,7 +17,7 @@ void Task_Init(void)
 
 void Task_1ms(void)
 {
-  PB13_Set(!PB13_Get()); /* toggling debug port */
+  /*PB13_Set(!PB13_Get());*/ /* toggling debug port */
   {
     static uint16_t t_ug;
     t_ug++;
@@ -49,6 +51,12 @@ void Task_10ms(void)
   //DebugOut();
   Bluetooth_Task_10ms();
   ADC_Handler_10ms();
+  {
+    static const uint8_t spiData[] = { 0x00, 0x39, 0x00, 0x5A};
+    static uint8_t spiBuf[sizeof(spiData)];
+    memcpy(spiBuf, spiData, sizeof(spiBuf));
+    SPI2_Tx(spiBuf, sizeof(spiBuf));
+  }
   {
 	  static uint8_t timer = 200;
 	  if (timer == 0)

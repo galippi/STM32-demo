@@ -7,7 +7,7 @@
                         0 /* SPI_CR1_CPHA */ | \
                         0 /* SPI_CR1_CPOL */ | \
                         SPI_CR1_MSTR /* SPI_CR1_MSTR */ | \
-                        (7 << 3) /* baud rate */ | \
+                        (6 << 3) /* baud rate */ | \
                         0 /* SPI_CR1_SPE */ | \
                         0 /* SPI_CR1_LSBFIRST */ | \
                         0 /* SPI_CR1_SSI */ | \
