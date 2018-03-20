@@ -33,6 +33,7 @@ DMA_TypeDef * const dma1 = DMA1;
 //DMA_Channel_TypeDef * const dma1_4 = DMA1_Channel4;
 SCB_Type * const scb = SCB;
 NVIC_Type * const nvic = NVIC;
+SPI_TypeDef * const spi2 = SPI2;
 
 uint32_t StartUpCounter;
 
@@ -209,6 +210,7 @@ int main(void)
   RCC->CFGR &= RCC_CFGR_MCO;
   RCC->CFGR |= RCC_CFGR_MCO_PLL; // MCO output is configured to PLL
 #endif
+  RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
   LED3_Init();
   LED3_Set(0);
   LED3_Set(1);
