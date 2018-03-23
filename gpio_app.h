@@ -93,6 +93,22 @@ LEDx_Set(6)
 #define LED6_Set(x) {/* do nothing */}
 #endif
 
+static inline void PB12_Init(void)
+{
+  GPIO_PortInit_Out(GPIOB, 12);
+}
+
+static inline void PB12_Set(uint32_t val)
+{
+  if (val)
+  {
+    GPIOB->ODR |= (1 << 12);
+  }else
+  {
+    GPIOB->ODR &= ~(1 << 12);
+  }
+}
+
 static inline void PB13_Init(void)
 {
   GPIO_PortInit_Out(PB13_PORT, PB13_PIN_NUM);

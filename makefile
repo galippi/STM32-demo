@@ -7,6 +7,7 @@ WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
 WARNINGS += -Wundef
 WARNINGS += -Wmissing-declarations
 WARNINGS += -Wmissing-prototypes -Wstrict-prototypes
+WARNINGS += -Wno-unused-function
 # stop at warnings
 WARNINGS += -Werror
 
