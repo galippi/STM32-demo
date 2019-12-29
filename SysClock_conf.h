@@ -13,7 +13,11 @@
 #define f_USBCLK_Hz 48000000
 #define f_RTCCLK_Hz 32768
 
-#define RCC_CR_INIT (RCC_CR_HSEBYP | RCC_CR_HSEON | RCC_CR_PLLON)
+#define HSI_ON 1
+#define HSE_ON 1
+#define HSE_BYP 0
+#define PLL_ON 1
+
 #define PLLXTPRE_REG 0
 #define PLLSRC   1
 #define PLLMUL_VAL 6
@@ -28,5 +32,18 @@
 #define PRFTBE_REG 1
 #define HLFCYA_REG 0
 #define FLASH_ACR (FLASH_ACR_PRFTBE | FLASH_ACR_LATENCY)
+
+#define HSI_STARTUP_TIMEOUT 5000
+
+#define HSI_STARTUP_DEBUG(x) /* do nothing */
+#define HSE_STARTUP_DEBUG(x) /* do nothing */
+#define PLL_STARTUP_DEBUG(x) /* do nothing */
+#define SYSCLK_SET_DEBUG(x) /* do nothing */
+
+
+#define HSI_STARTUP_ERROR() /* do nothing */
+/* If HSE fails to start-up, the application will have wrong clock
+   configuration. User can add here some code to deal with this error */
+#define HSE_STARTUP_ERROR() /* do nothing */
 
 #endif /* _SYSCLOCK_CONF_H_ */

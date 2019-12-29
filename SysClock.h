@@ -20,7 +20,36 @@
 #error f_USBCLK_Hz is wrongly set!
 #endif
 
+#ifndef HSI_ON
+  #define HSI_ON 0
+#endif
+#ifndef HSE_ON
+  #define HSE_ON 0
+#endif
+#if !defined(HSE_BYP)
+  #define HSE_BYP 0
+#endif
+#ifndef PLL_ON
+  #define PLL_ON 0
+#endif
+
+#if (HSE_ON != 0)
+  #if (HSE_BYP != 0)
+    #define f_HSE_MIN_HZ 0
+    #define f_HSE_MAX_HZ 25000000
+  #else
+    #define f_HSE_MIN_HZ  4000000
+    #define f_HSE_MAX_HZ 16000000
+  #endif
+  #if (f_HSE_Hz < f_HSE_MIN_HZ) || (f_HSE_Hz > f_HSE_MAX_HZ)
+    #error f_HSE_Hz or HSEBYP is wrongly set
+  #endif
+#endif
+
 #if PLLSRC != 0
+  #if (HSE_ON == 0)
+    #error HSE_ON is worngly set!
+  #endif
   #if PLLXTPRE_REG != 0
     #define F_PLL_INPUT_Hz (f_HSE_Hz / 2)
   #else
@@ -28,6 +57,9 @@
   #endif
     #define f_PLL_MAX_HZ 72000000
 #else
+    #if HSI_ON != 0
+    #error HSI_ON is worngly set!
+    #endif
     #define F_PLL_INPUT_Hz (f_HSI_Hz / 2)
     #define f_PLL_MAX_HZ 64000000
 #endif
@@ -46,9 +78,9 @@
 
 #if SWS == 0
   #define f_SYSCLK_Hz f_HSI_Hz
-#elif SWS == 1
+#elif SWS == 1 && (HSE_ON != 0)
   #define f_SYSCLK_Hz f_HSE_Hz
-#elif SWS == 2
+#elif SWS == 2 && (PLL_ON != 0)
   #define f_SYSCLK_Hz f_PLL_Hz
 #else
 #error SWS is wrongly set!
