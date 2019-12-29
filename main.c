@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "pll.h"
+#include "SysClock.h"
 #include "gpio_app.h"
 #include "adc.h"
 #include "adc_app.h"
@@ -90,7 +90,7 @@ void RAM_StartCheck(void)
 
 int main(void)
 {
-  PLL_Init();
+  SysClock_Init();
   SysTick_Init();
   SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
 #if 0

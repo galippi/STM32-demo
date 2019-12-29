@@ -1,8 +1,8 @@
-#include "pll.h"
+#include "SysClock.h"
 
 uint32_t StartUpCounter;
 
-void PLL_Init(void)
+void SysClock_Init(void)
 {
 #if !defined(TARGET_ECU)
 #error "Error: TARGET ECU is not defined!"

@@ -1,12 +1,12 @@
-#ifndef _PLL_H_
-#define _PLL_H_
+#ifndef _SYSCLOCK_H_
+#define _SYSCLOCK_H_
 
 #include "controller.h"
 
 #define f_LSI_Hz 40000
 #define f_HSI_Hz 8000000
 
-#include "pll_conf.h"
+#include "SysClock_conf.h"
 
 #if f_PLL_Hz > 72000000
 #error f_PLL_Hz is wrongly set!
@@ -149,6 +149,6 @@
 #define HLFCYA_REG is wrongly set!
 #endif
 
-void PLL_Init(void);
+void SysClock_Init(void);
 
-#endif /* _PLL_H_ */
+#endif /* _SYSCLOCK_H_ */

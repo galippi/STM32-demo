@@ -1,5 +1,5 @@
-#ifndef _PLL_CONF_H_
-#define _PLL_CONF_H_
+#ifndef _SYSCLOCK_CONF_H_
+#define _SYSCLOCK_CONF_H_
 
 #define f_HSE_Hz 8000000
 #define f_LSE_Hz 32768
@@ -29,4 +29,4 @@
 #define HLFCYA_REG 0
 #define FLASH_ACR (FLASH_ACR_PRFTBE | FLASH_ACR_LATENCY)
 
-#endif /* _PLL_CONF_H_ */
+#endif /* _SYSCLOCK_CONF_H_ */
