@@ -206,8 +206,14 @@ void SysClock_Init(void)
       StartUpCounter++;
     }
     SYSCLK_SET_DEBUG(StartUpCounter);
+
     #if HSI_ON == 0
     RCC->CR &= (uint32_t)(~RCC_CR_HSION);
+    #endif
+    #ifdef f_LSE_Hz
+      RCC->BDCR |= RCC_BDCR_LSEON;
+    #else
+      RCC->BDCR &= ~RCC_BDCR_LSEON;
     #endif
   }
 #else

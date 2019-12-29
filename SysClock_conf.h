@@ -2,7 +2,7 @@
 #define _SYSCLOCK_CONF_H_
 
 #define f_HSE_Hz 8000000
-#define f_LSE_Hz 32768
+//#define f_LSE_Hz 32768
 #define f_PLL_Hz 48000000
 #define f_AHB_Hz 48000000
 #define f_APB1_Hz 24000000 /* PCLK1 */
