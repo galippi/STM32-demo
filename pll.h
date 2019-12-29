@@ -1,10 +1,7 @@
 #ifndef _PLL_H_
 #define _PLL_H_
 
-//#include <stdint.h>
-
-#define STM32F10X_MD_VL
-#include "stm32f10x.h"
+#include "controller.h"
 
 #define f_LSI_Hz 40000
 #define f_HSI_Hz 8000000
@@ -151,5 +148,7 @@
 #if (HPRE_VAL != 1) && (HLFCYA_REG != 0)
 #define HLFCYA_REG is wrongly set!
 #endif
+
+void PLL_Init(void);
 
 #endif /* _PLL_H_ */
