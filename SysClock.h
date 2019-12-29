@@ -8,10 +8,6 @@
 
 #include "SysClock_conf.h"
 
-#if f_PLL_Hz > 72000000
-#error f_PLL_Hz is wrongly set!
-#endif
-
 #if f_APB1_Hz > 36000000
 #error f_APB1_Hz is wrongly set!
 #endif
@@ -124,6 +120,10 @@
 #endif
 
 #define f_ADC_Hz (f_APB2_Hz / ADCPRE_VAL)
+
+#if f_ADC_Hz > 14000000
+#error ADCPRE_REG is wrongly set!
+#endif
 
 #if USBPRE_REG == 0
   #define USBPRE_VAL 3 / 2
