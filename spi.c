@@ -104,7 +104,7 @@ void SPI2_Tx(uint8_t *data, uint8_t len)
     spi2Overrun++;
   }else
   {
-    DMA1->IFCR |= (DMA_ISR_TCIF4 | DMA_ISR_TCIF5); /* clear DMA transfer complete flag */
+    DMA1->IFCR = (DMA_ISR_TCIF4 | DMA_ISR_TCIF5); /* clear DMA transfer complete flag */
     /* start DMA channel for SPI2-Tx */
     DMA1_Channel5->CMAR = (uint32_t)data;
     DMA1_Channel5->CNDTR = len;

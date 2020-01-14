@@ -45,13 +45,13 @@ static inline void UART2_TX(const uint8_t *data, uint32_t len)
   DMA1_Channel4->CCR |= DMA_CCR_EN;
 #elif (CPU_TYPE == CPU_TYPE_STM32F1)
 #if UART2_DMA != 0
+  /* if ((DMA1->ISR & DMA_ISR_TCIF7) != 0) */
   if (DMA1_Channel7->CNDTR != 0)
   {
     UART2_TxOverrun++;
-  }else
-  { /* resetting Transfer Complete flag */
-    //DMA1->IFCR = DMA_ISR_TCIF7;
+    return;
   }
+  DMA1->IFCR = DMA_ISR_TCIF7; /* clear DMA transfer complete flag */
   DMA1_Channel7->CCR &= ~DMA_CCR1_EN;
   DMA1_Channel7->CMAR = (uint32_t)data;
   DMA1_Channel7->CNDTR = len;
