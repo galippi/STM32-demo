@@ -293,8 +293,12 @@ uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
   if (TIM3_SR_UIF_Get())
   {
     TIM3_SR_UIF_Reset();
-    //TIM3_UIF_Callback();
-    SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; /* activate PendSV handler */
+    TIM3_UIF_Callback();
+  }else
+  if (TIM3_SR_CC1IF_Get())
+  {
+    TIM3_SR_CC1IF_Reset();
+    TIM3_CC1IF_Callback();
   }else
   {
     CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF));
