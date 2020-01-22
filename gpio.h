@@ -23,4 +23,14 @@ static inline void GPIO_Set(GPIO_TypeDef *port, uint32_t pin_num, uint32_t val)
   }
 }
 
+static inline uint8_t GPIO_GetI(GPIO_TypeDef *port, uint32_t pin)
+{
+  return ((port->IDR >> pin) & 1);
+}
+
+static inline uint8_t GPIO_GetO(GPIO_TypeDef *port, uint32_t pin)
+{
+  return ((port->ODR >> pin) & 1);
+}
+
 #endif /* _GPIO_H_ */
