@@ -12,6 +12,7 @@ static inline void TIM3_UIF_PollHandler(void)
 
 static inline void TIM3_CC1IF_Callback(void)
 { /* call back function of TIM3 UIF - counter underflow */
+  TIM3_CCR1_Set(TIM3_CCR1_Get() + TIM3_FREQ); /* set next interrupt to the next 1ms slot */
   SchedulerPre_TaskTableUpdate();
   SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; /* activate PendSV handler */
 }
