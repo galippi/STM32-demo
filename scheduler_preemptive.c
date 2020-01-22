@@ -86,16 +86,13 @@ void SchedulerPre_TaskManagement(void)
       return;
     }else
     {
-      SchedPreTask_Disable(); /* disable IT */
-      if (SchedPreTask_RAM[i].state == SCHED_PRE_TASK_STATE_READY)
+      if (atomic_check_and_set_u8(SchedPreTask_RAM[i].state, SCHED_PRE_TASK_STATE_READY, SCHED_PRE_TASK_STATE_RUNNING))
       { /* task is ready to running -> start it */
-        SchedPreTask_RAM[i].state = SCHED_PRE_TASK_STATE_RUNNING;
-        SchedPreTask_Enable(); /* reenable IT */
         SchedPreTask_TaskStart(SchedPreTask_ROM[i].func); /* start the task */
         SchedPreTask_RAM[i].state = SCHED_PRE_TASK_STATE_IDLE;
       }else
-      {
-        SchedPreTask_Enable(); /* reenable IT */
+      { /* if the lock was not succesful, then the lower prio scheduling is running -> it will start the rest of the tasks */
+        return;
       }
     }
   }

@@ -23,6 +23,10 @@
 #define SchedPreTask_Enable() { \
 }
 
+/* atomic function to set the new task status, if it was in the given state */
+#define atomic_check_and_set_u8(var, val_old, val_new) \
+    ( (__LDREXB(&var) == val_old) ? (__STREXB(val_new, &var) == 0) : (__CLREX(), 0))
+
 #define SchedPreTask_TaskStart(func) { \
   func(); \
 }
