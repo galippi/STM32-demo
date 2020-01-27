@@ -972,21 +972,6 @@ HAL_StatusTypeDef  USB_DevDisconnect(USB_OTG_GlobalTypeDef *USBx)
 }
 
 /**
-  * @brief  USB_ReadInterrupts: return the global USB interrupt status
-  * @param  USBx  Selected device
-  * @retval HAL status
-  */
-uint32_t  USB_ReadInterrupts(USB_OTG_GlobalTypeDef *USBx)
-{
-  uint32_t tmpreg;
-
-  tmpreg = USBx->GINTSTS;
-  tmpreg &= USBx->GINTMSK;
-
-  return tmpreg;
-}
-
-/**
   * @brief  USB_ReadDevAllOutEpInterrupt: return the USB device OUT endpoints interrupt status
   * @param  USBx  Selected device
   * @retval HAL status
