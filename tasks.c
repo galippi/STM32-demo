@@ -8,7 +8,8 @@
 #include "bluetooth_hc05.h"
 #include "timer.h"
 #include "timer_app.h"
-#include "usb_device.h"
+#include "usb/usb_device.h"
+#include "usb_if.h"
 #include "vcom_if.h"
 #include "u32_to_hexstring.h"
 
@@ -53,6 +54,7 @@ void Task_1ms(void)
 #endif
     }
   }
+  USB_LP_CAN1_RX0_IRQHandler();
 }
 
 void Task_10ms(void)

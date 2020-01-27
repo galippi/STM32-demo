@@ -28,6 +28,7 @@
 #include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN Includes */
+#include "usb_if.h"
 
 /* USER CODE END Includes */
 
