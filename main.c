@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "controller.h"
+
 #include "gpio_app.h"
 #include "adc.h"
 #include "adc_app.h"
@@ -118,7 +120,7 @@ static void PLL_Init(void)
     RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PPRE1) | (RCC_CFGR_PPRE1_DIV2);
 
     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
-    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1_Div2 | RCC_CFGR_PLLMULL12); /* PLL configuration = HSE / 2 * 12 = 48 MHz */
+    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLXTPRE_HSE_Div2 | RCC_CFGR_PLLMULL12); /* PLL configuration = HSE / 2 * 12 = 48 MHz */
 
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
@@ -136,6 +138,7 @@ static void PLL_Init(void)
     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)RCC_CFGR_SWS_PLL)
     {
     }
+    RCC->CFGR |= RCC_CFGR_USBPRE;
   }
   else
   { /* If HSE fails to start-up, the application will have wrong clock
@@ -199,8 +202,87 @@ void RAM_StartCheck(void)
   }
 }
 
+extern uint8_t ld(volatile uint8_t *varPtr);
+uint8_t ld(volatile uint8_t *varPtr)
+{
+  return __LDREXB(varPtr);
+}
+
+extern uint8_t st(uint8_t newVal, volatile uint8_t *varPtr);
+uint8_t st(uint8_t newVal, volatile uint8_t *varPtr)
+{
+  return __STREXB(newVal, varPtr);
+}
+
+struct sLockDebug
+{
+  volatile uint8_t lockVar[16];
+  uint8_t lockResult[32];
+}lockDebug;
+
+static void t0(void)
+{
+  (void)ld(&lockDebug.lockVar[0]);
+  lockDebug.lockResult[0] = st(1, &lockDebug.lockVar[0]);
+  lockDebug.lockResult[1] = st(2, &lockDebug.lockVar[0]);
+  lockDebug.lockResult[2] = lockDebug.lockVar[0];
+}
+
+static void t1(void)
+{
+#if 1
+  (void)__LDREXB(&lockDebug.lockVar[0]);
+  __CLREX();
+  lockDebug.lockResult[3] = __STREXB(3, &lockDebug.lockVar[0]);
+  lockDebug.lockResult[4] = lockDebug.lockVar[0];
+#endif
+}
+
+static void t2(void)
+{
+#if 1
+  (void)__LDREXB(&lockDebug.lockVar[0]);
+  (void)__LDREXB(&lockDebug.lockVar[0]);
+  lockDebug.lockResult[5] = __STREXB(4, &lockDebug.lockVar[0]);
+  lockDebug.lockResult[6] = lockDebug.lockVar[0];
+  lockDebug.lockResult[7] = __STREXB(5, &lockDebug.lockVar[0]);
+  lockDebug.lockResult[8] = lockDebug.lockVar[0];
+#endif
+}
+
+static void t3(void)
+{
+#if 1
+  (void)__LDREXB(&lockDebug.lockVar[0]);
+  (void)__LDREXB(&lockDebug.lockVar[1]);
+  lockDebug.lockResult[9] = __STREXB(6, &lockDebug.lockVar[0]);
+  lockDebug.lockResult[10] = lockDebug.lockVar[0];
+  lockDebug.lockResult[11] = __STREXB(7, &lockDebug.lockVar[1]);
+  lockDebug.lockResult[12] = lockDebug.lockVar[1];
+#endif
+}
+
+static void t4(void)
+{
+#if 1
+  (void)__LDREXB(&lockDebug.lockVar[0]);
+  (void)__LDREXB(&lockDebug.lockVar[8]);
+  lockDebug.lockResult[13] = __STREXB(8, &lockDebug.lockVar[0]);
+  lockDebug.lockResult[14] = lockDebug.lockVar[0];
+  lockDebug.lockResult[15] = __STREXB(9, &lockDebug.lockVar[8]);
+  lockDebug.lockResult[16] = lockDebug.lockVar[8];
+#endif
+}
+
 int main(void)
 {
+  {
+    t0();
+    t1();
+    t2();
+    t3();
+    t4();
+  }
   PLL_Init();
   SysTick_Init();
   SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
@@ -223,6 +305,8 @@ int main(void)
   LED6_Init();
   PB13_Init();
   Button1_Init();
+  Debug0_Init(); /* Debug0 */
+  Debug1_Init(); /* Debug1 */
   ADC_HandlerInit();
   //UART2_Init();
   Bluetooth_Init();
