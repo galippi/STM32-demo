@@ -7,6 +7,8 @@
 #define CPU_TYPE_STM32F1 1
 #define CPU_TYPE_STM32F4 2
 
+#define USE_RTOS 0
+
 #if !defined(TARGET_ECU)
 #error "Error: TARGET ECU is not defined!"
 #endif /* !defined(TARGET_ECU) */
@@ -33,7 +35,7 @@
 
 #define CPU_TYPE CPU_TYPE_STM32F1
 
-#define STM32F10X_MD_VL 1 /* Medium-density devices */
+#define STM32F10X_MD 1 /* Medium-density devices */
 
 #include "stm32f10x.h"
 #define CONTROLLER_BASE_NAME "stm32f10x"

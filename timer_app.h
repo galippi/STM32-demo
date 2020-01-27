@@ -1,6 +1,7 @@
 #ifndef _TIMER_APP_H_
 #define _TIMER_APP_H_
 
+#include "timer.h"
 #include "timer_conf.h"
 
 static inline void TIM3_UIF_PollHandler(void)

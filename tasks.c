@@ -6,6 +6,11 @@
 #include "spi.h"
 #include "FaultHandler.h"
 #include "bluetooth_hc05.h"
+#include "timer.h"
+#include "timer_app.h"
+#include "usb_device.h"
+#include "vcom_if.h"
+#include "u32_to_hexstring.h"
 
 #include "tasks.h"
 
@@ -13,11 +18,15 @@ void Task_Init(void)
 {
   SPI_Init();
   //DebugOut_Init();
+  MX_USB_DEVICE_Init();
 }
 
 void Task_1ms(void)
 {
   /*PB13_Set(!PB13_Get());*/ /* toggling debug port */
+  static uint8_t var;
+  Debug1_Set(var);
+  var = !var;
   {
     static uint16_t t_ug;
     t_ug++;
@@ -48,6 +57,7 @@ void Task_1ms(void)
 
 void Task_10ms(void)
 {
+  Debug0_Set(1);
   //DebugOut();
   Bluetooth_Task_10ms();
   ADC_Handler_10ms();
@@ -76,7 +86,12 @@ void Task_10ms(void)
 		  timer--;
 	  }
   }
+
+  wait_us(1500);
+  Debug0_Set(0);
 }
+
+uint16_t usbItCtr;
 
 typedef enum
 {
@@ -138,4 +153,12 @@ void Task_500ms(void)
 	{
 		pulseTimer--;
 	}
+    {
+        static uint8_t msgCtr;
+        uint8_t usbDemoLine[] = "Periodic message ctr=xx xxxx\r\n";
+        U32_to_HexString((char*)usbDemoLine + 21, 2, msgCtr, '0');
+        U32_to_HexString((char*)usbDemoLine + 24, 4, usbItCtr, '0');
+        CDC_Transmit_FS(usbDemoLine, sizeof(usbDemoLine) - 1);
+        msgCtr++;
+    }
 }

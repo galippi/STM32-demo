@@ -1,6 +1,6 @@
 ##################################################################
 CFLAGS_DEBUG = -gdwarf-2
-SUBDIRS := ST_lib
+SUBDIRS := . ST_lib usb u32_to_hexstring
 
 WARNINGS = -Wall -Wextra
 WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
@@ -43,7 +43,7 @@ TARGET=demo1
 TARGET_DIR=bin
 DUMMY_DIR_FILE = $(TARGET_DIR)/dummy
 
-VPATH := $(TARGET_DIR) u32_to_hexstring
+VPATH := $(TARGET_DIR) u32_to_hexstring usb
 
 CPPFILES =
 #CPPFILES+=
@@ -66,6 +66,18 @@ CFILES  += FaultHandler.c
 CFILES  += ram_init.c
 CFILES  += vector.c
 CFILES  += u32_to_hexstring.c
+CFILES  += usb_device.c \
+           usbd_core.c \
+           usbd_conf.c \
+           usbd_cdc.c \
+           usbd_cdc_if.c \
+           usbd_desc.c \
+           usbd_ctlreq.c \
+           usbd_ioreq.c \
+           stm32f1xx_hal_pcd.c \
+           stm32f1xx_hal_pcd_ex.c \
+           stm32f1xx_ll_usb.c \
+
 #CFILES  += 
 
 SFILES  =
@@ -103,15 +115,29 @@ $(TARGET_LIST) : $(TARGET_ELF)
 	@echo Building $@
 	$(AS) -as $< -o $(TARGET_DIR)/$@
 
+$(TARGET_DIR)/%.o: $(notdir $@)
+
 #%.o: %.c $(MAKEFILE)
 %.o: %.c $(DUMMY_DIR_FILE)
 	@echo Building $(notdir $@)
 	-@rm -f $(@:.o=.d)
-	$(CC_DEP) -M $(CFLAGS_DEP) -c -o $(TARGET_DIR)/$(@:.o=.d) $<
-	$(CC) $(CFLAGS) -c -o $(TARGET_DIR)/$@ $<
+	$(CC) -MD $(CFLAGS) -c -o $(TARGET_DIR)/$@ $< &> $(TARGET_DIR)/$(@:.o=.err) ; \
+  if [ -s $(TARGET_DIR)/$(@:.o=.err) ] ; \
+  then \
+    rm -f $(TARGET_DIR)/$(@:.o=.d) ; \
+    cat $(TARGET_DIR)/$(@:.o=.err) ; \
+    exit 1 ; \
+  fi
+	@rm -f $(TARGET_DIR)/$(@:.o=.err)
+	cat $(TARGET_DIR)/$(@:.o=.d) | sed -e "s|$$|*|g" -e 's|\\|\/|g' -e 's|\([a-zA-Z]\)\:/|/cygdrive/\1/|g' -e 's|/\*|\\|' -e 's|*||' -e '1 s|bin/||' >$(TARGET_DIR)/$(@:.o=.d2)
+	@rm -f $(TARGET_DIR)/$(@:.o=.d)
+	mv $(TARGET_DIR)/$(@:.o=.d2) $(TARGET_DIR)/$(@:.o=.d)
 
 #	$(CC) -MD $(CFLAGS) -c -o $@ $<
 #	$(CC) -v -x c -E -
+
+%.d2: %.d
+	cat $< | sed -e "s|$$|*|g" -e 's|\\|\/|g' -e 's|\([a-zA-Z]\)\:/|/cygdrive/\1/|g' -e 's|/\*|\\|' -e 's|*||' >$@
 
 #%.o: %.cpp $(MAKEFILE)
 %.o: %.cpp $(DUMMY_DIR_FILE)

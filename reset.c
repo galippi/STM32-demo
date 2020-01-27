@@ -6,7 +6,7 @@
 
 void reset(void)
 {
-  RAM_StartCheck();
+  //RAM_StartCheck();
   RAM_Init();
   main();
 }

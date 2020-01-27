@@ -93,6 +93,22 @@ LEDx_Set(6)
 #define LED6_Set(x) {/* do nothing */}
 #endif
 
+static inline uint8_t Port_Get(GPIO_TypeDef *port, uint32_t pin)
+{
+  return ((port->IDR >> pin) & 1);
+}
+
+static inline void Port_Set(GPIO_TypeDef *port, uint32_t pin, uint32_t val)
+{
+  if (val)
+  {
+    port->ODR |= (1 << pin);
+  }else
+  {
+    port->ODR &= ~(1 << pin);
+  }
+}
+
 static inline void PB12_Init(void)
 {
   GPIO_PortInit_Out(GPIOB, 12);
@@ -129,5 +145,10 @@ static inline void PB13_Set(uint32_t val)
     PB13_PORT->ODR &= ~(1 << PB13_PIN_NUM);
   }
 }
+
+#define Debug0_Init() GPIO_PortInit_Out(GPIOC, 14)
+#define Debug0_Set(val) Port_Set(GPIOC, 14, (val))
+#define Debug1_Init() GPIO_PortInit_Out(GPIOC, 15)
+#define Debug1_Set(val) Port_Set(GPIOC, 15, (val))
 
 #endif /* _GPIO_APP_H_ */
