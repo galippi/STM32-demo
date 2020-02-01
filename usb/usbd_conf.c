@@ -82,7 +82,7 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef* pcdHandle)
     __HAL_RCC_USB_CLK_ENABLE();
 
     /* Peripheral interrupt init */
-    NVIC_SetPriority(USB_LP_CAN1_RX0_IRQn, 0);
+    NVIC_SetPriority(USB_LP_CAN1_RX0_IRQn, 15);
     NVIC_EnableIRQ(USB_LP_CAN1_RX0_IRQn);
   /* USER CODE BEGIN USB_MspInit 1 */
 
@@ -677,8 +677,10 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 {
   /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 0 */
   usbItCtr++;
+  while(_USB_ReadInterrupts() != 0)
+    HAL_PCD_IRQHandler(&hpcd_USB_FS);
   /* USER CODE END USB_LP_CAN1_RX0_IRQn 0 */
-  HAL_PCD_IRQHandler(&hpcd_USB_FS);
+  //HAL_PCD_IRQHandler(&hpcd_USB_FS);
   /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 1 */
 
   /* USER CODE END USB_LP_CAN1_RX0_IRQn 1 */
@@ -692,6 +694,11 @@ void USB_HP_CAN1_TX_IRQHandler(void)
 void USBWakeUp_IRQHandler(void)
 {
   CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF));
+}
+
+uint32_t _USB_ReadInterrupts(void)
+{
+  return USB_ReadInterrupts(hpcd_USB_FS.Instance);
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

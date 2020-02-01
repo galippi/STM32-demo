@@ -54,7 +54,21 @@ void Task_1ms(void)
 #endif
     }
   }
-  USB_LP_CAN1_RX0_IRQHandler();
+#if 0
+  uint16_t t_start = getTimer_us();
+  while (((_USB_ReadInterrupts()) != 0) && (((getTimer_us() - t_start) & 0xFFFF) < 600))
+  {
+    USB_LP_CAN1_RX0_IRQHandler();
+  }
+#endif
+}
+
+void Task_2ms(void)
+{
+}
+
+void Task_5ms(void)
+{
 }
 
 void Task_10ms(void)
@@ -94,6 +108,7 @@ void Task_10ms(void)
 }
 
 uint16_t usbItCtr;
+uint8_t taskOverrunCtr[5];
 
 typedef enum
 {
@@ -157,9 +172,14 @@ void Task_500ms(void)
 	}
     {
         static uint8_t msgCtr;
-        uint8_t usbDemoLine[] = "Periodic message ctr=xx xxxx\r\n";
+        uint8_t usbDemoLine[] = "Periodic message ctr=xx xxxx xx xx xx xx xx\r\n";
         U32_to_HexString((char*)usbDemoLine + 21, 2, msgCtr, '0');
         U32_to_HexString((char*)usbDemoLine + 24, 4, usbItCtr, '0');
+        U32_to_HexString((char*)usbDemoLine + 29, 2, taskOverrunCtr[0], '0');
+        U32_to_HexString((char*)usbDemoLine + 32, 2, taskOverrunCtr[1], '0');
+        U32_to_HexString((char*)usbDemoLine + 35, 2, taskOverrunCtr[2], '0');
+        U32_to_HexString((char*)usbDemoLine + 38, 2, taskOverrunCtr[3], '0');
+        U32_to_HexString((char*)usbDemoLine + 41, 2, taskOverrunCtr[4], '0');
         CDC_Transmit_FS(usbDemoLine, sizeof(usbDemoLine) - 1);
         msgCtr++;
     }

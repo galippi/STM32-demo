@@ -7,4 +7,6 @@ void USB_HP_CAN1_TX_IRQHandler(void);
 void USB_LP_CAN1_RX0_IRQHandler(void);
 void USBWakeUp_IRQHandler(void);
 
+uint32_t _USB_ReadInterrupts(void);
+
 #endif /* _USB_IF_H_ */

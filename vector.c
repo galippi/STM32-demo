@@ -15,6 +15,7 @@
 
 #include "reset.h"
 #include "main.h"
+#include "usb_if.h"
 
 #include "vector.h"
 
@@ -56,7 +57,7 @@ t_func_ptr const ISR_VectorTable[] =
   ISR_Invalid,       /*  DMA1 */
   ISR_Invalid,       /*  ADC */
   ISR_Invalid,       /*  USB TX */
-  ISR_Invalid,       /*  USB RX */
+  USB_LP_CAN1_RX0_IRQHandler, /*  USB RX */
   ISR_Invalid,       /*  CAN1 */
   ISR_Invalid,       /*  CAN1 */
   ISR_Invalid,       /*  EXTI9_5 */

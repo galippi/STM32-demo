@@ -9,6 +9,8 @@
 
 #define SCHED_PRE_TASK_LIST \
   SCHED_PRE_TASK_DEF(Task_1ms,     1) \
+  SCHED_PRE_TASK_DEF(Task_2ms,     2) \
+  SCHED_PRE_TASK_DEF(Task_5ms,     5) \
   SCHED_PRE_TASK_DEF(Task_10ms,   10) \
   SCHED_PRE_TASK_DEF(Task_500ms, 500)
 
@@ -30,8 +32,12 @@
 #define SchedPreTask_TaskStart(func) { \
   func(); \
 }
+
+extern uint8_t taskOverrunCtr[5];
 #define SchedPreTask_ErrorTaskOverrun(i) { \
-  CAT_Error(CAT_TaskOverrun_1ms + i, 0); \
+  taskOverrunCtr[i]++; \
 }
+
+//  CAT_Error(CAT_TaskOverrun_1ms + i, 0);
 
 #endif /* _SCHEDULER_PREEMPTIVE_CONF_H_ */
