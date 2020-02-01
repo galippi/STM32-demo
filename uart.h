@@ -4,6 +4,26 @@
 #include "controller.h"
 #include "uart_conf.h"
 
+void UART1_Init(uint32_t baudRate, uint8_t uartRemap);
+void UART1_Poll(void);
+
+static inline void UART1_TX(const uint8_t *data, uint32_t len)
+{
+#if UART1_DMA != 0
+  if (DMA1_Channel4->CNDTR != 0)
+  {
+    UART1_OverrunCallback();
+  }else
+  { /* resetting Transfer Complete flag */
+    //DMA1->IFCR = DMA_ISR_TCIF7;
+  }
+  DMA1_Channel4->CCR &= ~DMA_CCR1_EN;
+  DMA1_Channel4->CMAR = (uint32_t)data;
+  DMA1_Channel4->CNDTR = len;
+  DMA1_Channel4->CCR |= DMA_CCR1_EN;
+#endif
+}
+
 void UART2_Init(uint32_t BaudRate);
 void UART2_Poll(void);
 

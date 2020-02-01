@@ -244,7 +244,7 @@ int main(void)
 #if 1 || (UART2_DMA == 0)
     UART2_Poll();
 #endif
-    SPI_Poll();
+    //SPI_Poll();
   }
 
   return 0;
@@ -300,8 +300,20 @@ uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
     TIM3_SR_CC1IF_Reset();
     TIM3_CC1IF_Callback();
   }else
+  if (TIM3_SR_CC3IF_Get())
   {
-    CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF));
+    TIM3_SR_CC3IF_Reset();
+    TIM3_SR_CC3OF_Reset();
+    TIM3_CC3IF_Callback();
+  }else
+   if (TIM3_SR_CC4IF_Get())
+  {
+    TIM3_SR_CC4IF_Reset();
+    TIM3_SR_CC4OF_Reset();
+    TIM3_CC4IF_Callback();
+  }else
+  {
+    CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) | ((TIM3->SR) << 16));
   }
 }
 

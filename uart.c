@@ -5,6 +5,43 @@
 
 #include "uart.h"
 
+void UART1_Init(uint32_t baudRate, uint8_t uartRemap)
+{
+  if (uartRemap == 0)
+  {
+    GPIO_PortInit_AFOut(GPIOA,  9); /* PA2 USART1_TX */
+    GPIO_PortInit_In(GPIOA, 10); /* PA3 USART2_RX */
+    BitfieldSet(AFIO->MAPR, 2, 1, 0); /* AFIO_MAPR_USART1_REMAP */
+  }else
+  {
+    GPIO_PortInit_AFOut(GPIOB,  6); /* PA2 USART1_TX */
+    GPIO_PortInit_In(GPIOB,  7); /* PA3 USART2_RX */
+    BitfieldSet(AFIO->MAPR, 2, 1, 1); /* AFIO_MAPR_USART1_REMAP */
+  }
+  RCC->APB2ENR |= RCC_APB2ENR_USART1EN;   /* enable the USART1 */
+  USART1->CR1 = USART_CR1_TE | USART_CR1_RE; /* TX/RX are enabled */
+  USART1->BRR = ((((F_SYSTEM * 1000) / 1) + (baudRate / 2)) / baudRate);
+  USART1->CR2 = 0; /* 1 stop bit */
+#if UART1_DMA == 0
+  USART1->CR3 = 0x00; /* DMA is disabled (???) for the channel */
+#else
+  USART1->CR3 = 0xC0; /* DMA is enabled for the channel */
+  /* configuring DMA for USART1-TX */
+  DMA_Init(DMA1);
+  DMA1_Channel4->CCR &= ~DMA_CCR1_EN;
+  DMA1_Channel4->CPAR = (uint32_t)&(USART1->DR);
+  DMA1_Channel4->CCR = DMA_CCR1_DIR | DMA_CCR1_MINC; /* mem2per, no-circ, no-per-inc, mem-inc, psize=8, memsize=8,ch-prio=low, no-mem2mem */
+  /* configuring DMA for USART1-RX */
+  DMA1_Channel5->CCR &= ~DMA_CCR1_EN;
+  DMA1_Channel5->CPAR = (uint32_t)&(USART1->DR);
+  DMA1_Channel5->CCR = DMA_CCR1_MINC | DMA_CCR1_CIRC; /* per2mem, circ, no-per-inc, mem-inc, psize=8, memsize=8, ch-prio=low, no-mem2mem */
+  DMA1_Channel5->CMAR = (uint32_t)UART1_DMA_RX_BUFFER;
+  DMA1_Channel5->CNDTR = sizeof(UART1_DMA_RX_BUFFER);
+  DMA1_Channel5->CCR |= DMA_CCR1_EN;
+#endif
+  USART1->CR1 |= USART_CR1_UE; /* USART1 is enabled */
+}
+
 #if (CPU_TYPE == CPU_TYPE_STM32F1)
 #if F_SYSTEM == 48000
 //#define USART2_BRR ((F_SYSTEM * 1000l * (8 * (2 - USART2_OVER8))) /  9600)

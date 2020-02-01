@@ -106,6 +106,11 @@ static inline void TIM3_SR_CC3IF_Reset(void)
   TIM3->SR = ~(TIM_SR_CC3IF); /* reset the CC3-InterrupFlag */
 }
 
+static inline void TIM3_SR_CC3OF_Reset(void)
+{
+  TIM3->SR = ~(TIM_SR_CC3OF); /* reset the CC3-oveflow-InterrupFlag */
+}
+
 static inline uint16_t TIM3_CCR3_Get(void)
 {
   return TIM3->CCR3;
@@ -124,6 +129,11 @@ static inline uint32_t TIM3_SR_CC4IF_Get(void)
 static inline void TIM3_SR_CC4IF_Reset(void)
 {
   TIM3->SR = ~(TIM_SR_CC4IF); /* reset the CC4-InterrupFlag */
+}
+
+static inline void TIM3_SR_CC4OF_Reset(void)
+{
+  TIM3->SR = ~(TIM_SR_CC4OF); /* reset the CC3-oveflow-InterrupFlag */
 }
 
 static inline uint16_t TIM3_CCR4_Get(void)
