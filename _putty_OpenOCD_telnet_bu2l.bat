@@ -1,0 +1,1 @@
+start C:\KBApps\putty.exe -load openocd 
