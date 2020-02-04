@@ -39,7 +39,7 @@ static inline void TIM3_CC3IF_Callback(void)
   uint16_t t = TIM3_CCR3_Get();
   uint16_t dt = t - t_prev;
   t_prev = t;
-  if (dt > 200)
+  if (dt > 500)
   {
 	  if (GPIO_GetI(GPIOB, 1))
 	  {

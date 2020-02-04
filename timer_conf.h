@@ -16,7 +16,7 @@ static inline void TIM2_CC3IF_Callback(void)
 #define TIM3_ARR_INIT 65535 /* continuous counter */
 #define TIM3_CCER_INIT 0x1101 /* enable CC1 out high, CC3/CC4 input */
 #define TIM3_CCMR1_INIT 0x0000
-#define TIM3_CCMR2_INIT 0x0101 /* enable CC3/CC4 as input capture */
+#define TIM3_CCMR2_INIT 0xF1F1 /* enable CC3/CC4 as input capture */
 #define TIM3_DIER_INIT 0x001B /* enable update interrupt */
 
 static inline void TIM3_UIF_Callback(void)
