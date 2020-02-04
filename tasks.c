@@ -152,7 +152,7 @@ void Task_500ms(void)
 	}
     {
         static uint8_t msgCtr;
-        uint8_t usbDemoLine[] = "Periodic message ctr=xx xx   xx xx xx xx xx xx xx xxxx\r\n";
+        static uint8_t usbDemoLine[] = "Periodic message ctr=xx xx   xx xx xx xx xx xx xx xxxx\r\n";
         U32_to_HexString((char*)usbDemoLine + 21, 2, msgCtr, '0');
         U32_to_HexString((char*)usbDemoLine + 24, 2, UART1_TxOverrun, '0');
         UART1_RxNum = DMA1_Channel5->CNDTR - (uint32_t)Rx_buffer;
