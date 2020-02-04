@@ -1,1 +1,0 @@
-start C:\Programok\putty.exe -load STM32-vcom
