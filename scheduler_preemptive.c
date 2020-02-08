@@ -1,8 +1,15 @@
 #include <stdint.h>
 
+#include "timer_app.h"
+
 #include "scheduler_preemptive_conf.h"
 
 #include "scheduler_preemptive.h"
+
+uint8_t CPU_load = 0xFF;
+static volatile uint8_t CPU_loadCntr = 0xFF;
+static uint16_t CPU_loadStart;
+static uint16_t CPU_loadBusy, CPU_loadFree;
 
 typedef enum {
   SCHED_PRE_TASK_STATE_IDLE,
@@ -53,6 +60,28 @@ void SchedulerPre_TaskTableUpdate(void)
 {
   uint32_t i;
   SchedPreTask_Disable(); /* disable IT */
+  {
+    uint16_t t = getTimer_us();
+    if (CPU_loadCntr == 0xFF)
+    {
+        CPU_loadCntr = 0;
+        CPU_loadStart = t;
+    }else
+    if (CPU_loadCntr == 0)
+    {
+      uint16_t dt = t - CPU_loadStart;
+      CPU_loadStart = t;
+      uint32_t CPU_loadFree_new = (uint32_t)CPU_loadFree + dt;
+      if (CPU_loadFree_new > 65535)
+      {
+        CPU_loadBusy = CPU_loadBusy / 2;
+        CPU_loadFree_new = CPU_loadFree_new / 2;
+      }
+      CPU_loadFree = (uint16_t)CPU_loadFree_new;
+      CPU_load = (uint8_t)((200 * (uint32_t)CPU_loadBusy) / ((uint32_t)CPU_loadFree + (uint32_t)CPU_loadBusy));
+    }
+    CPU_loadCntr++;
+  }
   for(i = 0; i < SchedPreTaskNum; i++)
   {
     if (SchedPreTask_RAM[i].timer == 0)
@@ -66,7 +95,6 @@ void SchedulerPre_TaskTableUpdate(void)
       }
       /* reschedule the task */
       SchedPreTask_RAM[i].timer = SchedPreTask_ROM[i].T;
-    ;
     }else
     { /* update/decrease the task timer */
       SchedPreTask_RAM[i].timer --;
@@ -83,7 +111,7 @@ void SchedulerPre_TaskManagement(void)
   {
     if (SchedPreTask_RAM[i].state == SCHED_PRE_TASK_STATE_RUNNING)
     { /* task is running -> continue it */
-      return;
+      break;
     }else
     {
       if (atomic_check_and_set_u8(SchedPreTask_RAM[i].state, SCHED_PRE_TASK_STATE_READY, SCHED_PRE_TASK_STATE_RUNNING))
@@ -92,8 +120,27 @@ void SchedulerPre_TaskManagement(void)
         SchedPreTask_RAM[i].state = SCHED_PRE_TASK_STATE_IDLE;
       }else
       { /* if the lock was not succesful, then the lower prio scheduling is running -> it will start the rest of the tasks */
-        return;
+        break;
       }
     }
   }
+  SchedPreTask_Disable(); /* disable IT */
+  {
+    CPU_loadCntr--;
+    if (CPU_loadCntr == 0)
+    {
+      uint16_t t = getTimer_us();
+      uint16_t dt = t - CPU_loadStart;
+      uint32_t CPU_loadBusy_new = (uint32_t)CPU_loadBusy + dt;
+      CPU_loadBusy += dt;
+      if (CPU_loadBusy_new > 65535)
+      {
+    	  CPU_loadBusy_new = CPU_loadBusy_new / 2;
+        CPU_loadFree = CPU_loadFree / 2;
+      }
+      CPU_loadBusy = (uint16_t)CPU_loadBusy_new;
+      CPU_loadStart = t;
+    }
+  }
+  SchedPreTask_Enable(); /* enable IT */
 }
