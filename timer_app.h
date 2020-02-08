@@ -1,6 +1,8 @@
 #ifndef _TIMER_APP_H_
 #define _TIMER_APP_H_
 
+#include "gpio_app.h"
+
 #include "timer.h"
 #include "timer_conf.h"
 
