@@ -10,7 +10,7 @@
 #define SCHED_PRE_TASK_LIST \
   SCHED_PRE_TASK_DEF(Task_1ms,     1) \
   SCHED_PRE_TASK_DEF(Task_10ms,   10) \
-  SCHED_PRE_TASK_DEF(Task_500ms, 500)
+  SCHED_PRE_TASK_DEF(Task_500ms, 100)
 
 #define SchedPreTask_ActivateTask() { \
   /* activate PendSV handler */ \
