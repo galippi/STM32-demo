@@ -8,6 +8,8 @@
 #include "bluetooth_hc05.h"
 #include "uart.h"
 #include "u32_to_hexstring/u32_to_hexstring.h"
+#include "scheduler_preemptive.h"
+#include "timer_app.h"
 
 #include "tasks.h"
 
@@ -82,6 +84,7 @@ void Task_10ms(void)
 		  timer--;
 	  }
   }
+  //wait_us(4500);
 }
 
 uint8_t UART1_TxOverrun;
@@ -155,10 +158,10 @@ void Task_500ms(void)
         static uint8_t usbDemoLine[] = "Periodic message ctr=xx xx   xx xx xx xx xx xx xx xxxx\r\n";
         U32_to_HexString((char*)usbDemoLine + 21, 2, msgCtr, '0');
         U32_to_HexString((char*)usbDemoLine + 24, 2, UART1_TxOverrun, '0');
-        UART1_RxNum = DMA1_Channel5->CNDTR - (uint32_t)Rx_buffer;
+        UART1_RxNum = DMA1_Channel5->CNDTR;
         U32_to_HexString((char*)usbDemoLine + 29, 2, UART1_RxNum, '0');
+        U32_to_HexString((char*)usbDemoLine + 32, 2, CPU_load, '0');
 #if 0
-        U32_to_HexString((char*)usbDemoLine + 32, 2, taskOverrunCtr[1], '0');
         U32_to_HexString((char*)usbDemoLine + 35, 2, taskOverrunCtr[2], '0');
         U32_to_HexString((char*)usbDemoLine + 38, 2, taskOverrunCtr[3], '0');
         U32_to_HexString((char*)usbDemoLine + 41, 2, taskOverrunCtr[4], '0');
