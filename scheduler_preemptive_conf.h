@@ -34,4 +34,11 @@
   CAT_Error(CAT_TaskOverrun_1ms + i, 0); \
 }
 
+#define SchedulerPre_LostInterruptCallBack() \
+  CAT_Error(CAT_SchedLostInterrupt, 0)
+
+#define SchedPreTask_EnableCPULoadMeas 1
+#define SchedPreTask_EnableTaskLoadMeas 1
+#define SchedPreTask_LoadMeasResolution TIM3_FREQ
+
 #endif /* _SCHEDULER_PREEMPTIVE_CONF_H_ */
