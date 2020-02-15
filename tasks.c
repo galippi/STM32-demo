@@ -70,15 +70,22 @@ void Task_1ms(void)
   }
 }
 
+uint8_t spi1Buf[4];
+uint8_t spi2Buf[sizeof(spi1Buf)];
+
 void Task_10ms(void)
 {
   //DebugOut();
   ADC_Handler_10ms();
+  { // the slave has to be prepared first
+    static const uint8_t spiData[sizeof(spi1Buf)] = { 0x55, 0x0A, 0x05, 0x0F};
+    memcpy(spi1Buf, spiData, sizeof(spi1Buf));
+    SPI1_Tx(spi1Buf, sizeof(spi1Buf));
+  }
   {
-    static const uint8_t spiData[] = { 0x00, 0x39, 0x00, 0x5A};
-    static uint8_t spiBuf[sizeof(spiData)];
-    memcpy(spiBuf, spiData, sizeof(spiBuf));
-    SPI2_Tx(spiBuf, sizeof(spiBuf));
+    static const uint8_t spiData[sizeof(spi1Buf)] = { 0x00, 0x39, 0x00, 0x5A};
+    memcpy(spi2Buf, spiData, sizeof(spi2Buf));
+    SPI2_Tx(spi2Buf, sizeof(spi2Buf));
   }
   {
 	  static uint8_t timer = 200;
@@ -99,7 +106,7 @@ void Task_10ms(void)
 		  timer--;
 	  }
   }
-  wait_us(4500);
+  //wait_us(4500);
 }
 
 uint8_t UART1_TxOverrun;
@@ -193,4 +200,11 @@ void Task_500ms(void)
         UART1_TX(usbDemoLine, sizeof(usbDemoLine)-1);
         msgCtr++;
     }
+}
+
+void Task_Bgrd(void)
+{
+  ADC_Handler();
+  SPI1_Poll();
+  SPI2_Poll();
 }

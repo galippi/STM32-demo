@@ -2,6 +2,7 @@
 #include "spi.h"
 #include "spi_conf.h"
 #include "controller.h"
+#include "bitfield_lib.h"
 
 #if (SPI1_DMA != 0) || (SPI2_DMA != 0)
 #include "dma.h"
@@ -15,21 +16,30 @@ uint8_t  spi1Len = 0;
 #endif /* SPI2_DMA */
 uint8_t spi1TxCtr;
 uint8_t spi1Overrun;
+uint8_t spi1RxCtr;
 
 void SPI1_Init(uint8_t slave, uint8_t spiRemap)
 {
 #ifdef SPI1_CR1_INIT
   RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
+  SPI1->CR1 = 0;
 #ifndef SPI1_SS_INIT
   if (spiRemap == 0)
-    GPIO_PortInit_AFOut(GPIOA,  4); /* chip-select */
+    if (slave == 0)
+      GPIO_PortInit_AFOut(GPIOA,  4); /* chip-select */
+    else
+      GPIO_PortInit_In(GPIOA,  4); /* chip-select */
   else
-    GPIO_PortInit_AFOut(GPIOA, 15); /* chip-select */
+    if (slave == 0)
+      GPIO_PortInit_AFOut(GPIOA, 15); /* chip-select */
+    else
+      GPIO_PortInit_In(GPIOA,  15); /* chip-select */
 #else /* SPI1_SS_INIT */
   SPI1_SS_INIT();
 #endif /* SPI1_SS_INIT */
   if (spiRemap == 0)
   {
+    BitfieldSet(AFIO->MAPR, 0, 1, 0); /* AFIO_MAPR_SPI1_REMAP */
     if (slave == 0)
     {
         GPIO_PortInit_AFOut(GPIOA, 5); /* clock */
@@ -43,6 +53,7 @@ void SPI1_Init(uint8_t slave, uint8_t spiRemap)
     }
   }else
   {
+    BitfieldSet(AFIO->MAPR, 0, 1, 1); /* AFIO_MAPR_SPI1_REMAP */
     if (slave == 0)
     {
         GPIO_PortInit_AFOut(GPIOB, 3); /* clock */
@@ -103,6 +114,7 @@ void SPI1_Poll(void)
     DMA_SPI1_TX->CCR &= ~DMA_CCR1_EN;
     DMA_SPI1_RX->CCR &= ~DMA_CCR1_EN;
     SPI1_SS_DEACTIVE();
+    spi1RxCtr++;
   }
   #endif /* SPI1_DMA */
 }
@@ -150,6 +162,7 @@ void SPI2_Init(void)
 {
 #ifdef SPI2_CR1_INIT
   RCC->APB1ENR |= RCC_APB1ENR_SPI2EN;
+  SPI2->CR1 = 0;
 #ifndef SPI2_SS_INIT
   GPIO_PortInit_AFOut(GPIOB, 12); /* chip-select */
 #else /* SPI2_SS_INIT */

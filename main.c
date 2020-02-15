@@ -32,6 +32,7 @@ DMA_TypeDef * const dma1 = DMA1;
 //DMA_Channel_TypeDef * const dma1_4 = DMA1_Channel4;
 SCB_Type * const scb = SCB;
 NVIC_Type * const nvic = NVIC;
+SPI_TypeDef * const spi1 = SPI1;
 SPI_TypeDef * const spi2 = SPI2;
 
 uint32_t StartUpCounter;
@@ -223,12 +224,7 @@ int main(void)
 
   while (1)
   {
-    ADC_Handler();
-    //TIM3_UIF_PollHandler();
-#if 1 || (UART2_DMA == 0)
-    UART2_Poll();
-#endif
-    //SPI_Poll();
+    Task_Bgrd();
   }
 
   return 0;
