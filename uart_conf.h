@@ -22,6 +22,6 @@
 extern uint8_t UART1_TxOverrun;
 #define UART1_OverrunCallback() (UART1_TxOverrun++)
 
-#define UART2_DMA 1
+#define UART2_DMA 0
 
 #endif /* _UART_CONF_H_ */

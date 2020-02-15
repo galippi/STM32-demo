@@ -10,7 +10,6 @@
 #include "timer_conf.h"
 #include "timer_app.h"
 #include "uart.h"
-#include "bluetooth_hc05.h"
 #include "scheduler_preemptive.h"
 #include "tasks.h"
 #include "FaultHandler.h"
@@ -211,21 +210,6 @@ int main(void)
   RCC->CFGR |= RCC_CFGR_MCO_PLL; // MCO output is configured to PLL
 #endif
   RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
-  LED3_Init();
-  LED3_Set(0);
-  LED3_Set(1);
-  LED3_Set(0);
-  LED3_Set(1);
-  LED3_Set(0);
-  LED3_Set(1);
-  LED4_Init();
-  LED5_Init();
-  LED6_Init();
-  PB13_Init();
-  Button1_Init();
-  ADC_HandlerInit();
-  //UART2_Init();
-  Bluetooth_Init();
   Task_Init();
   SchedulerPre_Init();
   TIM3_Init();

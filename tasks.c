@@ -5,11 +5,11 @@
 #include "adc_app.h"
 //#include "spi.h"
 #include "FaultHandler.h"
-#include "bluetooth_hc05.h"
 #include "uart.h"
 #include "u32_to_hexstring/u32_to_hexstring.h"
 #include "scheduler_preemptive.h"
 #include "timer_app.h"
+#include "spi.h"
 
 #include "tasks.h"
 
@@ -18,9 +18,25 @@ uint8_t uart1TxBuffer[128];
 
 void Task_Init(void)
 {
+  LED3_Init();
+  LED3_Set(0);
+  LED3_Set(1);
+  LED3_Set(0);
+  LED3_Set(1);
+  LED3_Set(0);
+  LED3_Set(1);
+  LED4_Init();
+  LED5_Init();
+  LED6_Init();
+  PB13_Init();
+  Button1_Init();
+  ADC_HandlerInit();
+  //UART2_Init();
   //SPI_Init();
   //DebugOut_Init();
   UART1_Init(38400, 1);
+  SPI1_Init(SPI_SLAVE, SPI_REMAP);
+  SPI2_Init();
 }
 
 void Task_1ms(void)
@@ -57,13 +73,12 @@ void Task_1ms(void)
 void Task_10ms(void)
 {
   //DebugOut();
-  Bluetooth_Task_10ms();
   ADC_Handler_10ms();
   {
     static const uint8_t spiData[] = { 0x00, 0x39, 0x00, 0x5A};
     static uint8_t spiBuf[sizeof(spiData)];
     memcpy(spiBuf, spiData, sizeof(spiBuf));
-    //SPI2_Tx(spiBuf, sizeof(spiBuf));
+    SPI2_Tx(spiBuf, sizeof(spiBuf));
   }
   {
 	  static uint8_t timer = 200;

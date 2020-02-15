@@ -93,6 +93,22 @@ LEDx_Set(6)
 #define LED6_Set(x) {/* do nothing */}
 #endif
 
+static inline void PA15_Init(void)
+{
+  GPIO_PortInit_Out(GPIOA, 15);
+}
+
+static inline void PA15_Set(uint32_t val)
+{
+  if (val)
+  {
+    GPIOA->ODR |= (1 << 15);
+  }else
+  {
+    GPIOA->ODR &= ~(1 << 15);
+  }
+}
+
 static inline void PB12_Init(void)
 {
   GPIO_PortInit_Out(GPIOB, 12);
