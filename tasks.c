@@ -20,15 +20,6 @@ void Task_Init(void)
 {
   LED3_Init();
   LED3_Set(0);
-  LED3_Set(1);
-  LED3_Set(0);
-  LED3_Set(1);
-  LED3_Set(0);
-  LED3_Set(1);
-  LED4_Init();
-  LED5_Init();
-  LED6_Init();
-  PB13_Init();
   Button1_Init();
   ADC_HandlerInit();
   //UART2_Init();
@@ -41,33 +32,7 @@ void Task_Init(void)
 
 void Task_1ms(void)
 {
-  /*PB13_Set(!PB13_Get());*/ /* toggling debug port */
-  {
-    static uint16_t t_ug;
-    t_ug++;
-    if (t_ug > 1950)
-    {
-      if (t_ug > 2000)
-      {
-        t_ug = 0;
-      }
-    }else
-    {
-#if (CPU_TYPE == CPU_TYPE_STM32F0)
-      static uint16_t dac_val = 0;
-      if (ADC_values[ADC_IN5_Ub] > (uint32_t)(0.7 * 4095/3.3))
-      {
-        dac_val++;
-      }else
-      {
-        if (dac_val > 0)
-        {
-          dac_val--;
-        }
-      }
-#endif
-    }
-  }
+  //if (ADC_values[ADC_IN5_Ub] > (uint32_t)(0.7 * 4095/3.3))
 }
 
 uint8_t spi1Buf[4];
@@ -97,12 +62,6 @@ void Task_10ms(void)
 		  timer = 200;
 	  }else
 	  {
-		  if ((timer == 50) || (timer == 150))
-		  {
-		    static uint8_t l4;
-        LED4_Set(l4);
-        l4 = !l4;
-		  }
 		  timer--;
 	  }
   }
@@ -177,7 +136,7 @@ void Task_500ms(void)
 	}
     {
         static uint8_t msgCtr;
-        static uint8_t usbDemoLine[] = "Periodic message ctr=xx xx   xx xx xx xx xx xx xx xxxx xx xx xx\r\n";
+        static uint8_t usbDemoLine[] = "Periodic message ctr=xx xx   xx xx xx xx xx xx xx xxxx xx xx xx xx xx xx\r\n";
         U32_to_HexString((char*)usbDemoLine + 21, 2, msgCtr, '0');
         U32_to_HexString((char*)usbDemoLine + 24, 2, UART1_TxOverrun, '0');
         UART1_RxNum = DMA1_Channel5->CNDTR;
@@ -196,6 +155,10 @@ void Task_500ms(void)
         U32_to_HexString((char*)usbDemoLine + 55, 2, SchedPreTask_GetTaskLoadMax(0), '0');
         U32_to_HexString((char*)usbDemoLine + 58, 2, SchedPreTask_GetTaskLoadMax(1), '0');
         U32_to_HexString((char*)usbDemoLine + 61, 2, SchedPreTask_GetTaskLoadMax(2), '0');
+
+        U32_to_HexString((char*)usbDemoLine + 64, 2, spi1_isrCtr, '0');
+        U32_to_HexString((char*)usbDemoLine + 67, 2, spi2_isrCtr, '0');
+        U32_to_HexString((char*)usbDemoLine + 70, 2, spi2_errCtr, '0');
 
         UART1_TX(usbDemoLine, sizeof(usbDemoLine)-1);
         msgCtr++;

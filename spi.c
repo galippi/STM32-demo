@@ -158,6 +158,12 @@ void SPI1_Tx(uint8_t *data, uint8_t len)
 #endif /* SPI1_DMA */
 }
 
+uint8_t spi1_isrCtr;
+void SPI1_ISR(void)
+{
+  spi1_isrCtr++;
+}
+
 void SPI2_Init(void)
 {
 #ifdef SPI2_CR1_INIT
@@ -173,6 +179,7 @@ void SPI2_Init(void)
   GPIO_PortInit_AFOut(GPIOB, 15); /* MOSI */
   SPI2->CR1 = SPI2_CR1_INIT;
   SPI2->CR2 = SPI2_CR2_INIT;
+  SPI2->CR1 |= SPI_CR1_SPE;
 #if SPI2_DMA == 0
   /* DMA is disabled (???) for the channel */
 #else /* SPI2_DMA */
@@ -204,6 +211,7 @@ uint8_t spi2TxCtr;
 void SPI2_Poll(void)
 {
   #if SPI2_DMA == 0
+    #if SPI2_ISR_ENABLE == 0
   uint16_t spi2SR = SPI2->SR;
   if ((spi2SR & SPI_SR_RXNE) && (spi2RxIdx < spi2Len))
   {
@@ -222,6 +230,7 @@ void SPI2_Poll(void)
       SPI2->DR = spi2DataPtr[spi2TxIdx++];
     }
   }
+    #endif
   #else /* SPI2_DMA */
   /* if ((DMA1_Channel4->CCR & DMA_CCR1_EN) && (DMA1_Channel4->CNDTR == 0)) */
   if ((DMA1_Channel4->CCR & DMA_CCR1_EN) && ((DMA1->ISR & DMA_ISR_TCIF4) != 0))
@@ -240,15 +249,20 @@ void SPI2_Tx(uint8_t *data, uint8_t len)
   if (spi2Len != 0)
   {
     spi2Overrun++;
-  }else
+  }//else
   {
     spi2DataPtr = data;
     spi2Len = len;
     spi2TxIdx = 0;
     spi2RxIdx = 0;
     SPI2_SS_ACTIVE();
-    SPI2->CR1 |= SPI_CR1_SPE;
+#if SPI2_ISR_ENABLE == 0
     SPI2_Poll();
+#else
+    SPI2->DR = spi2DataPtr[spi2TxIdx++];
+    SPI2->CR2 = SPI2->CR2 | (SPI_CR2_RXNEIE | SPI_CR2_TXEIE);
+    NVIC_EnableIRQ(SPI2_IRQn);
+#endif
   }
 #else /* SPI2_DMA */
   if (DMA1_Channel4->CCR & DMA_CCR1_EN)
@@ -271,3 +285,42 @@ void SPI2_Tx(uint8_t *data, uint8_t len)
   }
 #endif /* SPI2_DMA */
 }
+
+#if SPI2_ISR_ENABLE != 0
+uint8_t spi2_isrCtr;
+uint8_t spi2_errCtr;
+void SPI2_ISR(void)
+{
+  spi2_isrCtr++;
+  uint16_t spi2SR = SPI2->SR;
+  if (spi2SR & (SPI_SR_UDR | SPI_SR_CRCERR | SPI_SR_MODF | SPI_SR_OVR))
+  {
+    NVIC_DisableIRQ(SPI2_IRQn);
+    spi2_errCtr++;
+  }
+  if ((spi2SR & SPI_SR_RXNE) && (spi2RxIdx < spi2Len))
+  {
+    spi2DataPtr[spi2RxIdx++] = SPI2->DR;
+    if (spi2RxIdx == spi2Len)
+    {
+      SPI2->CR2 = SPI2->CR2 & (~SPI_SR_RXNE);
+      NVIC_DisableIRQ(SPI2_IRQn);
+      SPI2_SS_DEACTIVE();
+      /* SPI2->CR1 &= ~SPI_CR1_SPE;*/
+      spi2Len = 0;
+    }
+  }
+  if ((spi2SR & SPI_SR_TXE) && (spi2TxIdx < spi2Len))
+  {
+#if 0
+    SPI2->DR = spi2DataPtr[spi2TxIdx++];
+#else
+    SPI2->DR = spi2DataPtr[spi2TxIdx];
+    spi2DataPtr[spi2TxIdx] = 0; /* SPI testing purpose */
+    spi2TxIdx++;
+#endif
+    if (spi2TxIdx == spi2Len)
+      SPI2->CR2 = SPI2->CR2 & (~SPI_CR2_TXEIE);
+  }
+}
+#endif

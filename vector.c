@@ -15,6 +15,7 @@
 
 #include "reset.h"
 #include "main.h"
+#include "spi.h"
 
 #include "vector.h"
 
@@ -71,8 +72,8 @@ t_func_ptr const ISR_VectorTable[] =
   ISR_Invalid,       /*  I2C1 */
   ISR_Invalid,       /*  I2C2 */
   ISR_Invalid,       /*  I2C2 */
-  ISR_Invalid,       /*  SPI1 */
-  ISR_Invalid,       /*  SPI2 */
+  SPI1_ISR,          /*  SPI1 */
+  SPI2_ISR,          /*  SPI2 */
   ISR_Invalid,       /*  USART1 */
   ISR_Invalid,       /*  USART2 */
   ISR_Invalid,       /*  USART3 */
