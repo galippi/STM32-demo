@@ -13,7 +13,7 @@ uint8_t *spi1DataPtr;
 uint8_t spi1TxIdx;
 uint8_t spi1RxIdx;
 uint8_t  spi1Len = 0;
-#endif /* SPI2_DMA */
+#endif /* SPI1_DMA */
 uint8_t spi1TxCtr;
 uint8_t spi1Overrun;
 uint8_t spi1RxCtr;
@@ -68,6 +68,7 @@ void SPI1_Init(uint8_t slave, uint8_t spiRemap)
   }
   SPI1->CR1 = SPI1_CR1_INIT;
   SPI1->CR2 = SPI1_CR2_INIT;
+  SPI1->CR1 |= SPI_CR1_SPE;
 #if SPI1_DMA == 0
   /* DMA is disabled (???) for the channel */
 #else /* SPI1_DMA */
@@ -90,6 +91,7 @@ void SPI1_Init(uint8_t slave, uint8_t spiRemap)
 void SPI1_Poll(void)
 {
   #if SPI1_DMA == 0
+    #if SPI2_ISR_ENABLE == 0
   uint16_t spi1SR = SPI1->SR;
   if ((spi1SR & SPI_SR_RXNE) && (spi1RxIdx < spi1Len))
   {
@@ -108,6 +110,7 @@ void SPI1_Poll(void)
       SPI1->DR = spi1DataPtr[spi1TxIdx++];
     }
   }
+    #endif
   #else /* SPI1_DMA */
   if ((DMA_SPI1_RX->CCR & DMA_CCR1_EN) && ((DMA1->ISR & DMA_ISR_TCIF2) != 0))
   {
@@ -133,8 +136,14 @@ void SPI1_Tx(uint8_t *data, uint8_t len)
     spi1TxIdx = 0;
     spi1RxIdx = 0;
     SPI1_SS_ACTIVE();
+#if SPI1_ISR_ENABLE == 0
     SPI1->CR1 |= SPI_CR1_SPE;
     SPI1_Poll();
+#else
+    SPI1->DR = spi1DataPtr[spi1TxIdx++];
+    SPI1->CR2 = SPI1->CR2 | (SPI_CR2_RXNEIE | SPI_CR2_TXEIE);
+    NVIC_EnableIRQ(SPI1_IRQn);
+#endif
   }
 #else /* SPI1_DMA */
   if (DMA_SPI1_RX->CCR & DMA_CCR1_EN)
@@ -158,11 +167,38 @@ void SPI1_Tx(uint8_t *data, uint8_t len)
 #endif /* SPI1_DMA */
 }
 
+#if SPI1_ISR_ENABLE != 0
 uint8_t spi1_isrCtr;
+uint8_t spi1_errCtr;
 void SPI1_ISR(void)
 {
   spi1_isrCtr++;
+  SPI_TypeDef * const spi = SPI1;
+  uint16_t spi_SR = spi->SR;
+  if (spi_SR & (SPI_SR_UDR | SPI_SR_CRCERR | SPI_SR_MODF | SPI_SR_OVR))
+  {
+    NVIC_DisableIRQ(SPI1_IRQn);
+    spi1_errCtr++;
+  }
+  if ((spi_SR & SPI_SR_RXNE) && (spi1RxIdx < spi1Len))
+  {
+    spi1DataPtr[spi1RxIdx++] = spi->DR;
+    if (spi1RxIdx == spi1Len)
+    {
+      spi->CR2 = spi->CR2 & (~SPI_SR_RXNE);
+      NVIC_DisableIRQ(SPI1_IRQn);
+      SPI1_SS_DEACTIVE();
+      spi1Len = 0;
+    }
+  }
+  if ((spi_SR & SPI_SR_TXE) && (spi1TxIdx < spi1Len))
+  {
+    spi->DR = spi1DataPtr[spi1TxIdx++];
+    if (spi1TxIdx == spi1Len)
+      spi->CR2 = spi->CR2 & (~SPI_CR2_TXEIE);
+  }
 }
+#endif
 
 void SPI2_Init(void)
 {
@@ -312,13 +348,7 @@ void SPI2_ISR(void)
   }
   if ((spi2SR & SPI_SR_TXE) && (spi2TxIdx < spi2Len))
   {
-#if 0
     SPI2->DR = spi2DataPtr[spi2TxIdx++];
-#else
-    SPI2->DR = spi2DataPtr[spi2TxIdx];
-    spi2DataPtr[spi2TxIdx] = 0; /* SPI testing purpose */
-    spi2TxIdx++;
-#endif
     if (spi2TxIdx == spi2Len)
       SPI2->CR2 = SPI2->CR2 & (~SPI_CR2_TXEIE);
   }
