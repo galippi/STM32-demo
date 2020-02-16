@@ -26,7 +26,6 @@ void Task_Init(void)
   //SPI_Init();
   //DebugOut_Init();
   UART1_Init(38400, 1);
-  SPI1_Init(SPI_SLAVE, SPI_REMAP);
   SPI2_Init();
 }
 
@@ -35,22 +34,41 @@ void Task_1ms(void)
   //if (ADC_values[ADC_IN5_Ub] > (uint32_t)(0.7 * 4095/3.3))
 }
 
-uint8_t spi1Buf[4];
-uint8_t spi2Buf[sizeof(spi1Buf)];
+uint8_t spi2Buf[12];
 
 void Task_10ms(void)
 {
   //DebugOut();
   ADC_Handler_10ms();
-  { // the slave has to be prepared first
-    static const uint8_t spiData[sizeof(spi1Buf)] = { 0x55, 0x0A, 0x05, 0x0F};
-    memcpy(spi1Buf, spiData, sizeof(spi1Buf));
-    SPI1_Tx(spi1Buf, sizeof(spi1Buf));
-  }
   {
-    static const uint8_t spiData[sizeof(spi1Buf)] = { 0x00, 0x39, 0x00, 0x5A};
-    memcpy(spi2Buf, spiData, sizeof(spi2Buf));
-    SPI2_Tx(spi2Buf, sizeof(spi2Buf));
+    static uint8_t SD_state;
+    static uint8_t NCR;
+    switch (SD_state)
+    {
+      case 0:
+      {
+        static const uint8_t spiData[sizeof(spi2Buf)] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x95, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+        memcpy(spi2Buf, spiData, sizeof(spi2Buf));
+        SPI2_Tx(spi2Buf, sizeof(spi2Buf));
+        SD_state++;
+        break;
+      }
+      case 1:
+      {
+        for(uint32_t i = 6; i < sizeof(spi2Buf); i++)
+        {
+          if (spi2Buf[i] == 0x01)
+          {
+            NCR = i - 5;
+          }
+        }
+        static const uint8_t spiData[sizeof(spi2Buf)] = { 0x48, 0x00, 0x00, 0x01, 0xAA, 0x87, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+        memcpy(spi2Buf, spiData, sizeof(spi2Buf));
+        SPI2_Tx(spi2Buf, 6 + NCR);
+        SD_state++;
+        break;
+      }
+    }
   }
   {
 	  static uint8_t timer = 200;
