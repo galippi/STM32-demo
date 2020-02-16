@@ -211,6 +211,7 @@ int main(void)
   RCC->CFGR |= RCC_CFGR_MCO_PLL; // MCO output is configured to PLL
 #endif
   RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+  AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE; /* disable JTAG, enable SWD - PA15, PB3, PB4: free; PA13, PA14: in use */
   LED3_Init();
   LED3_Set(0);
   LED3_Set(1);
