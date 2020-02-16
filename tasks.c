@@ -156,7 +156,7 @@ void Task_500ms(void)
         U32_to_HexString((char*)usbDemoLine + 58, 2, SchedPreTask_GetTaskLoadMax(1), '0');
         U32_to_HexString((char*)usbDemoLine + 61, 2, SchedPreTask_GetTaskLoadMax(2), '0');
 
-        U32_to_HexString((char*)usbDemoLine + 64, 2, spi1_isrCtr, '0');
+        //U32_to_HexString((char*)usbDemoLine + 64, 2, spi1_isrCtr, '0');
         U32_to_HexString((char*)usbDemoLine + 67, 2, spi2_isrCtr, '0');
         U32_to_HexString((char*)usbDemoLine + 70, 2, spi2_errCtr, '0');
 

@@ -3,8 +3,8 @@
 
 #include "gpio_app.h"
 
-#define SPI1_DMA 0
-#define SPI1_ISR_ENABLE 1
+#define SPI1_DMA 1
+#define SPI1_ISR_ENABLE 0
 
 #define SPI1_CR1_INIT ( \
                         0 /* SPI_CR1_CPHA */ | \
