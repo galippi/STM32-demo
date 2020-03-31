@@ -6355,9 +6355,13 @@ typedef struct
 
 /*******************  Bit definition for CAN_BTR register  ********************/
 #define  CAN_BTR_BRP                         ((uint32_t)0x000003FF)        /*!< Baud Rate Prescaler */
+#define  CAN_BTR_BRP_0                       ((uint32_t)0x00000001)
 #define  CAN_BTR_TS1                         ((uint32_t)0x000F0000)        /*!< Time Segment 1 */
+#define  CAN_BTR_TS1_0                       ((uint32_t)0x00010000)
 #define  CAN_BTR_TS2                         ((uint32_t)0x00700000)        /*!< Time Segment 2 */
+#define  CAN_BTR_TS2_0                       ((uint32_t)0x00100000)
 #define  CAN_BTR_SJW                         ((uint32_t)0x03000000)        /*!< Resynchronization Jump Width */
+#define  CAN_BTR_SJW_0                       ((uint32_t)0x01000000)
 #define  CAN_BTR_LBKM                        ((uint32_t)0x40000000)        /*!< Loop Back Mode (Debug) */
 #define  CAN_BTR_SILM                        ((uint32_t)0x80000000)        /*!< Silent Mode */
 
