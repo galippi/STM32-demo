@@ -10,6 +10,7 @@
 #include "scheduler_preemptive.h"
 #include "timer_app.h"
 #include "spi.h"
+#include "can_app.h"
 
 #include "tasks.h"
 
@@ -27,6 +28,9 @@ void Task_Init(void)
   //DebugOut_Init();
   UART1_Init(38400, 1);
   SPI2_Init();
+  GPIO_PortInit_In(GPIOB, 8);    /* CAN1-Rx */
+  GPIO_PortInit_AFOut(GPIOB, 9); /* CAN1-Tx */
+  can1_init();
 }
 
 void Task_1ms(void)
@@ -35,7 +39,9 @@ void Task_1ms(void)
 }
 
 uint8_t spi2Buf[12];
-
+uint8_t CAN_rxCtr;
+uint8_t CAN_txCtr;
+uint8_t CAN_txFull;
 void Task_10ms(void)
 {
   //DebugOut();
@@ -83,6 +89,26 @@ void Task_10ms(void)
 		  timer--;
 	  }
   }
+  {
+      CAN_msg msg;
+      while (CAN_STM32_rx(&msg))
+      {
+        CAN_rxCtr++;
+        {
+          CAN_msg msgTx = { .id = 101, .dlc = 8};
+          msgTx.data.data32[0] = msg.id;
+          msgTx.data.data8[4] = msg.dlc;
+          msgTx.data.data8[5] = msg.data.data8[0];
+          msgTx.data.data8[6] = msg.data.data8[1];
+          msgTx.data.data8[7] = msg.data.data8[2];
+          if (CAN_STM32_tx(&msgTx))
+            CAN_txCtr++;
+          else
+            CAN_txFull++;
+        }
+      }
+  }
+
   //wait_us(4500);
 }
 

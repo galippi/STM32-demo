@@ -1,9 +1,9 @@
-#include "datatype.h"
+#include <stdint.h>
 #include "bitfield_lib.h"
 
-#include "STM32_registers.h"
+#include "controller.h"
 
-#include "pll.h"
+#include "system_conf.h"
 
 #include "can_conf.h"
 
@@ -114,22 +114,31 @@ void CAN_STM32_setFilter(CAN_TypeDef *can, uint8_t filterIdx, t_CAN_FilterMode m
 uint32_t CAN_STM32_tx(const CAN_msg *msg)
 {
   CAN_TypeDef *can = CAN1;
-  if ((can->TSR & CAN_TSR_TME0) == 0)
+  uint8_t mailboxIdx;
+  if ((can->TSR & CAN_TSR_TME0) != 0)
+    mailboxIdx = 0;
+  else
+  if ((can->TSR & CAN_TSR_TME1) != 0)
+    mailboxIdx = 1;
+  else
+  if ((can->TSR & CAN_TSR_TME2) != 0)
+    mailboxIdx = 2;
+  else
     return 0; // Tx mailbox is full
 
   if ((msg->id & 0x80000000) == 0)  {          //    Standard ID
-      can->sTxMailBox[0].TIR = (msg->id << 21);
+      can->sTxMailBox[mailboxIdx].TIR = (msg->id << 21);
   }  else  {                                      // Extended ID
-      can->sTxMailBox[0].TIR = (msg->id <<  3) | 0x04;
+      can->sTxMailBox[mailboxIdx].TIR = (msg->id <<  3) | 0x04;
   }
   //can->sTxMailBox[0].TIR &= ~CAN_TI1R_RTR; // no remote frame support
-  can->sTxMailBox[0].TDLR = msg->data.data32[0];
-  can->sTxMailBox[0].TDHR = msg->data.data32[1];
+  can->sTxMailBox[mailboxIdx].TDLR = msg->data.data32[0];
+  can->sTxMailBox[mailboxIdx].TDHR = msg->data.data32[1];
 
-  can->sTxMailBox[0].TDTR = (can->sTxMailBox[0].TDTR & ~CAN_TDT0R_DLC) | (msg->dlc & CAN_TDT0R_DLC); // setup message length
+  can->sTxMailBox[mailboxIdx].TDTR = (can->sTxMailBox[mailboxIdx].TDTR & ~CAN_TDT0R_DLC) | (msg->dlc & CAN_TDT0R_DLC); // setup message length
 
   //can->IER |= CAN_IER_TMEIE;                      // enable  TME interrupt
-  can->sTxMailBox[0].TIR |=  CAN_TI0R_TXRQ;       // transmit message
+  can->sTxMailBox[mailboxIdx].TIR |=  CAN_TI0R_TXRQ;       // transmit message
 
   return 1;
 }
