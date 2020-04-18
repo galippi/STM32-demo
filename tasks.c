@@ -28,8 +28,9 @@ void Task_Init(void)
   //DebugOut_Init();
   UART1_Init(38400, 1);
   SPI2_Init();
-  GPIO_PortInit_In(GPIOB, 8);    /* CAN1-Rx */
-  GPIO_PortInit_AFOut(GPIOB, 9); /* CAN1-Tx */
+  GPIO_PortInit_In(   GPIOB,  8); /* CAN1-Rx */
+  GPIO_PortInit_AFOut(GPIOB,  9); /* CAN1-Tx */
+  AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_CAN_REMAP) | AFIO_MAPR_CAN_REMAP_REMAP2;
   can1_init();
 }
 
@@ -88,6 +89,15 @@ void Task_10ms(void)
 	  {
 		  timer--;
 	  }
+  }
+  {
+    CAN_msg msgTx = { .id = 0x8000F200, .dlc = 8};
+    msgTx.data.data32[0] = 0x11224466;
+    msgTx.data.data32[1] = 0xFEDCBA98;
+    if (CAN_STM32_tx(&msgTx))
+      CAN_txCtr++;
+    else
+      CAN_txFull++;
   }
   {
 	{
