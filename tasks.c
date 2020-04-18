@@ -90,12 +90,24 @@ void Task_10ms(void)
 	  }
   }
   {
+	{
+	  CAN_msg msgTx = { .id = 0x100, .dlc = 8};
+	  msgTx.data.data32[0] = 0x01234567;
+	  msgTx.data.data32[1] = 0xFEDCBA98;
+	  if (CAN_STM32_tx(&msgTx))
+		CAN_txCtr++;
+	  else
+		CAN_txFull++;
+	}
+  }
+
+  {
       CAN_msg msg;
       while (CAN_STM32_rx(&msg))
       {
         CAN_rxCtr++;
         {
-          CAN_msg msgTx = { .id = 101, .dlc = 8};
+          CAN_msg msgTx = { .id = 0x101, .dlc = 8};
           msgTx.data.data32[0] = msg.id;
           msgTx.data.data8[4] = msg.dlc;
           msgTx.data.data8[5] = msg.data.data8[0];
