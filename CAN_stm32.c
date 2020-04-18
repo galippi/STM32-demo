@@ -86,6 +86,11 @@ void CAN_STM32_setFilter(CAN_TypeDef *can, uint8_t filterIdx, t_CAN_FilterMode m
       BitReset(can->FA1R, filterIdx); // deactivate filter
       BitSet(can->FS1R, filterIdx);   // set 32-bit scale configuration
       BitReset(can->FM1R, filterIdx); // set 32-bit identifier mask mode
+      if ((id & 0x04) == 0) // standard ID
+      {
+        id   = ((id   << 18) & 0xFFE00000);
+        mask = ((mask << 18) & 0xFFE00000);
+      }
       can->sFilterRegister[filterIdx].FR1 = id;   //  32-bit identifier
       can->sFilterRegister[filterIdx].FR2 = mask; //  32-bit mask
       BitReset(can->FFA1R, filterIdx); // assign filter to FIFO 0
