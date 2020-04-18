@@ -3,7 +3,7 @@
 
 #include "controller.h"
 
-#include "system_conf.h"
+#include "SysClock_conf.h"
 
 #include "can_conf.h"
 
@@ -26,7 +26,7 @@ void CAN_STM32_init(uint32_t baud)
   RCC->APB1ENR |= RCC_APB1ENR_CAN1EN;
   CAN1->MCR = (CAN_MCR_NART | CAN_MCR_INRQ);       /* init mode, disable auto. retransmission */
   /* set BTR register so that sample point is at about 72% bit time from bit start */
-  uint16_t brp  = (PLL_APB1_FREQ_HZ) / ((CAN_TSEG1 + CAN_TSEG2 + 1) * baud);
+  uint16_t brp  = (f_APB1_Hz) / ((CAN_TSEG1 + CAN_TSEG2 + 1) * baud);
   CAN1->BTR &= ~(CAN_BTR_SILM | CAN_BTR_LBKM | CAN_BTR_BRP | CAN_BTR_TS1 | CAN_BTR_TS2 | CAN_BTR_SJW);
   CAN1->BTR |=  (CAN_BTR_INIT | ((CAN_SJW - 1)* CAN_BTR_SJW_0) | ((CAN_TSEG2 - 1) * CAN_BTR_TS2_0) | ((CAN_TSEG1 - 1) * CAN_BTR_TS1_0) | ((brp-1) * CAN_BTR_BRP_0));
   CAN1->MCR &= ~CAN_MCR_INRQ;                      /* normal operating mode, reset INRQ */

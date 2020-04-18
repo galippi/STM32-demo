@@ -1,19 +1,6 @@
 #ifndef _SYSTEM_CONF_H_
 #define _SYSTEM_CONF_H_
 
-#define CLK_SOURCE_HSI      0
-#define CLK_SOURCE_HSE_OSC  1
-#define CLK_SOURCE_HSE_PLL  2
-
-#define CLK_SOURCE CLK_SOURCE_HSE_PLL
-
-#define F_SYSTEM 48000 /* kHz */
-#define F_OSC     8000 /* kHz */
-#define PCLK1    24000 /* kHz */
-#define PCLK2    48000 /* kHz */
-
-#define PLL_APB1_FREQ_HZ (PCLK1 * 1000)
-
 #define TARGET_ECU_STM32F0DISCOVERY 0
 #define TARGET_ECU_STM32F4DISCOVERY 1
 #define TARGET_ECU_STM32F103C8_ARDUINO 2

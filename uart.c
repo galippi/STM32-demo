@@ -2,6 +2,7 @@
 #include "gpio.h"
 #include "dma.h"
 #include "bitfield_lib.h"
+#include "SysClock_conf.h"
 
 #include "uart.h"
 
@@ -20,7 +21,7 @@ void UART1_Init(uint32_t baudRate, uint8_t uartRemap)
   }
   RCC->APB2ENR |= RCC_APB2ENR_USART1EN;   /* enable the USART1 */
   USART1->CR1 = USART_CR1_TE | USART_CR1_RE; /* TX/RX are enabled */
-  USART1->BRR = ((((F_SYSTEM * 1000) / 1) + (baudRate / 2)) / baudRate);
+  USART1->BRR = ((((f_APB2_Hz) / 1) + (baudRate / 2)) / baudRate);
   USART1->CR2 = 0; /* 1 stop bit */
 #if UART1_DMA == 0
   USART1->CR3 = 0x00; /* DMA is disabled (???) for the channel */
@@ -43,13 +44,13 @@ void UART1_Init(uint32_t baudRate, uint8_t uartRemap)
 }
 
 #if (CPU_TYPE == CPU_TYPE_STM32F1)
-#if F_SYSTEM == 48000
+#if (f_PLL_Hz == 48000000) && (f_APB1_Hz == 24000000)
 //#define USART2_BRR ((F_SYSTEM * 1000l * (8 * (2 - USART2_OVER8))) /  9600)
 //#define USART2_BRR (1000 << 4) /* testing clock generation of USART */
-#define USART2_BRR_9600   ((24000000/  9600) + 4) /* testing clock generation of USART */
-#define USART2_BRR_19200  ((24000000/ 19200) + 2) /* testing clock generation of USART */
-#define USART2_BRR_38400  ((24000000/ 38400) + 0) /* testing clock generation of USART */
-#define USART2_BRR_115200 ((24000000/115200) + 0) /* testing clock generation of USART */
+#define USART2_BRR_9600   ((f_APB1_Hz/  9600) + 4) /* testing clock generation of USART */
+#define USART2_BRR_19200  ((f_APB1_Hz/ 19200) + 2) /* testing clock generation of USART */
+#define USART2_BRR_38400  ((f_APB1_Hz/ 38400) + 0) /* testing clock generation of USART */
+#define USART2_BRR_115200 ((f_APB1_Hz/115200) + 0) /* testing clock generation of USART */
 #else
 #error Settings must be adapted for system configuration!
 #endif
@@ -89,7 +90,6 @@ void UART2_Init(uint32_t BaudRate)
     RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
   }
   USART2->CR1 = USART_CR1_TE | USART_CR1_RE; /* TX/RX are enabled */
-#if F_SYSTEM == 48000
   if (BaudRate == 9600)
   {
     USART2->BRR = USART2_BRR_9600;
@@ -110,9 +110,6 @@ void UART2_Init(uint32_t BaudRate)
   { /* wrong baud rate is specified -> error */
     USART2->BRR = USART2_BRR_9600;
   }
-#else
-#error "USART2_BRR must be adapted for system frequency!"
-#endif
   USART2->CR2 = 0; /* 1 stop bit */
 #if UART2_DMA == 0
   USART2->CR3 = 0x00; /* DMA is disabled (???) for the channel */
