@@ -21,20 +21,43 @@
 
 #define VDD 3.0 /* Volt */
 
-GPIO_TypeDef * const gpioa = GPIOA;
-GPIO_TypeDef * const gpiob = GPIOB;
-GPIO_TypeDef * const gpioc = GPIOC;
-RCC_TypeDef * const rcc = RCC;
-SysTick_Type * const systick = SysTick;
-ADC_TypeDef * const adc1 = ADC1;
-TIM_TypeDef * const tim3 = TIM3;
-USART_TypeDef * const uart2 = USART2;
-DMA_TypeDef * const dma1 = DMA1;
-//DMA_Channel_TypeDef * const dma1_4 = DMA1_Channel4;
-SCB_Type * const scb = SCB;
-NVIC_Type * const nvic = NVIC;
-SPI_TypeDef * const spi1 = SPI1;
-SPI_TypeDef * const spi2 = SPI2;
+struct IO_ports
+{
+  AFIO_TypeDef *afio;
+  GPIO_TypeDef *gpioa;
+  GPIO_TypeDef *gpiob;
+  GPIO_TypeDef *gpioc;
+  GPIO_TypeDef *gpiod;
+  RCC_TypeDef *rcc;
+  SysTick_Type *systick;
+  ADC_TypeDef *adc1;
+  TIM_TypeDef *tim3;
+  USART_TypeDef *uart2;
+  DMA_TypeDef *dma1;
+  //DMA_Channel_TypeDef *dma1_4;
+  SCB_Type *scb;
+  NVIC_Type *nvic;
+  SPI_TypeDef *spi1;
+  SPI_TypeDef *spi2;
+} const registers =
+{
+  AFIO,
+  GPIOA,
+  GPIOB,
+  GPIOC,
+  GPIOD,
+  RCC,
+  SysTick,
+  ADC1,
+  TIM3,
+  USART2,
+  DMA1,
+  //DMA1_Channel4,
+  SCB,
+  NVIC,
+  SPI1,
+  SPI2,
+};
 
 /** \brief  Set Stack Pointer
 
