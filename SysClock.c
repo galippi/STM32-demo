@@ -181,8 +181,8 @@ void SysClock_Init(void)
     #if PLL_ON != 0
     /* PLL configuration */
     RCC->CFGR = (RCC->CFGR & (~(uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL)))
-                           | (RCC_CFGR_PLLSRC_PREDIV1 * PLLSRC)
-                           | (RCC_CFGR_PLLXTPRE_PREDIV1_Div2 * PLLXTPRE_REG)
+                           | (RCC_CFGR_PLLSRC * PLLSRC)
+                           | (RCC_CFGR_PLLXTPRE * PLLXTPRE_REG)
                            | (RCC_CFGR_PLLMULL3 * (PLLMUL_VAL - 2));
 
     /* Start PLL */
