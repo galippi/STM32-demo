@@ -1,0 +1,9 @@
+http://elm-chan.org/docs/mmc/mmc_e.html
+
+http://wiki.seabright.co.nz/wiki/SdCardProtocol.html
+
+https://www.microchip.com/forums/m530149.aspx
+https://openlabpro.com/guide/interfacing-microcontrollers-with-sd-card/
+
+http://www.dejazzer.com/ee379/lecture_notes/lec12_sd_card.pdf
+https://en.wikipedia.org/wiki/MultiMediaCard
