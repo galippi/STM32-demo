@@ -10,6 +10,7 @@
 #include "scheduler_preemptive.h"
 #include "timer_app.h"
 #include "spi.h"
+#include "sd_mmc.h"
 
 #include "tasks.h"
 
@@ -26,7 +27,7 @@ void Task_Init(void)
   //SPI_Init();
   //DebugOut_Init();
   UART1_Init(38400, 1);
-  SPI2_Init();
+  SD_MMC_init();
 }
 
 void Task_1ms(void)
@@ -40,36 +41,6 @@ void Task_10ms(void)
 {
   //DebugOut();
   ADC_Handler_10ms();
-  {
-    static uint8_t SD_state;
-    static uint8_t NCR;
-    switch (SD_state)
-    {
-      case 0:
-      {
-        static const uint8_t spiData[sizeof(spi2Buf)] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x95, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-        memcpy(spi2Buf, spiData, sizeof(spi2Buf));
-        SPI2_Tx(spi2Buf, sizeof(spi2Buf));
-        SD_state++;
-        break;
-      }
-      case 1:
-      {
-        for(uint32_t i = 6; i < sizeof(spi2Buf); i++)
-        {
-          if (spi2Buf[i] == 0x01)
-          {
-            NCR = i - 5;
-          }
-        }
-        static const uint8_t spiData[sizeof(spi2Buf)] = { 0x48, 0x00, 0x00, 0x01, 0xAA, 0x87, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-        memcpy(spi2Buf, spiData, sizeof(spi2Buf));
-        SPI2_Tx(spi2Buf, 6 + NCR);
-        SD_state++;
-        break;
-      }
-    }
-  }
   {
 	  static uint8_t timer = 200;
 	  if (timer == 0)
@@ -175,8 +146,8 @@ void Task_500ms(void)
         U32_to_HexString((char*)usbDemoLine + 61, 2, SchedPreTask_GetTaskLoadMax(2), '0');
 
         //U32_to_HexString((char*)usbDemoLine + 64, 2, spi1_isrCtr, '0');
-        U32_to_HexString((char*)usbDemoLine + 67, 2, spi2_isrCtr, '0');
-        U32_to_HexString((char*)usbDemoLine + 70, 2, spi2_errCtr, '0');
+        //U32_to_HexString((char*)usbDemoLine + 67, 2, spi2_isrCtr, '0');
+        //U32_to_HexString((char*)usbDemoLine + 70, 2, spi2_errCtr, '0');
 
         UART1_TX(usbDemoLine, sizeof(usbDemoLine)-1);
         msgCtr++;
@@ -186,6 +157,5 @@ void Task_500ms(void)
 void Task_Bgrd(void)
 {
   ADC_Handler();
-  SPI1_Poll();
-  SPI2_Poll();
+  SD_MMC_BgdTask();
 }

@@ -7,3 +7,9 @@ https://openlabpro.com/guide/interfacing-microcontrollers-with-sd-card/
 
 http://www.dejazzer.com/ee379/lecture_notes/lec12_sd_card.pdf
 https://en.wikipedia.org/wiki/MultiMediaCard
+https://www.kingston.com/datasheets/SDCIT-specsheet-8gb-32gb_us.pdf
+
+https://stackoverflow.com/questions/8080718/sdhc-microsd-card-and-spi-initialization
+https://stackoverflow.com/questions/47041939/microsd-card-initialization-in-spi-mode-acmd41-always-returns-0x01
+
+https://elinux.org/images/d/d3/Mmc_spec.pdf
