@@ -353,4 +353,21 @@ void SPI2_ISR(void)
       SPI2->CR2 = SPI2->CR2 & (~SPI_CR2_TXEIE);
   }
 }
+#else
+uint8_t SPI2_Tx_u8(uint8_t data)
+{
+  SPI_TypeDef *spi = SPI2;
+  while((spi->SR & SPI_SR_TXE) == 0)
+  {
+  }
+  if ((spi->SR & SPI_SR_RXNE) != 0)
+  {
+    (void)spi->DR;
+  }
+  spi->DR = data;
+  while((spi->SR & SPI_SR_RXNE) == 0)
+  {
+  }
+  return spi->DR;
+}
 #endif

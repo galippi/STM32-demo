@@ -29,6 +29,7 @@ extern uint8_t spi2_errCtr;
 void SPI2_Init(void);
 void SPI2_Poll(void);
 void SPI2_Tx(uint8_t *data, uint8_t len);
+uint8_t SPI2_Tx_u8(uint8_t data);
 
 #if SPI2_ISR_ENABLE != 0
 void SPI2_ISR(void);
