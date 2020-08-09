@@ -1,3 +1,4 @@
+http://elm-chan.org/docs/mmc/i/sdinit.png
 http://elm-chan.org/docs/mmc/mmc_e.html
 
 http://wiki.seabright.co.nz/wiki/SdCardProtocol.html
