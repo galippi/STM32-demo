@@ -66,6 +66,7 @@ CFILES  += timer.c
 CFILES  += util.c
 CFILES  += FaultHandler.c
 CFILES  += ram_init.c
+CFILES  += svc.c
 CFILES  += vector.c
 CFILES  += u32_to_hexstring.c
 #CFILES  += 
@@ -100,15 +101,19 @@ $(TARGET_S19) : $(TARGET_ELF)
 $(TARGET_LIST) : $(TARGET_ELF)
 	$(OBJDUMP) -D $^ > $@
 
+%.src : %.o
+	$(OBJDUMP) -D $^ > $(TARGET_DIR)/$@
+
   #%.o: %.s $(MAKEFILE)
 %.o: %.s $(DUMMY_DIR_FILE)
 	@echo Building $@
+	-@rm -f $(TARGET_DIR)/$(@:.o=.src)
 	$(AS) -as $< -o $(TARGET_DIR)/$@
 
 #%.o: %.c $(MAKEFILE)
 %.o: %.c $(DUMMY_DIR_FILE)
 	@echo Building $(notdir $@)
-	-@rm -f $(@:.o=.d)
+	-@rm -f $(TARGET_DIR)/$(@:.o=.d) $(TARGET_DIR)/$(@:.o=.src)
 	$(CC_DEP) -M $(CFLAGS_DEP) -c -o $(TARGET_DIR)/$(@:.o=.d) $<
 	$(CC) $(CFLAGS) -c -o $(TARGET_DIR)/$@ $<
 
@@ -118,7 +123,7 @@ $(TARGET_LIST) : $(TARGET_ELF)
 #%.o: %.cpp $(MAKEFILE)
 %.o: %.cpp $(DUMMY_DIR_FILE)
 	@echo Building $@
-	-@rm -f $(@:.o=.d)
+	-@rm -f $(TARGET_DIR)/$(@:.o=.d) $(TARGET_DIR)/$(@:.o=.src)
 	$(CC) -M $(CPPFLAGS) -c -o $(TARGET_DIR)/$(TARGET_DIR)$(@:.o=.d) $<
 	$(CC) $(CPPFLAGS) -c -o $(TARGET_DIR)/$(TARGET_DIR)$@ $<
 #	$(CC) --version

@@ -16,6 +16,7 @@
 #include "reset.h"
 #include "main.h"
 #include "spi.h"
+#include "svc.h"
 
 #include "vector.h"
 

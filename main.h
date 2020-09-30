@@ -30,6 +30,5 @@ void ISR_Invalid2(void);
 void ISR_Invalid3(void);
 void ISR_Invalid(void);
 void PendSV_Handler(void);
-void SVC_Handler(void);
 
 #endif /* _MAIN_H_ */

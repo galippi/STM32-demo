@@ -15,6 +15,7 @@
 #include "FaultHandler.h"
 #include "vector.h"
 #include "spi.h"
+#include "svc.h"
 
 #include "main.h"
 
@@ -214,6 +215,25 @@ int main(void)
   AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE; /* disable JTAG, enable SWD - PA15, PB3, PB4: free; PA13, PA14: in use */
   Task_Init();
   SchedulerPre_Init();
+  {
+      static uint8_t sem0;
+      (void)lockSemaphore(&sem0, 33);
+  }
+  {
+      static uint8_t var8;
+      atomicAddU8(&var8, 8);
+  }
+  {
+      static uint16_t var16;
+      atomicAddU16(&var16, 0x1016);
+  }
+  {
+      static uint32_t var32;
+      atomicAddU32(&var32, 100032);
+  }
+  enableInterrupt();
+  disableInterrupt();
+  while(1);
   TIM3_Init();
   TIM3_CCR1_Set(TIM3_Cnt_Get() + TIM3_FREQ); /* set the first scheduler interrupt to 1ms */
   NVIC->ISER[29/32] = NVIC->ISER[29/32] | (1 << (29%32)); /* enable TIM3 interrupt */
@@ -334,17 +354,6 @@ static __INLINE uint32_t  __get_BASEPRI2(void)
 #error _CORTEX_M < 3
 #endif
 
-extern void svc_ret(void);
-void svc_ret(void)
-{
-  // ???????????????????????????????
-  //__ASM("CPSIE i"); /* enable interrupts to allow SVCall exception*/
-  /*
-   * FPU handling
-   */
-  __ASM("SVC #0");
-}
-
 /* INTERRUPT */ void PendSV_Handler(void)
 {
   //PendSV_Ctr++;
@@ -359,19 +368,4 @@ void svc_ret(void)
   __ASM("MOVS r0,#0x6");
   __ASM("MVNS r0,r0"); /* r0:=~0x6=0xFFFFFFF9 */
   __ASM("BX r0"); /* exception-return to the scheduler */
-}
-
-/* INTERRUPT */ void SVC_Handler(void)
-{
-  //__ASM("ADD sp,sp,#(1*4)"); /* pop the pushed stack */
-#if 1
-  /* remove one 8-register exception frame */
-  __ASM("ADD sp,sp,#(8*4)");
-#else
-  /* remove one 8-register exception frame */
-  /* plus the "aligner" from the stack */
-  __ASM("ADD sp,sp,#(9*4)");
-#endif
-  /* return to the preempted task */
-  __ASM("BX lr"); /* exception-return to the scheduler */
 }
