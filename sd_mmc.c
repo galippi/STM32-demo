@@ -210,11 +210,11 @@ void SD_MMC_BgdTask(void)
                             if (sd_mmc_data.OCR[0] & 0x40)
                             {
                               sd_mmc_data.hc = 1;
-                              sd_mmc_data.version = 3;
+                              sd_mmc_data.version = 4;
                             }else
                             {
                               sd_mmc_data.hc = 0;
-                              sd_mmc_data.version = 2;
+                              sd_mmc_data.version = 3;
                               SD_MMC_Command(SD_MMC_SET_BLOCKLEN, 0x00000200, 0xFF, NULL, 0); // set the block size to 512 bytes
                             }
                           }
