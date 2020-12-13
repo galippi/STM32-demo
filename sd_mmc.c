@@ -129,6 +129,7 @@ static void SD_MMC_ReadData(void *ptr, uint32_t size)
 static uint8_t SD_MMC_Read_CSD(void)
 {
   uint8_t ret;
+  sd_mmc_data.csdValid = 0;
   if (SD_MMC_Command(SD_MMC_CMD9, 0x00000000, 0xAF, NULL, SD_MMC_READ_CONT) != 0xFF)
   {
     uint8_t timeout = 30;
@@ -145,6 +146,7 @@ static uint8_t SD_MMC_Read_CSD(void)
     {
       SD_MMC_ReadData(sd_mmc_data.CSD, sizeof(sd_mmc_data.CSD));
       ret = 0;
+      sd_mmc_data.csdValid = 1;
     }
   }else
   {
@@ -158,6 +160,7 @@ static uint8_t SD_MMC_Read_CSD(void)
 static uint8_t SD_MMC_Read_CID(void)
 {
   uint8_t ret;
+  sd_mmc_data.cidValid = 0;
   if (SD_MMC_Command(SD_MMC_CMD10, 0x00000000, 0xFF, NULL, SD_MMC_READ_CONT) != 0xFF)
   {
     uint8_t timeout = 30;
@@ -173,6 +176,7 @@ static uint8_t SD_MMC_Read_CID(void)
     {
       SD_MMC_ReadData(sd_mmc_data.CID, sizeof(sd_mmc_data.CID));
       ret = 0;
+      sd_mmc_data.cidValid = 1;
     }
   }else
   {
@@ -308,11 +312,9 @@ void SD_MMC_BgdTask(void)
           {
               if (SD_MMC_Read_CSD() != 0x00)
               {
-                sd_mmc_data.csdValid = 0;
                 sd_mmc_data.size = 0;
               }else
               {
-                sd_mmc_data.csdValid = 1;
                 if (sd_mmc_data.CSD[0] & 0xC0)
                 { // V2 or higher device
                   // It is a 22-bit number in bit position 69:48.
@@ -352,11 +354,9 @@ void SD_MMC_BgdTask(void)
                 }
               }
               if (SD_MMC_Read_CID() != 0x00)
-              {
-                sd_mmc_data.cidValid = 0;
+              { /* do nothing */
               }else
-              {
-                sd_mmc_data.cidValid = 1;
+              { /* do nothing */
               }
               //SD_MMC_Command(SD_MMC_CRC_ON_OFF, 0x00000000, 0x25, NULL, 0); /* turn CRC off */
               //SD_MMC_Command(SD_MMC_SET_BLOCKLEN, 512, 0xFF, NULL, 0);
@@ -426,33 +426,21 @@ void SD_MMC_BgdTask(void)
     }
     case e_SD_MMC_InitStep9:
     {
-      uint8_t buffer[48];
-      for (uint8_t i = 0; i < 16; i++)
-      {
-
-      }
       SD_MMC_ACmd(SD_MMC_CMD41, 0x00000000, 0xF9, NULL, 0);
-      if (SD_MMC_Command(SD_MMC_CMD9, 0x00000000, 0xAF, buffer, sizeof(buffer)) != 0x01)
+      if (SD_MMC_Read_CSD() != 0x00)
       {
-        sd_mmc_data.csdValid = 0;
       }else
       {
-        memcpy(sd_mmc_data.CSD, &buffer[30], 16);
-        sd_mmc_data.csdValid = 1;
       }
       sd_mmc_data.state = e_SD_MMC_InitStep10;
       break;
     }
     case e_SD_MMC_InitStep10:
     {
-      uint8_t buffer[48];
-      if (SD_MMC_Command(SD_MMC_CMD10, 0x00000000, 0xFF, buffer, sizeof(buffer)) != 0x01)
+      if (SD_MMC_Read_CID() != 0x00)
       {
-        sd_mmc_data.cidValid = 0;
       }else
       {
-        memcpy(sd_mmc_data.CID, &buffer[30], 16);
-        sd_mmc_data.cidValid = 1;
       }
       SD_MMC_Command(SD_MMC_CRC_ON_OFF, 0x00000000, 0x25, NULL, 0); /* turn CRC off */
       SD_MMC_Command(SD_MMC_SET_BLOCKLEN, 512, 0xFF, NULL, 0);
