@@ -35,12 +35,14 @@ typedef struct
   uint8_t ocrValid;
   uint8_t csdValid;
   uint8_t cidValid;
-  uint8_t CID[16];
-  uint8_t CSD[17];
+  uint8_t CID[18];
+  uint8_t CSD[18];
   uint8_t OCR[4];
 }t_SD_MMC;
 
 static t_SD_MMC sd_mmc_data;
+
+#define SD_MMC_READ_CONT 0xFFFFFFFF
 
 #define SD_MMC_CS_High() PB12_Set(1)
 #define SD_MMC_CS_Low()  PB12_Set(0)
@@ -97,7 +99,7 @@ static uint8_t SD_MMC_Command(uint8_t cmd, uint32_t data, uint8_t crc, void *res
       ptr++;
     }
   }
-  if (responseLength != 0xFFFFFFFF)
+  if (responseLength != SD_MMC_READ_CONT)
   {
     SD_MMC_CS_High();
     SPI2_Tx_u8(0xFF);
@@ -111,6 +113,74 @@ static uint8_t SD_MMC_ACmd(uint8_t cmd, uint32_t data, uint8_t crc, void *respon
   if (response != 0x01)
     return 0xFF;
   return SD_MMC_Command(cmd, data, crc, responseData, responseLength);
+}
+
+static void SD_MMC_ReadData(void *ptr, uint32_t size)
+{
+  uint8_t *data = ptr;
+  while(size != 0)
+  {
+    *data = SPI2_Tx_u8(0xFF);
+    data++;
+    size--;
+  }
+}
+
+static uint8_t SD_MMC_Read_CSD(void)
+{
+  uint8_t ret;
+  if (SD_MMC_Command(SD_MMC_CMD9, 0x00000000, 0xAF, NULL, SD_MMC_READ_CONT) != 0xFF)
+  {
+    uint8_t timeout = 30;
+    while (timeout != 0)
+    {
+      if (SPI2_Tx_u8(0xFF) == 0xFE)
+        break;
+      timeout--;
+    }
+    if (timeout == 0)
+    {
+      ret = 2;
+    }else
+    {
+      SD_MMC_ReadData(sd_mmc_data.CSD, sizeof(sd_mmc_data.CSD));
+      ret = 0;
+    }
+  }else
+  {
+    ret = 1;
+  }
+  SD_MMC_CS_High();
+  SPI2_Tx_u8(0xFF);
+  return ret;
+}
+
+static uint8_t SD_MMC_Read_CID(void)
+{
+  uint8_t ret;
+  if (SD_MMC_Command(SD_MMC_CMD10, 0x00000000, 0xFF, NULL, SD_MMC_READ_CONT) != 0xFF)
+  {
+    uint8_t timeout = 30;
+    while (timeout != 0)
+    {
+      if (SPI2_Tx_u8(0xFF) == 0xFE)
+        break;
+      timeout--;
+    }
+    if (timeout == 0)
+      ret = 2;
+    else
+    {
+      SD_MMC_ReadData(sd_mmc_data.CID, sizeof(sd_mmc_data.CID));
+      ret = 0;
+    }
+  }else
+  {
+    ret = 1;
+  }
+  SD_MMC_CS_High();
+  SPI2_Tx_u8(0xFF);
+  return ret;
 }
 
 void SD_MMC_init(void)
@@ -236,7 +306,7 @@ void SD_MMC_BgdTask(void)
           }
           if (sd_mmc_data.initRequest == 0)
           {
-              if (SD_MMC_Command(SD_MMC_CMD9, 0x00000000, 0xAF, sd_mmc_data.CSD, sizeof(sd_mmc_data.CSD)) != 0x00)
+              if (SD_MMC_Read_CSD() != 0x00)
               {
                 sd_mmc_data.csdValid = 0;
                 sd_mmc_data.size = 0;
@@ -281,7 +351,7 @@ void SD_MMC_BgdTask(void)
                     sd_mmc_data.size2 = size;
                 }
               }
-              if (SD_MMC_Command(SD_MMC_CMD10, 0x00000000, 0xFF, sd_mmc_data.CID, sizeof(sd_mmc_data.CID)) != 0x00)
+              if (SD_MMC_Read_CID() != 0x00)
               {
                 sd_mmc_data.cidValid = 0;
               }else
