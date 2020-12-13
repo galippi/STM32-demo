@@ -168,6 +168,14 @@ void SD_MMC_BgdTask(void)
                           { // MMC ver.3
                               resetOk = 1,
                               sd_mmc_data.version = 1;
+                              if (SD_MMC_Command(SD_MMC_CMD58, 0x00000000, 0x25, sd_mmc_data.OCR, sizeof(sd_mmc_data.OCR)) != 0x00)
+                              {
+                                sd_mmc_data.initRequest = 1;
+                                resetOk = 0;
+                              }else
+                              {
+                                sd_mmc_data.ocrValid = 1;
+                              }
                               break;
                           }
                       }
