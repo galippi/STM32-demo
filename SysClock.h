@@ -106,7 +106,7 @@
 #define f_ADC_Hz (f_APB2_Hz / ADCPRE_VAL)
 
 #if USBPRE_REG == 0
-  #define USBPRE_VAL 3 / 2
+  #define USBPRE_VAL 2 / 3
 #elif USBPRE_REG == 1
   #define USBPRE_VAL 1
 #else
