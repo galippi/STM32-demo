@@ -1,0 +1,5 @@
+_git_gitk.bat
+_git_cmd.bat
+bin/*
+javafiles
+src/Version/VersionInfo.java

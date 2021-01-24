@@ -1,0 +1,6 @@
+package Version;
+
+public class VersionInfo
+{
+  public final static String version = "git-revision";
+}
