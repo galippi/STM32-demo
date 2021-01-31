@@ -59,7 +59,7 @@ void Task_1ms(void)
 uint32_t rxCtr = 0;
 uint32_t rxErrorCtr = 0;
 uint32_t rxOkCtr = 0;
-uint8_t rxLastVal;
+uint8_t rxLastVal = 'Z';
 
 void Task_10ms(void)
 {
