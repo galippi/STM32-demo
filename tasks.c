@@ -1,21 +1,31 @@
+#include <string.h>
+
 #include "gpio_app.h"
 #include "debug.h"
 #include "adc_app.h"
-#include "spi.h"
+//#include "spi.h"
 #include "FaultHandler.h"
 #include "bluetooth_hc05.h"
+#include "uart.h"
+#include "u32_to_hexstring/u32_to_hexstring.h"
+#include "scheduler_preemptive.h"
+#include "timer_app.h"
 
 #include "tasks.h"
 
+uint8_t uart1RxBuffer[16];
+uint8_t uart1TxBuffer[128];
+
 void Task_Init(void)
 {
-  SPI_Init();
+  //SPI_Init();
   //DebugOut_Init();
+  UART1_Init(38400, 1);
 }
 
 void Task_1ms(void)
 {
-  PB13_Set(!PB13_Get()); /* toggling debug port */
+  /*PB13_Set(!PB13_Get());*/ /* toggling debug port */
   {
     static uint16_t t_ug;
     t_ug++;
@@ -50,6 +60,12 @@ void Task_10ms(void)
   Bluetooth_Task_10ms();
   ADC_Handler_10ms();
   {
+    static const uint8_t spiData[] = { 0x00, 0x39, 0x00, 0x5A};
+    static uint8_t spiBuf[sizeof(spiData)];
+    memcpy(spiBuf, spiData, sizeof(spiBuf));
+    //SPI2_Tx(spiBuf, sizeof(spiBuf));
+  }
+  {
 	  static uint8_t timer = 200;
 	  if (timer == 0)
 	  {
@@ -68,7 +84,14 @@ void Task_10ms(void)
 		  timer--;
 	  }
   }
+  wait_us(4500);
 }
+
+uint8_t UART1_TxOverrun;
+uint8_t tim3_cc3_ctr;
+uint8_t tim3_cc4_ctr;
+uint16_t encoder;
+uint32_t UART1_RxNum;
 
 typedef enum
 {
@@ -130,4 +153,29 @@ void Task_500ms(void)
 	{
 		pulseTimer--;
 	}
+    {
+        static uint8_t msgCtr;
+        static uint8_t usbDemoLine[] = "Periodic message ctr=xx xx   xx xx xx xx xx xx xx xxxx xx xx xx\r\n";
+        U32_to_HexString((char*)usbDemoLine + 21, 2, msgCtr, '0');
+        U32_to_HexString((char*)usbDemoLine + 24, 2, UART1_TxOverrun, '0');
+        UART1_RxNum = DMA1_Channel5->CNDTR;
+        U32_to_HexString((char*)usbDemoLine + 29, 2, UART1_RxNum, '0');
+        U32_to_HexString((char*)usbDemoLine + 32, 2, CPU_load, '0');
+
+        U32_to_HexString((char*)usbDemoLine + 35, 2, SchedPreTask_GetTaskLoad(0), '0');
+        U32_to_HexString((char*)usbDemoLine + 38, 2, SchedPreTask_GetTaskLoad(1), '0');
+        U32_to_HexString((char*)usbDemoLine + 41, 2, SchedPreTask_GetTaskLoad(2), '0');
+
+        U32_to_HexString((char*)usbDemoLine + 44, 2, tim3_cc3_ctr, '0');
+        U32_to_HexString((char*)usbDemoLine + 47, 2, tim3_cc4_ctr, '0');
+
+        U32_to_HexString((char*)usbDemoLine + 50, 4, encoder, '0');
+
+        U32_to_HexString((char*)usbDemoLine + 55, 2, SchedPreTask_GetTaskLoadMax(0), '0');
+        U32_to_HexString((char*)usbDemoLine + 58, 2, SchedPreTask_GetTaskLoadMax(1), '0');
+        U32_to_HexString((char*)usbDemoLine + 61, 2, SchedPreTask_GetTaskLoadMax(2), '0');
+
+        UART1_TX(usbDemoLine, sizeof(usbDemoLine)-1);
+        msgCtr++;
+    }
 }

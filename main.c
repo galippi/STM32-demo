@@ -34,6 +34,7 @@ DMA_TypeDef * const dma1 = DMA1;
 //DMA_Channel_TypeDef * const dma1_4 = DMA1_Channel4;
 SCB_Type * const scb = SCB;
 NVIC_Type * const nvic = NVIC;
+SPI_TypeDef * const spi2 = SPI2;
 
 /** \brief  Set Stack Pointer
 
@@ -99,6 +100,8 @@ int main(void)
   RCC->CFGR &= RCC_CFGR_MCO;
   RCC->CFGR |= RCC_CFGR_MCO_PLL; // MCO output is configured to PLL
 #endif
+  RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+  AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE; /* disable JTAG, enable SWD - PA15, PB3, PB4: free; PA13, PA14: in use */
   LED3_Init();
   LED3_Set(0);
   LED3_Set(1);
@@ -132,7 +135,7 @@ int main(void)
 #if 1 || (UART2_DMA == 0)
     UART2_Poll();
 #endif
-    SPI_Poll();
+    //SPI_Poll();
   }
 
   return 0;
@@ -181,11 +184,27 @@ uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
   if (TIM3_SR_UIF_Get())
   {
     TIM3_SR_UIF_Reset();
-    //TIM3_UIF_Callback();
-    SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; /* activate PendSV handler */
+    TIM3_UIF_Callback();
+  }else
+  if (TIM3_SR_CC1IF_Get())
+  {
+    TIM3_SR_CC1IF_Reset();
+    TIM3_CC1IF_Callback();
+  }else
+  if (TIM3_SR_CC3IF_Get())
+  {
+    TIM3_SR_CC3IF_Reset();
+    TIM3_SR_CC3OF_Reset();
+    TIM3_CC3IF_Callback();
+  }else
+   if (TIM3_SR_CC4IF_Get())
+  {
+    TIM3_SR_CC4IF_Reset();
+    TIM3_SR_CC4OF_Reset();
+    TIM3_CC4IF_Callback();
   }else
   {
-    CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF));
+    CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) | ((TIM3->SR) << 16));
   }
 }
 

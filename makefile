@@ -7,6 +7,7 @@ WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
 WARNINGS += -Wundef
 WARNINGS += -Wmissing-declarations
 WARNINGS += -Wmissing-prototypes -Wstrict-prototypes
+WARNINGS += -Wno-unused-function
 # stop at warnings
 WARNINGS += -Werror
 
@@ -52,7 +53,7 @@ CFILES  += main.c
 CFILES  += adc.c
 CFILES  += adc_app.c
 #CFILES  += dac.c
-CFILES  += spi.c
+#CFILES  += spi.c
 CFILES  += debug.c
 CFILES  += gpio.c
 CFILES  += scheduler_preemptive.c
