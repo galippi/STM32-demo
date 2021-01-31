@@ -157,14 +157,7 @@ void ExceptionHandler_4(void)
 uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
 /* INTERRUPT */ void TIM2_ISR(void)
 {
-  if (TIM2_SR_CC3IF_Get())
-  {
-    TIM2_SR_CC3IF_Reset();
-    TIM2_CC3IF_Callback();
-  }else
-  {
     CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF));
-  }
 }
 
 /* INTERRUPT */ void TIM3_ISR(void)
