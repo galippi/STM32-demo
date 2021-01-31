@@ -8,6 +8,15 @@ static inline void TIM2_CC3IF_Callback(void)
 { /* call back function of TIM2 CC1IF - capture compare event */
 }
 
+#define TIM2_CR1_INIT 0x80 /* up counter mode, ARPE: Auto-reload preload enable */
+#define TIM2_CR2_INIT 0x0
+#define TIM2_FREQ 1000 /* Hz */
+#define TIM2_PSC_INIT  ((f_TIMXCLK_Hz / (TIM2_FREQ * (TIM2_ARR_INIT + 1))) - 1) /* prescaler of TIM2 */
+#define TIM2_ARR_INIT 254 /* PWM value range is 0..255 */
+#define TIM2_CCER_INIT 0x0000
+#define TIM2_CCMR1_INIT 0x0000
+#define TIM2_CCMR2_INIT 0x0000
+#define TIM2_DIER_INIT 0x0000
 
 #define TIM3_CR1_INIT 0x00 /* up counter mode */
 #define TIM3_CR2_INIT 0x0

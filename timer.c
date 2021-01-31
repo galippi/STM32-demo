@@ -17,6 +17,23 @@ void SysTick_Init(void)
                    SysTick_CTRL_ENABLE_Msk;                    /* Enable SysTick IRQ and SysTick Timer */
 }
 
+void TIM2_Init(void)
+{
+  RCC->APB1ENR |= RCC_APB1Periph_TIM2;
+
+  TIM2->CR1 = (TIM2->CR1 & 0xFC00) | TIM2_CR1_INIT;
+  TIM2->CR2 = (TIM2->CR2 & 0xFF07) | TIM2_CR2_INIT;
+  TIM2->ARR = TIM2_ARR_INIT;
+  TIM2->PSC = TIM2_PSC_INIT;
+  TIM2->EGR = 0x01; /* immediate reload */
+  TIM2->CCMR1 = TIM2_CCMR1_INIT;
+  TIM2->CCMR2 = TIM2_CCMR2_INIT;
+  TIM2->CCER = TIM2_CCER_INIT;
+  TIM2->SR = 0x0000; /* clear all IT requests */
+  TIM2->DIER = (TIM2->DIER & 0xA0A0) | TIM2_DIER_INIT; /* enable update interrupt */
+  TIM2->CR1 |= 1; /* enable timer */
+}
+
 void TIM3_Init(void)
 {
   if (!(RCC->APB1ENR & RCC_APB1Periph_TIM3))

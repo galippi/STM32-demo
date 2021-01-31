@@ -4,12 +4,38 @@
 #include <stdint.h>
 
 #include "controller.h"
+#include "bitfield_lib.h"
 
 void SysTick_Init(void);
 
 static inline uint16_t SysTick_Get(void)
 {
   return (~SysTick->VAL) & 0xFFFF;
+}
+
+static inline void TIMx_CCRy_Set(TIM_TypeDef *tim, uint32_t chIdx, uint16_t val)
+{
+    *((&(tim->CCR1)) + (chIdx * 2)) = val;
+}
+
+// 0        - OC1CE: clear is not enabled
+//  110     - PWM mode 1
+//     1    - OC1PE: preload is enabled
+//      0   - OC1FE: fast disabled
+//       00 - CC1S: channel is output
+#define PWM1_MODE_VAL 0x68
+
+static inline void TIMx_CCRy_PWM1_Set(TIM_TypeDef *tim, uint32_t chIdx)
+{
+    uint8_t shiftValue = (chIdx & 0x01) * 8;
+    if (chIdx < 2)
+    {
+        BitfieldSet(tim->CCMR1, shiftValue, 8, PWM1_MODE_VAL);
+    }else
+    {
+        BitfieldSet(tim->CCMR2, shiftValue, 8, PWM1_MODE_VAL);
+    }
+    BitfieldSet(tim->CCER, chIdx * 4, 2, 0x01);
 }
 
 void TIM2_Init(void);

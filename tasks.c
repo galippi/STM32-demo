@@ -10,11 +10,13 @@
 #include "u32_to_hexstring/u32_to_hexstring.h"
 #include "scheduler_preemptive.h"
 #include "timer_app.h"
+#include "pwm.h"
 
 #include "tasks.h"
 
 USART_TypeDef * const uart1 = USART1;
 DMA_TypeDef * const dma1 = DMA1;
+TIM_TypeDef * const tim2 = TIM2;
 
 uint8_t uart1RxBuffer[128];
 uint8_t uart1TxBuffer[128];
@@ -23,6 +25,11 @@ void Task_Init(void)
 {
   UART1_Init(115200, 1);
   //ESP8266_open();
+  TIM2_Init();
+  PWM_Init(TIM2, 1);
+  GPIO_PortInit_AFOut(GPIOA, 1); /* PA1 PWM2/2 */
+  // BitfieldSet(AFIO->MAPR, 2, 1, 0); /* no remap is needed */
+  PWM_Set(TIM2, 1, 0);
 }
 
 void Task_1ms(void)
@@ -104,6 +111,14 @@ void Task_10ms(void)
 		  }
 		  timer--;
 	  }
+  }
+  {
+      static uint16_t pwmVal = 16;
+      if (pwmVal < 255)
+          pwmVal++;
+      else
+          pwmVal = 0;
+      PWM_Set(TIM2, 1, pwmVal);
   }
 }
 

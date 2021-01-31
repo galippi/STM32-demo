@@ -68,6 +68,7 @@ CFILES  += ram_init.c
 CFILES  += vector.c
 CFILES  += u32_to_hexstring.c
 CFILES  += SysClock.c
+CFILES  += pwm.c
 #CFILES  += 
 
 SFILES  =

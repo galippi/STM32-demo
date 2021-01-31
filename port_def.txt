@@ -1,6 +1,6 @@
 	STM32F103C8T6
 A0	Button1		HC05-reset	HC05-enable
-A1			HC05-key
+A1	PWM2/2   	HC05-key
 A2	USART2_TX
 A3	USART2_RX
 A4					DAC-out
