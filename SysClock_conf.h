@@ -3,12 +3,12 @@
 
 #define f_HSE_Hz 8000000
 //#define f_LSE_Hz 32768
-#define f_PLL_Hz 48000000
-#define f_AHB_Hz 48000000
-#define f_APB1_Hz 24000000 /* PCLK1 */
-#define f_APB2_Hz 48000000 /* PCLK2 */
-#define f_TIMXCLK_Hz 48000000
-#define f_TIM1CLK_Hz 48000000
+#define f_PLL_Hz 72000000
+#define f_AHB_Hz 72000000
+#define f_APB1_Hz 36000000 /* PCLK1 */
+#define f_APB2_Hz 72000000 /* PCLK2 */
+#define f_TIMXCLK_Hz 72000000
+#define f_TIM1CLK_Hz 72000000
 #define f_ADCCLK_Hz 12000000
 #define f_USBCLK_Hz 48000000
 #define f_RTCCLK_Hz 32768
@@ -20,15 +20,15 @@
 
 #define PLLXTPRE_REG 0
 #define PLLSRC   1
-#define PLLMUL_VAL 6
+#define PLLMUL_VAL 9
 #define SWS 2 /* PLL */
 #define HPRE_REG  0
 #define PPRE1_REG 4 /* APB1 prescaler */
 #define PPRE2_REG 0 /* APB2 prescaler */
-#define ADCPRE_REG 1
-#define USBPRE_REG 1
+#define ADCPRE_REG 2
+#define USBPRE_REG 0
 
-#define LATENCY_VAL 1
+#define LATENCY_VAL 3
 #define PRFTBE_REG 1
 #define HLFCYA_REG 0
 #define FLASH_ACR (FLASH_ACR_PRFTBE | FLASH_ACR_LATENCY)

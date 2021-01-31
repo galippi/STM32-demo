@@ -25,4 +25,6 @@ void *memset(void *ptr_, int data, size_t size);
 
 void wait_us_rough(uint32_t t_us);
 
+void systemSleepMs(uint32_t ms);
+
 #endif /* _UTIL_H_ */

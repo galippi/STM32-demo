@@ -1,6 +1,6 @@
 ##################################################################
 CFLAGS_DEBUG = -gdwarf-2
-SUBDIRS := ST_lib
+SUBDIRS := . ST_lib u32_to_hexstring ESP8266
 
 WARNINGS = -Wall -Wextra
 WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
@@ -36,14 +36,14 @@ CFLAGS_TARGET += -mcpu=cortex-m3
 LDFLAGS  += $(LDFLAGS_STRIP_DEBUG_INFO)
 
 LDLIBS :=
-LDLIBS += -lgcc
+LDLIBS += -lc
 
 ##################################################################
 TARGET=demo1
 TARGET_DIR=bin
 DUMMY_DIR_FILE = $(TARGET_DIR)/dummy
 
-VPATH := $(TARGET_DIR) u32_to_hexstring
+VPATH := $(TARGET_DIR) $(SUBDIRS)
 
 CPPFILES =
 #CPPFILES+=
@@ -58,7 +58,8 @@ CFILES  += debug.c
 CFILES  += gpio.c
 CFILES  += scheduler_preemptive.c
 CFILES  += uart.c
-CFILES  += bluetooth_hc05.c
+CFILES  += ESP8266.c
+CFILES  += ESP8266_io.c
 CFILES  += tasks.c
 CFILES  += timer.c
 CFILES  += util.c

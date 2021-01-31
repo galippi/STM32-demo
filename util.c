@@ -117,3 +117,49 @@ void wait_us_rough(uint32_t t_us)
     wait--;
   }
 }
+
+int strcmp(const char *str1, const char *str2)
+{
+    while((*str1 != 0) && (*str1 == *str2))
+    {
+        str1++;
+        str2++;
+    }
+    return ((*str1 == *str2) ? 0 : ((*str1 < *str2) ? -1 : +1));
+}
+
+size_t strlen(const char *str)
+{
+    size_t len = 0;
+    while(*str != 0)
+    {
+        str++;
+        len++;
+    }
+    return len;
+}
+
+char *strcat(char *dst, const char *src)
+{
+    while(*dst != 0)
+    {
+        dst++;
+    }
+    while(*src != 0)
+    {
+        *dst = *src;
+        dst++;
+        src++;
+    }
+    *dst = 0;
+    return dst;
+}
+
+void systemSleepMs(uint32_t ms)
+{
+    while(ms > 0)
+    {
+        wait_us_rough(1000);
+        ms--;
+    }
+}

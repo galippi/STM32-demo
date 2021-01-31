@@ -5,7 +5,7 @@
 #include "adc_app.h"
 //#include "spi.h"
 #include "FaultHandler.h"
-#include "bluetooth_hc05.h"
+//#include "ESP8266.h"
 #include "uart.h"
 #include "u32_to_hexstring/u32_to_hexstring.h"
 #include "scheduler_preemptive.h"
@@ -13,14 +13,16 @@
 
 #include "tasks.h"
 
-uint8_t uart1RxBuffer[16];
+USART_TypeDef * const uart1 = USART1;
+DMA_TypeDef * const dma1 = DMA1;
+
+uint8_t uart1RxBuffer[128];
 uint8_t uart1TxBuffer[128];
 
 void Task_Init(void)
 {
-  //SPI_Init();
-  //DebugOut_Init();
-  UART1_Init(38400, 1);
+  UART1_Init(115200, 1);
+  //ESP8266_open();
 }
 
 void Task_1ms(void)
@@ -54,16 +56,35 @@ void Task_1ms(void)
   }
 }
 
+uint32_t rxCtr = 0;
+uint32_t rxErrorCtr = 0;
+uint32_t rxOkCtr = 0;
+uint8_t rxLastVal;
+
 void Task_10ms(void)
 {
   //DebugOut();
-  Bluetooth_Task_10ms();
   ADC_Handler_10ms();
   {
-    static const uint8_t spiData[] = { 0x00, 0x39, 0x00, 0x5A};
-    static uint8_t spiBuf[sizeof(spiData)];
-    memcpy(spiBuf, spiData, sizeof(spiBuf));
-    //SPI2_Tx(spiBuf, sizeof(spiBuf));
+      uint8_t buf[128];
+      uint32_t num = UART1_RX(buf, sizeof(buf));
+      for(uint32_t i = 0; i < num; i++)
+      {
+          rxCtr++;
+          uint8_t rxNextVal = rxLastVal;
+          if (rxNextVal == 'Z')
+              rxNextVal = 'A';
+          else
+              rxNextVal = rxNextVal + 1;
+          if (buf[i] == rxNextVal)
+          {
+              rxOkCtr++;
+          }else
+          {
+              rxErrorCtr++;
+          }
+          rxLastVal = buf[i];
+      }
   }
   {
 	  static uint8_t timer = 200;
@@ -84,7 +105,6 @@ void Task_10ms(void)
 		  timer--;
 	  }
   }
-  wait_us(4500);
 }
 
 uint8_t UART1_TxOverrun;
@@ -175,7 +195,7 @@ void Task_500ms(void)
         U32_to_HexString((char*)usbDemoLine + 58, 2, SchedPreTask_GetTaskLoadMax(1), '0');
         U32_to_HexString((char*)usbDemoLine + 61, 2, SchedPreTask_GetTaskLoadMax(2), '0');
 
-        UART1_TX(usbDemoLine, sizeof(usbDemoLine)-1);
+        //ESP8266_send(0, sizeof(usbDemoLine)-1, usbDemoLine);
         msgCtr++;
     }
 }

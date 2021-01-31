@@ -10,13 +10,10 @@
 #include "system_conf.h"
 #include "timer_conf.h"
 #include "timer_app.h"
-#include "uart.h"
-#include "bluetooth_hc05.h"
 #include "scheduler_preemptive.h"
 #include "tasks.h"
 #include "FaultHandler.h"
 #include "vector.h"
-#include "spi.h"
 
 #include "main.h"
 
@@ -29,12 +26,9 @@ RCC_TypeDef * const rcc = RCC;
 SysTick_Type * const systick = SysTick;
 ADC_TypeDef * const adc1 = ADC1;
 TIM_TypeDef * const tim3 = TIM3;
-USART_TypeDef * const uart2 = USART2;
-DMA_TypeDef * const dma1 = DMA1;
 //DMA_Channel_TypeDef * const dma1_4 = DMA1_Channel4;
 SCB_Type * const scb = SCB;
 NVIC_Type * const nvic = NVIC;
-SPI_TypeDef * const spi2 = SPI2;
 
 /** \brief  Set Stack Pointer
 
@@ -116,7 +110,6 @@ int main(void)
   Button1_Init();
   ADC_HandlerInit();
   //UART2_Init();
-  Bluetooth_Init();
   Task_Init();
   SchedulerPre_Init();
   TIM3_Init();
@@ -131,11 +124,6 @@ int main(void)
   while (1)
   {
     ADC_Handler();
-    //TIM3_UIF_PollHandler();
-#if 1 || (UART2_DMA == 0)
-    UART2_Poll();
-#endif
-    //SPI_Poll();
   }
 
   return 0;
