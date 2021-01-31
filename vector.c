@@ -48,18 +48,18 @@ t_func_ptr const ISR_VectorTable[] =
   ISR_Invalid,       /* 24 External Interrupt(2) */
   ISR_Invalid,       /* 25 External Interrupt(3) */
   ISR_Invalid,       /* 26 External Interrupt(4) */
-  ISR_Invalid,       /*  DMA1 */
-  ISR_Invalid,       /*  DMA1 */
-  ISR_Invalid,       /*  DMA1 */
-  ISR_Invalid,       /*  DMA1 */
+  ISR_Invalid,       /*  DMA1 Ch1 */
+  ISR_Invalid,       /*  DMA1 Ch2 */
+  ISR_Invalid,       /*  DMA1 Ch3 */
+  ISR_Invalid,       /*  DMA1 Ch4 */
   UART1_RxDma_ISR,   /*  DMA1 Ch5 */
-  ISR_Invalid,       /*  DMA1 */
-  ISR_Invalid,       /*  DMA1 */
+  ISR_Invalid,       /*  DMA1 Ch6 */
+  ISR_Invalid,       /*  DMA1 Ch7 */
   ISR_Invalid,       /*  ADC */
-  ISR_Invalid,       /*  CAN1 */
-  ISR_Invalid,       /*  CAN1 */
-  ISR_Invalid,       /*  CAN1 */
-  ISR_Invalid,       /*  CAN1 */
+  ISR_Invalid,       /*  CAN1 Tx */
+  ISR_Invalid,       /*  CAN1 Rx0 */
+  ISR_Invalid,       /*  CAN1 Rx1 */
+  ISR_Invalid,       /*  CAN1 SCE   */
   ISR_Invalid,       /*  EXTI9_5 */
   ISR_Invalid,       /*  TIM1 */
   ISR_Invalid,       /*  TIM1 */
