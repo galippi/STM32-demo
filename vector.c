@@ -15,6 +15,7 @@
 
 #include "reset.h"
 #include "main.h"
+#include "uart.h"
 
 #include "vector.h"
 
@@ -51,7 +52,7 @@ t_func_ptr const ISR_VectorTable[] =
   ISR_Invalid,       /*  DMA1 */
   ISR_Invalid,       /*  DMA1 */
   ISR_Invalid,       /*  DMA1 */
-  ISR_Invalid,       /*  DMA1 */
+  UART1_RxDma_ISR,   /*  DMA1 Ch5 */
   ISR_Invalid,       /*  DMA1 */
   ISR_Invalid,       /*  DMA1 */
   ISR_Invalid,       /*  ADC */
