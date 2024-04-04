@@ -1,6 +1,6 @@
 ##################################################################
 CFLAGS_DEBUG = -gdwarf-2
-SUBDIRS := . ST_lib u32_to_hexstring ESP8266 dht11
+SUBDIRS := . ST_lib u32_to_hexstring dht11
 
 WARNINGS = -Wall -Wextra
 WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
@@ -58,8 +58,6 @@ CFILES  += debug.c
 CFILES  += gpio.c
 CFILES  += scheduler_preemptive.c
 CFILES  += uart.c
-CFILES  += ESP8266.c
-CFILES  += ESP8266_io.c
 CFILES  += tasks.c
 CFILES  += timer.c
 CFILES  += util.c
