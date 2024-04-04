@@ -19,16 +19,37 @@
 
 #define VDD 3.0 /* Volt */
 
-GPIO_TypeDef * const gpioa = GPIOA;
-GPIO_TypeDef * const gpiob = GPIOB;
-GPIO_TypeDef * const gpioc = GPIOC;
-RCC_TypeDef * const rcc = RCC;
-SysTick_Type * const systick = SysTick;
-ADC_TypeDef * const adc1 = ADC1;
-TIM_TypeDef * const tim3 = TIM3;
-//DMA_Channel_TypeDef * const dma1_4 = DMA1_Channel4;
-SCB_Type * const scb = SCB;
-NVIC_Type * const nvic = NVIC;
+#define DBG_PORTS \
+	DBG_PORT(GPIO_TypeDef, gpioa, GPIOA) \
+	DBG_PORT(GPIO_TypeDef, gpiob, GPIOB) \
+	DBG_PORT(GPIO_TypeDef, gpioc, GPIOC) \
+	DBG_PORT(RCC_TypeDef, rcc, RCC) \
+	DBG_PORT(SysTick_Type, systick, SysTick) \
+	DBG_PORT(ADC_TypeDef, adc1, ADC1) \
+	DBG_PORT(TIM_TypeDef, tim2, TIM2) \
+	DBG_PORT(TIM_TypeDef, tim3, TIM3) \
+	DBG_PORT(TIM_TypeDef, tim4, TIM4) \
+	DBG_PORT(SCB_Type, scb, SCB) \
+	DBG_PORT(NVIC_Type, nvic, NVIC) \
+	DBG_PORT(DMA_TypeDef, dma1, DMA1) \
+	DBG_PORT(DMA_Channel_TypeDef, dma1_4, DMA1_Channel4) \
+	DBG_PORT(USART_TypeDef, uart1, USART1) \
+	DBG_PORT(DMA_Channel_TypeDef, dma1_4, DMA1_Channel4) \
+  /* no more peripheries */
+
+#undef DBG_PORT
+#define DBG_PORT(type, field, val) type * const field;
+
+typedef struct {
+    DBG_PORTS
+}t_DBG_Ports;
+
+#undef DBG_PORT
+#define DBG_PORT(type, field, val) val,
+
+t_DBG_Ports dbg_ports = {
+	DBG_PORTS
+};
 
 /** \brief  Set Stack Pointer
 
@@ -186,6 +207,35 @@ uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
   }else
   {
     CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) | ((TIM3->SR) << 16));
+  }
+}
+
+/* INTERRUPT */ void TIM4_ISR(void)
+{
+  if (TIM4_SR_UIF_Get())
+  {
+    TIM4_SR_UIF_Reset();
+    TIM4_UIF_Callback();
+  }else
+  if (TIM4_SR_CC1IF_Get())
+  {
+    TIM4_SR_CC1IF_Reset();
+    TIM4_CC1IF_Callback();
+  }else
+  if (TIM4_SR_CC3IF_Get())
+  {
+    TIM4_SR_CC3IF_Reset();
+    TIM4_SR_CC3OF_Reset();
+    TIM4_CC3IF_Callback();
+  }else
+   if (TIM4_SR_CC4IF_Get())
+  {
+    TIM4_SR_CC4IF_Reset();
+    TIM4_SR_CC4OF_Reset();
+    TIM4_CC4IF_Callback();
+  }else
+  {
+    CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) | ((TIM4->SR) << 16));
   }
 }
 

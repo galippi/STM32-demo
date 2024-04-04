@@ -19,6 +19,7 @@ void RAM_StartCheck(void);
 int main(void);
 void TIM2_ISR(void);
 void TIM3_ISR(void);
+void TIM4_ISR(void);
 void ExceptionHandler_0(void);
 void ExceptionHandler_1(void);
 void ExceptionHandler_2(void);

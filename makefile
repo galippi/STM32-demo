@@ -1,6 +1,6 @@
 ##################################################################
 CFLAGS_DEBUG = -gdwarf-2
-SUBDIRS := . ST_lib u32_to_hexstring ESP8266
+SUBDIRS := . ST_lib u32_to_hexstring ESP8266 dht11
 
 WARNINGS = -Wall -Wextra
 WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
@@ -69,6 +69,7 @@ CFILES  += vector.c
 CFILES  += u32_to_hexstring.c
 CFILES  += SysClock.c
 CFILES  += pwm.c
+CFILES  += dht11.c
 #CFILES  += 
 
 SFILES  =

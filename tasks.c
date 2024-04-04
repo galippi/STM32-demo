@@ -11,12 +11,9 @@
 #include "scheduler_preemptive.h"
 #include "timer_app.h"
 #include "pwm.h"
+#include "dht11.h"
 
 #include "tasks.h"
-
-USART_TypeDef * const uart1 = USART1;
-DMA_TypeDef * const dma1 = DMA1;
-TIM_TypeDef * const tim2 = TIM2;
 
 uint8_t uart1RxBuffer[128];
 uint8_t uart1TxBuffer[128];
@@ -30,6 +27,8 @@ void Task_Init(void)
   GPIO_PortInit_AFOut(GPIOA, 1); /* PA1 PWM2/2 */
   // BitfieldSet(AFIO->MAPR, 2, 1, 0); /* no remap is needed */
   PWM_Set(TIM2, 1, 0);
+  dht11_init();
+  GPIO_PortInit_OC(GPIOB, 3);
 }
 
 void Task_1ms(void)
