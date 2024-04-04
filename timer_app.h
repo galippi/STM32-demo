@@ -75,4 +75,20 @@ static inline void wait_us(uint32_t time)
   }
 }
 
+#ifndef TIM4_CC1IF_Callback
+#define TIM4_CC1IF_Callback() /* do nothing */
+#endif
+
+#ifndef TIM4_CC2IF_Callback
+#define TIM4_CC2IF_Callback() /* do nothing */
+#endif
+
+#ifndef TIM4_CC3IF_Callback
+#define TIM4_CC3IF_Callback() /* do nothing */
+#endif
+
+#ifndef TIM4_CC4IF_Callback
+#define TIM4_CC4IF_Callback() /* do nothing */
+#endif
+
 #endif /* _TIMER_APP_H_ */

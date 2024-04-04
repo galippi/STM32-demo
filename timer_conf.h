@@ -3,6 +3,7 @@
 
 #include "SysClock_conf.h"
 #include "scheduler_preemptive.h"
+#include "dht11.h"
 
 #define TIM2_CR1_INIT 0x00 /* up counter mode */
 #define TIM2_CR2_INIT 0x0
@@ -38,6 +39,12 @@ static inline void TIM3_UIF_Callback(void)
 { /* call back function of TIM3 UIF - counter underflow */
   static uint8_t TIM3_UIF_ctr = 0;
   TIM3_UIF_ctr++;
+}
+
+static inline void TIM4_UIF_Callback(void)
+{ /* call back function of TIM4 UIF - counter underflow */
+  static uint8_t TIM4_UIF_ctr = 0;
+  TIM4_UIF_ctr++;
 }
 
 #endif /* _TIMER_CONF_H_ */

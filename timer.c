@@ -52,3 +52,22 @@ void TIM3_Init(void)
   TIM3->DIER = (TIM3->DIER & 0xA0A0) | TIM3_DIER_INIT; /* enable update interrupt */
   TIM3->CR1 |= 1; /* enable timer */
 }
+
+void TIM4_Init(void)
+{
+  if (!(RCC->APB1ENR & RCC_APB1Periph_TIM4))
+  {
+    RCC->APB1ENR |= RCC_APB1Periph_TIM4;
+  }
+  TIM4->CR1 = (TIM4->CR1 & 0xFC00) | TIM4_CR1_INIT;
+  TIM4->CR2 = (TIM4->CR2 & 0xFF07) | TIM4_CR2_INIT;
+  TIM4->ARR = TIM4_ARR_INIT;
+  TIM4->PSC = TIM4_PSC_INIT;
+  TIM4->EGR = 0x01; /* immediate reload */
+  TIM4->CCMR1 = TIM4_CCMR1_INIT;
+  TIM4->CCMR2 = TIM4_CCMR2_INIT;
+  TIM4->CCER = TIM4_CCER_INIT;
+  TIM4->SR = 0x0000; /* clear all IT requests */
+  TIM4->DIER = (TIM4->DIER & 0xA0A0) | TIM4_DIER_INIT; /* enable update interrupt */
+  TIM4->CR1 |= 1; /* enable timer */
+}
