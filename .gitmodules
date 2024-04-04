@@ -1,9 +1,6 @@
 [submodule "u32_to_hexstring"]
 	path = u32_to_hexstring
 	url = s:\\git\\u32_to_hexstring.git
-[submodule "ESP8266"]
-	path = ESP8266
-	url = s:\\git\\ESP8266.git\\ESP8266_lib.git
 [submodule "DHT11"]
 	path = DHT11
 	url = s:\\git\\DHT11
