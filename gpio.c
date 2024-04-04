@@ -142,6 +142,18 @@ void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum)
   }
 }
 
+void GPIO_PortInit_OC(GPIO_TypeDef * const gpio, uint8_t portnum)
+{ // the port is set to open-collector/drain output with 2MHz
+  GPIO_PortEnable(gpio);
+  if (portnum < 8)
+  {
+    BitfieldSet(gpio->CRL, portnum * 4, 4, ((GPIO_Mode_Out_OD & 0x0F) | GPIO_Speed_2MHz));
+  }else
+  {
+    BitfieldSet(gpio->CRH, (portnum - 8) * 4, 4, ((GPIO_Mode_Out_OD & 0x0F) | GPIO_Speed_2MHz));
+  }
+}
+
 void GPIO_PortInit_Analog(GPIO_TypeDef * const gpio, uint8_t portnum)
 {
   GPIO_PortEnable(gpio);

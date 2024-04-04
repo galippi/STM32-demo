@@ -4,6 +4,8 @@
 #include "controller.h"
 
 void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum);
+void GPIO_PortInit_OC(GPIO_TypeDef * const gpio, uint8_t portnum);
+
 #if (CPU_TYPE != CPU_TYPE_STM32F1)
 void GPIO_PortInit_AFOut(GPIO_TypeDef * const gpio, uint8_t portnum, uint8_t AFR_val);
 #else
