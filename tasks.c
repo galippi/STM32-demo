@@ -5,13 +5,12 @@
 #include "adc_app.h"
 //#include "spi.h"
 #include "FaultHandler.h"
-//#include "ESP8266.h"
 #include "uart.h"
 #include "u32_to_hexstring/u32_to_hexstring.h"
 #include "scheduler_preemptive.h"
-#include "timer_app.h"
 #include "pwm.h"
 #include "dht11.h"
+#include "timer_app.h"
 
 #include "tasks.h"
 
@@ -27,8 +26,10 @@ void Task_Init(void)
   GPIO_PortInit_AFOut(GPIOA, 1); /* PA1 PWM2/2 */
   // BitfieldSet(AFIO->MAPR, 2, 1, 0); /* no remap is needed */
   PWM_Set(TIM2, 1, 0);
+
+  // DHT11
+  TIM4_Init();
   dht11_init();
-  GPIO_PortInit_OC(GPIOB, 3);
 }
 
 void Task_1ms(void)
@@ -36,28 +37,11 @@ void Task_1ms(void)
   /*PB13_Set(!PB13_Get());*/ /* toggling debug port */
   {
     static uint16_t t_ug;
-    t_ug++;
-    if (t_ug > 1950)
+    if (t_ug == 100)
+        dht11_request();
+    if (t_ug < 500)
     {
-      if (t_ug > 2000)
-      {
-        t_ug = 0;
-      }
-    }else
-    {
-#if (CPU_TYPE == CPU_TYPE_STM32F0)
-      static uint16_t dac_val = 0;
-      if (ADC_values[ADC_IN5_Ub] > (uint32_t)(0.7 * 4095/3.3))
-      {
-        dac_val++;
-      }else
-      {
-        if (dac_val > 0)
-        {
-          dac_val--;
-        }
-      }
-#endif
+        t_ug++;
     }
   }
 }
@@ -70,6 +54,7 @@ uint8_t rxLastVal = 'Z';
 void Task_10ms(void)
 {
   //DebugOut();
+  dht11_run();
   ADC_Handler_10ms();
   {
       uint8_t buf[128];

@@ -177,28 +177,6 @@ void ExceptionHandler_4(void)
 uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
 /* INTERRUPT */ void TIM2_ISR(void)
 {
-    if (TIM2_SR_UIF_Get())
-    {
-      TIM2_SR_UIF_Reset();
-      TIM2_UIF_Callback();
-    }else
-    if (TIM2_SR_CC1IF_Get())
-    {
-      TIM2_SR_CC1IF_Reset();
-      TIM2_CC1IF_Callback();
-    }else
-    if (TIM2_SR_CC3IF_Get())
-    {
-      TIM2_SR_CC3IF_Reset();
-      TIM2_SR_CC3OF_Reset();
-      TIM2_CC3IF_Callback();
-    }else
-     if (TIM2_SR_CC4IF_Get())
-    {
-      TIM2_SR_CC4IF_Reset();
-      TIM2_SR_CC4OF_Reset();
-      TIM2_CC4IF_Callback();
-    }else
     {
       CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) | ((TIM2->SR) << 16));
     }
