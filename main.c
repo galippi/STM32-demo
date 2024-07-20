@@ -143,7 +143,7 @@ int main(void)
 
   while (1)
   {
-    ADC_Handler();
+    //ADC_Handler();
   }
 
   return 0;

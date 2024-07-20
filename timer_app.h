@@ -24,30 +24,11 @@ static inline void TIM3_CC1IF_Callback(void)
   SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; /* activate PendSV handler */
 }
 
-static inline void TIM3_CC1IF_PollHandler(void)
-{
-  if (TIM3_SR_CC1IF_Get())
-  {
-    TIM3_SR_CC1IF_Reset();
-    TIM3_CCR1_Set(TIM3_CCR1_Get() + TIM3_FREQ); /* set next interrupt to the next 1ms slot */
-    TIM3_CC1IF_Callback();
-  }
-}
-
 extern uint8_t tim3_cc3_ctr;
-extern uint16_t encoder;
+
 static inline void TIM3_CC3IF_Callback(void)
 {
   tim3_cc3_ctr++;
-  {
-	  if (GPIO_GetI(GPIOB, 1))
-	  {
-	    encoder++;
-	  }else
-	  {
-	    encoder--;
-	  }
-  }
 }
 
 extern uint8_t tim3_cc4_ctr;

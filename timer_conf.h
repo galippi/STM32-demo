@@ -23,7 +23,7 @@
 #define TIM3_CCER_INIT 0x0101 /* enable CC1 out high, CC3/CC4 input */
 #define TIM3_CCMR1_INIT 0x0000
 #define TIM3_CCMR2_INIT 0x00F1 /* enable CC3/CC4 as input capture */
-#define TIM3_DIER_INIT 0x000B /* enable update interrupt */
+#define TIM3_DIER_INIT 0x0003 /* enable update and CC1 (scheduler) interrupt */
 
 #define TIM4_CR1_INIT 0x00 /* up counter mode */
 #define TIM4_CR2_INIT 0x0

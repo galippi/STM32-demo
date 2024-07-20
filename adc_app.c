@@ -11,16 +11,16 @@ uint16_t ADC_values[ADC_Ch_Num];
 int16_t Temperature = -32768;
 int16_t Temperature_raw = -32768;
 
-static uint8_t adc_idx;
 void ADC_HandlerInit(void)
 {
-  adc_idx = 0;
   //GPIO_PortInit_Analog(GPIOB, 0);
   //GPIO_PortInit_Analog(GPIOB, 1);
   ADC_Init();
   ADC_Start();
 }
 
+#if 0
+static uint8_t adc_idx = 0;
 uint16_t ADC_ctr;
 void ADC_Handler(void)
 {
@@ -88,3 +88,4 @@ void ADC_Handler_10ms(void)
   UART2_TX((uint8_t*)uart2Buffer, sizeof(uart2Buffer));
   ctr++;
 }
+#endif

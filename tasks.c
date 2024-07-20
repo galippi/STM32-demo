@@ -55,7 +55,7 @@ void Task_10ms(void)
 {
   //DebugOut();
   dht11_run();
-  ADC_Handler_10ms();
+  //ADC_Handler_10ms();
   {
       uint8_t buf[128];
       uint32_t num = UART1_RX(buf, sizeof(buf));
@@ -109,7 +109,6 @@ void Task_10ms(void)
 uint8_t UART1_TxOverrun;
 uint8_t tim3_cc3_ctr;
 uint8_t tim3_cc4_ctr;
-uint16_t encoder;
 uint32_t UART1_RxNum;
 
 typedef enum
@@ -174,7 +173,7 @@ void Task_500ms(void)
 	}
     {
         static uint8_t msgCtr;
-        static uint8_t usbDemoLine[] = "Periodic message ctr=xx xx   xx xx xx xx xx xx xx xxxx xx xx xx\r\n";
+        static uint8_t usbDemoLine[] = "Periodic message ctr=xx xx   xx xx xx xx xx xx xx xx xxx xxx xxx xxx xxx xxx *        q\r\n";
         U32_to_HexString((char*)usbDemoLine + 21, 2, msgCtr, '0');
         U32_to_HexString((char*)usbDemoLine + 24, 2, UART1_TxOverrun, '0');
         UART1_RxNum = DMA1_Channel5->CNDTR;
@@ -185,14 +184,18 @@ void Task_500ms(void)
         U32_to_HexString((char*)usbDemoLine + 38, 2, SchedPreTask_GetTaskLoad(1), '0');
         U32_to_HexString((char*)usbDemoLine + 41, 2, SchedPreTask_GetTaskLoad(2), '0');
 
-        U32_to_HexString((char*)usbDemoLine + 44, 2, tim3_cc3_ctr, '0');
-        U32_to_HexString((char*)usbDemoLine + 47, 2, tim3_cc4_ctr, '0');
+        U32_to_HexString((char*)usbDemoLine + 44, 2, SchedPreTask_GetTaskLoadMax(0), '0');
+        U32_to_HexString((char*)usbDemoLine + 47, 2, SchedPreTask_GetTaskLoadMax(1), '0');
+        U32_to_HexString((char*)usbDemoLine + 50, 2, SchedPreTask_GetTaskLoadMax(2), '0');
 
-        U32_to_HexString((char*)usbDemoLine + 50, 4, encoder, '0');
+        U32_to_HexString((char*)usbDemoLine + 53, 3, ADC_values[0], '0');
+        U32_to_HexString((char*)usbDemoLine + 57, 3, ADC_values[1], '0');
+        U32_to_HexString((char*)usbDemoLine + 61, 3, ADC_values[2], '0');
+        U32_to_HexString((char*)usbDemoLine + 65, 3, ADC_values[3], '0');
+        U32_to_HexString((char*)usbDemoLine + 69, 3, ADC_values[4], '0');
+        U32_to_HexString((char*)usbDemoLine + 73, 3, ADC_values[5], '0');
 
-        U32_to_HexString((char*)usbDemoLine + 55, 2, SchedPreTask_GetTaskLoadMax(0), '0');
-        U32_to_HexString((char*)usbDemoLine + 58, 2, SchedPreTask_GetTaskLoadMax(1), '0');
-        U32_to_HexString((char*)usbDemoLine + 61, 2, SchedPreTask_GetTaskLoadMax(2), '0');
+        U32_to_HexString((char*)usbDemoLine + 77, 2, tim3_cc3_ctr, '0');
 
         //ESP8266_send(0, sizeof(usbDemoLine)-1, usbDemoLine);
         UART1_TX(usbDemoLine, sizeof(usbDemoLine)-1);
