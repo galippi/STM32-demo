@@ -195,6 +195,7 @@ void Task_500ms(void)
         U32_to_HexString((char*)usbDemoLine + 61, 2, SchedPreTask_GetTaskLoadMax(2), '0');
 
         //ESP8266_send(0, sizeof(usbDemoLine)-1, usbDemoLine);
+        UART1_TX(usbDemoLine, sizeof(usbDemoLine)-1);
         msgCtr++;
     }
 }
