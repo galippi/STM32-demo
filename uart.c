@@ -17,12 +17,12 @@ void UART1_Init(uint32_t baudRate, uint8_t uartRemap)
   if (uartRemap == 0)
   {
     GPIO_PortInit_AFOut(GPIOA,  9); /* PA2 USART1_TX */
-    GPIO_PortInit_In(GPIOA, 10); /* PA3 USART2_RX */
+    GPIO_PortInit_In(GPIOA, 10); /* PA3 USART1_RX */
     BitfieldSet(AFIO->MAPR, 2, 1, 0); /* AFIO_MAPR_USART1_REMAP */
   }else
   {
     GPIO_PortInit_AFOut(GPIOB,  6); /* PA2 USART1_TX */
-    GPIO_PortInit_In(GPIOB,  7); /* PA3 USART2_RX */
+    GPIO_PortInit_In(GPIOB,  7); /* PA3 USART1_RX */
     BitfieldSet(AFIO->MAPR, 2, 1, 1); /* AFIO_MAPR_USART1_REMAP */
   }
   RCC->APB2ENR |= RCC_APB2ENR_USART1EN;   /* enable the USART1 */
