@@ -32,21 +32,8 @@
 #error "Error: TARGET_ECU is invalid!"
 #endif
 
-#define BUTTON1_PORT GPIOA
-#define BUTTON1_PIN_NUM 0
-
 #define PB13_PORT GPIOB
 #define PB13_PIN_NUM 13
-
-static inline void Button1_Init(void)
-{
-  GPIO_PortInit_In(BUTTON1_PORT, BUTTON1_PIN_NUM);
-}
-
-static inline uint8_t Button1_Get(void)
-{
-  return (BUTTON1_PORT->IDR & (1 << BUTTON1_PIN_NUM)) ? 1 : 0;
-}
 
 #define LEDx_Init(x) \
   static inline void LED##x##_Init(void)\
