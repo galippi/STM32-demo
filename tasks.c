@@ -11,6 +11,7 @@
 #include "pwm.h"
 #include "dht11.h"
 #include "timer_app.h"
+#include "version.h"
 
 #include "tasks.h"
 
