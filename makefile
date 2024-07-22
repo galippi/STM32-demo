@@ -1,6 +1,7 @@
 ##################################################################
 CFLAGS_DEBUG = -gdwarf-2
-SUBDIRS := . ST_lib u32_to_hexstring dht11
+SUBDIRS := . ST_lib u32_to_hexstring dht11 hal_STM32F1 hal_STM32F1/ST_lib
+SUBDIRS_LINKER := hal_STM32F1/lib
 
 WARNINGS = -Wall -Wextra
 WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
@@ -33,7 +34,7 @@ CFLAGS_TARGET += -mcpu=cortex-m3
 #CFLAGS_TARGET += -march=armv7-m
 
 #LDFLAGS_STRIP_DEBUG_INFO = -s
-LDFLAGS  += $(LDFLAGS_STRIP_DEBUG_INFO)
+LDFLAGS  += $(LDFLAGS_STRIP_DEBUG_INFO) $(addprefix -L, $(SUBDIRS_LINKER))
 
 LDLIBS :=
 LDLIBS += -lc
