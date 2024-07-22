@@ -1,1 +1,0 @@
-start C:\Programok\eclipse.Mars.32bit\eclipse.exe
