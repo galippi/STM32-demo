@@ -9,6 +9,7 @@ WARNINGS += -Wundef
 WARNINGS += -Wmissing-declarations
 WARNINGS += -Wmissing-prototypes -Wstrict-prototypes
 WARNINGS += -Wno-unused-function
+WARNINGS += -Wno-enum-compare
 # stop at warnings
 WARNINGS += -Werror
 
