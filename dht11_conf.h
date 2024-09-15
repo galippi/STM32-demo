@@ -63,4 +63,7 @@
 #define DHT_ResultTimeoutCtr 3
 #define DHT_ResultTimeout_cb() /* do nothing */
 
+extern void DHT_ResultDebug(uint16_t resultCtr, uint16_t resultChecksumCtr);
+#define DHT_Result_cb() DHT_ResultDebug(dht11.dbg.resultCtr, dht11.dbg.resultChecksumCtr)
+
 #endif /* _DHT11_CONF_H_ */

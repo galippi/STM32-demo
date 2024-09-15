@@ -50,6 +50,17 @@ uint32_t rxErrorCtr = 0;
 uint32_t rxOkCtr = 0;
 uint8_t rxLastVal = 'Z';
 
+void DHT_ResultDebug(uint16_t resultCtr, uint16_t resultChecksumCtr)
+{
+    char dhtData[] = "DHTxxxx_xxxx_xx_xx\r\n";
+    t_DHT11_Result dhtResult = dht_getResult();
+    U32_to_HexString(dhtData + 3, 4, dhtResult.temperature, '0');
+    U32_to_HexString(dhtData + 8, 4, dhtResult.humidity, '0');
+    U32_to_HexString(dhtData + 13, 2, resultCtr, '0');
+    U32_to_HexString(dhtData + 16, 2, resultChecksumCtr, '0');
+    UART1_TX((uint8_t*)dhtData, sizeof(dhtData)-1);
+}
+
 void Task_10ms(void)
 {
   //DebugOut();
@@ -205,7 +216,7 @@ void Task_500ms(void)
         U32_to_HexString((char*)usbDemoLine + 77, 2, tim3_cc3_ctr, '0');
 
         //ESP8266_send(0, sizeof(usbDemoLine)-1, usbDemoLine);
-        UART1_TX(usbDemoLine, sizeof(usbDemoLine)-1);
+        //UART1_TX(usbDemoLine, sizeof(usbDemoLine)-1);
         msgCtr++;
     }
 }
