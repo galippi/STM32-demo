@@ -60,4 +60,7 @@
 
 #define DHT11_MissingFallingEdgeIRQ_cb() /* do nothing */
 
+#define DHT_ResultTimeoutCtr 3
+#define DHT_ResultTimeout_cb() /* do nothing */
+
 #endif /* _DHT11_CONF_H_ */
