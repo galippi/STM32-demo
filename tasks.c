@@ -40,6 +40,7 @@ void Task_1ms(void)
     static uint16_t t_ug;
     if (t_ug == 100)
         dht11_request();
+    dht11_run();
     if (t_ug < 500)
     {
         t_ug++;
@@ -55,7 +56,6 @@ uint8_t rxLastVal = 'Z';
 void Task_10ms(void)
 {
   //DebugOut();
-  dht11_run();
   //ADC_Handler_10ms();
   {
       uint8_t buf[128];
