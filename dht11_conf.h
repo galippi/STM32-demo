@@ -3,6 +3,8 @@
 
 #include "timer.h"
 
+#define DHT_MODE DHT_MODE_22
+
 #define DHT11_DEBUG 1
 
 #define DHT_TimerResolution 0.000001 /* sec */
