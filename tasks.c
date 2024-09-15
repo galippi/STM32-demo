@@ -38,9 +38,6 @@ void Task_1ms(void)
   /*PB13_Set(!PB13_Get());*/ /* toggling debug port */
   {
     static uint16_t t_ug;
-    if (t_ug == 100)
-        dht11_request();
-    dht11_run();
     if (t_ug < 500)
     {
         t_ug++;
@@ -57,6 +54,15 @@ void Task_10ms(void)
 {
   //DebugOut();
   //ADC_Handler_10ms();
+    {
+        static uint16_t dhtCtr = 0;
+        if (dhtCtr == 300) {
+            dht11_request();
+            dhtCtr = 0;
+        }else
+            dhtCtr++;
+        dht11_run();
+    }
   {
       uint8_t buf[128];
       uint32_t num = UART1_RX(buf, sizeof(buf));
