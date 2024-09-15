@@ -14,6 +14,8 @@
 #ifndef _DMA_H_
 #define _DMA_H_
 
+#include "dma_conf.h"
+
 #include "controller.h"
 #include STM32_RCC_HEADER
 
