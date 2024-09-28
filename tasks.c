@@ -219,4 +219,13 @@ void Task_500ms(void)
         //UART1_TX(usbDemoLine, sizeof(usbDemoLine)-1);
         msgCtr++;
     }
+#if 0
+    ADC_Handler_10ms();
+#else
+    {
+        static char uart2Buffer[] = "U0xxxx\n";
+        (void)U32_to_HexString(uart2Buffer +  2, 4, ADC_values[ADC_IN0], '0');
+        UART1_TX((uint8_t*)uart2Buffer, sizeof(uart2Buffer) - 1);
+    }
+#endif
 }
