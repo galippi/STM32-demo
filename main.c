@@ -128,6 +128,7 @@ int main(void)
   LED6_Init();
   PB13_Init();
   GPIO_PortInit_Analog(GPIOA, 0);
+  GPIO_PortInit_Analog(GPIOA, 1);
   ADC_HandlerInit();
   //UART2_Init();
   Task_Init();

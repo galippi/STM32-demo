@@ -24,7 +24,7 @@ void Task_Init(void)
   //ESP8266_open();
   TIM2_Init();
   PWM_Init(TIM2, 1);
-  GPIO_PortInit_AFOut(GPIOA, 1); /* PA1 PWM2/2 */
+  //GPIO_PortInit_AFOut(GPIOA, 1); /* PA1 PWM2/2 */
   // BitfieldSet(AFIO->MAPR, 2, 1, 0); /* no remap is needed */
   PWM_Set(TIM2, 1, 0);
 
@@ -223,8 +223,13 @@ void Task_500ms(void)
     ADC_Handler_10ms();
 #else
     {
-        static char uart2Buffer[] = "U0xxxx\n";
+        static char uart2Buffer[] = "U0xxxx\nU1xxxx\nIxxxx\n";
         (void)U32_to_HexString(uart2Buffer +  2, 4, ADC_values[ADC_IN0], '0');
+        (void)U32_to_HexString(uart2Buffer +  9, 4, ADC_values[ADC_IN1], '0');
+        {
+            int32_t du = ADC_values[ADC_IN1] - ADC_values[ADC_IN0];
+            (void)U32_to_HexString(uart2Buffer +  15, 4, ((uint32_t)du) & 0xFFFF, '0');
+        }
         UART1_TX((uint8_t*)uart2Buffer, sizeof(uart2Buffer) - 1);
     }
 #endif
