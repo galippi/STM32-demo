@@ -52,7 +52,7 @@ uint8_t rxLastVal = 'Z';
 
 void DHT_ResultDebug(uint16_t resultCtr, uint16_t resultChecksumCtr)
 {
-    char dhtData[] = "DHTxxxxxxxxxxxx\r\n";
+    char dhtData[] = "DHTxxxxxxxxxxxx\r";
     t_DHT11_Result dhtResult = dht_getResult();
     U32_to_HexString(dhtData + 3, 4, dhtResult.temperature, '0');
     U32_to_HexString(dhtData + 7, 4, dhtResult.humidity, '0');
