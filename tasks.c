@@ -52,12 +52,12 @@ uint8_t rxLastVal = 'Z';
 
 void DHT_ResultDebug(uint16_t resultCtr, uint16_t resultChecksumCtr)
 {
-    char dhtData[] = "DHTxxxx_xxxx_xx_xx\r\n";
+    char dhtData[] = "DHTxxxxxxxxxxxx\r\n";
     t_DHT11_Result dhtResult = dht_getResult();
     U32_to_HexString(dhtData + 3, 4, dhtResult.temperature, '0');
-    U32_to_HexString(dhtData + 8, 4, dhtResult.humidity, '0');
-    U32_to_HexString(dhtData + 13, 2, resultCtr, '0');
-    U32_to_HexString(dhtData + 16, 2, resultChecksumCtr, '0');
+    U32_to_HexString(dhtData + 7, 4, dhtResult.humidity, '0');
+    U32_to_HexString(dhtData + 11, 2, resultCtr, '0');
+    U32_to_HexString(dhtData + 13, 2, resultChecksumCtr, '0');
     UART1_TX((uint8_t*)dhtData, sizeof(dhtData)-1);
 }
 
@@ -221,7 +221,7 @@ void Task_500ms(void)
     }
 #if 0
     ADC_Handler_10ms();
-#else
+#elsif 0
     {
         static char uart2Buffer[] = "U0xxxx\nU1xxxx\nIxxxx\n";
         (void)U32_to_HexString(uart2Buffer +  2, 4, ADC_values[ADC_IN0], '0');

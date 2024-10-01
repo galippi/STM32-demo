@@ -3,7 +3,7 @@
 
 #include "timer.h"
 
-#define DHT_MODE DHT_MODE_22
+#define DHT_MODE DHT_MODE_11
 
 #define DHT11_DEBUG 1
 
@@ -19,16 +19,15 @@
 #define DHT11_STANDBY_CNT (uint32_t)(2.5 / (DHT11_run_period_time)) /* 2.5 sec standby after the last measurement */
 
 /* Port-B - pin 8 - DHT11 - data - TIM4 - CH3/CH4 */
-#define DHT11_PORT_IN  GPIOB, 8
-#define DHT11_PORT_OUT GPIOB, 9
+//#define DHT11_PORT_IN  GPIOB, 8
+#define DHT11_PORT_OUT GPIOB, 8
 #define DHT11_PORT_INIT() \
     do { \
-        GPIO_PortInit_Out(DHT11_PORT_OUT); \
-        GPIO_PortInit_In(DHT11_PORT_IN); \
+        GPIO_PortInit_OC(DHT11_PORT_OUT); \
     } while(0)
 //#define DHT11_OUT_INIT() GPIO_PortInit_Out(DHT11_PORT)
-#define DHT11_OUT_LOW()  GPIO_Set(DHT11_PORT_OUT, 1) /* inerting by external circuit */
-#define DHT11_OUT_HIGH() GPIO_Set(DHT11_PORT_OUT, 0)
+#define DHT11_OUT_LOW()  GPIO_Set(DHT11_PORT_OUT, 0)
+#define DHT11_OUT_HIGH() GPIO_Set(DHT11_PORT_OUT, 1)
 #define DHT11_CC_IRQ_ENABLE() \
     do { \
         TIM4_SR_CC3IF_Reset(); \
