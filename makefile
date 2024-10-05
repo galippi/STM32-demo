@@ -1,6 +1,7 @@
 ##################################################################
 CFLAGS_DEBUG = -gdwarf-2
 SUBDIRS := . ST_lib u32_to_hexstring dht11 hal_STM32F1 hal_STM32F1/ST_lib
+SUBDIRS += queue
 SUBDIRS_LINKER := hal_STM32F1/lib
 
 WARNINGS = -Wall -Wextra
@@ -60,6 +61,7 @@ CFILES  += debug.c
 CFILES  += gpio.c
 CFILES  += scheduler_preemptive.c
 CFILES  += uart.c
+CFILES  += uart_app.c
 CFILES  += tasks.c
 CFILES  += timer.c
 CFILES  += util.c
@@ -70,6 +72,7 @@ CFILES  += u32_to_hexstring.c
 CFILES  += SysClock.c
 CFILES  += pwm.c
 CFILES  += dht11.c
+CFILES  += queue.c
 #CFILES  += 
 
 SFILES  =

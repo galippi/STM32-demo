@@ -51,7 +51,7 @@ t_func_ptr const ISR_VectorTable[] =
   ISR_Invalid,       /*  DMA1 Ch1 */
   ISR_Invalid,       /*  DMA1 Ch2 */
   ISR_Invalid,       /*  DMA1 Ch3 */
-  ISR_Invalid,       /*  DMA1 Ch4 */
+  UART1_TxDma_ISR,   /*  DMA1 Ch4 */
   UART1_RxDma_ISR,   /*  DMA1 Ch5 */
   ISR_Invalid,       /*  DMA1 Ch6 */
   ISR_Invalid,       /*  DMA1 Ch7 */

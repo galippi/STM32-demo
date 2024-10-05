@@ -18,6 +18,7 @@
 #include "uart_app.h"
 
 #define UART1_DMA 1
+#define UART1_TX_QUEUE 1
 #define UART1_DMA_RX_BUFFER uart1RxBuffer
 extern uint8_t UART1_TxOverrun;
 #define UART1_OverrunCallback() (UART1_TxOverrun++)

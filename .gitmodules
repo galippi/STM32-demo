@@ -7,3 +7,6 @@
 [submodule "hal_STM32F1"]
 	path = hal_STM32F1
 	url = S:\\git\\STM32F103C8T6.git
+[submodule "queue"]
+	path = queue
+	url = s:\\git\\Queue\\Queue.test
