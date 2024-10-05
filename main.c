@@ -32,7 +32,8 @@
 	DBG_PORT(SCB_Type, scb, SCB) \
 	DBG_PORT(NVIC_Type, nvic, NVIC) \
 	DBG_PORT(DMA_TypeDef, dma1, DMA1) \
-	DBG_PORT(DMA_Channel_TypeDef, dma1_4, DMA1_Channel4) \
+    DBG_PORT(DMA_Channel_TypeDef, dma1_4, DMA1_Channel4) \
+    DBG_PORT(DMA_Channel_TypeDef, dma1_5, DMA1_Channel5) \
 	DBG_PORT(USART_TypeDef, uart1, USART1) \
   /* no more peripheries */
 
