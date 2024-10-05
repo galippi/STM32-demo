@@ -8,7 +8,9 @@
 
 #include "uart.h"
 
-DMA_Channel_TypeDef * const dma1_Channel5 = DMA1_Channel5;
+#ifndef UART1_TX_QUEUE
+#define UART1_TX_QUEUE 0
+#endif
 
 static void UART1_RxDma_Update(void);
 
@@ -37,7 +39,10 @@ void UART1_Init(uint32_t baudRate, uint8_t uartRemap)
   DMA_Init(DMA1);
   DMA1_Channel4->CCR &= ~DMA_CCR1_EN;
   DMA1_Channel4->CPAR = (uint32_t)&(USART1->DR);
-  DMA1_Channel4->CCR = DMA_CCR1_DIR | DMA_CCR1_MINC; /* mem2per, no-circ, no-per-inc, mem-inc, psize=8, memsize=8,ch-prio=low, no-mem2mem */
+  DMA1_Channel4->CCR = DMA_CCR1_DIR | DMA_CCR1_MINC | DMA_CCR1_TCIE; /* mem2per, no-circ, no-per-inc, mem-inc, psize=8, memsize=8,ch-prio=low, no-mem2mem */
+#if UART1_TX_QUEUE
+  DMA1_Channel4->CCR |= DMA_CCR1_TCIE; /* enable DMA interrupt */
+#endif // UART1_TX_QUEUE
   /* configuring DMA for USART1-RX */
   DMA1_Channel5->CCR &= ~DMA_CCR1_EN;
   DMA1_Channel5->CPAR = (uint32_t)&(USART1->DR);
@@ -60,6 +65,16 @@ static inline t_UART1_idx idxUpdate(t_UART1_idx prev, t_UART1_idx increment, t_U
     if (newVal >= limit)
         newVal -= limit;
     return (t_UART1_idx)newVal;
+}
+
+uint8_t UART1_TxDmaCtr;
+void UART1_TxDma_ISR(void)
+{
+    UART1_TxDmaCtr++;
+    DMA1->IFCR = DMA_IFCR_CTCIF4;
+#if UART1_TX_QUEUE
+    UART1_TxDma_Update();
+#endif /* UART1_TX_QUEUE */
 }
 
 uint32_t UART1_RxDmaCtr;

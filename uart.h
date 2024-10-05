@@ -24,6 +24,8 @@ static inline void UART1_TX(const uint8_t *data, uint32_t len)
 #endif
 }
 
+void UART1_TxDma_ISR(void);
+
 void UART1_RxDma_ISR(void);
 uint32_t UART1_RX(uint8_t *data, uint32_t len);
 
