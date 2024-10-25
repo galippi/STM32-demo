@@ -67,8 +67,8 @@ void Task_10ms(void)
   //DebugOut();
   //ADC_Handler_10ms();
     {
-        static uint16_t dhtCtr = 0;
-        if (dhtCtr == 300) {
+        static uint8_t dhtCtr = 0;
+        if (dhtCtr == 210) {
             dht11_request();
             dhtCtr = 0;
         }else
