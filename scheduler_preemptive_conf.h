@@ -17,11 +17,9 @@
   SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; \
 }
 
-#define SchedPreTask_Disable() { \
-}
+#define SchedPreTask_Disable() __disable_irq()
 
-#define SchedPreTask_Enable() { \
-}
+#define SchedPreTask_Enable() __enable_irq()
 
 /* atomic function to set the new task status, if it was in the given state */
 #define atomic_check_and_set_u8(var, val_old, val_new) \
