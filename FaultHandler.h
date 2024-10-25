@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 typedef enum {
+  CAT_NoError,
   CAT_Exception_0,
   CAT_Exception_1,
   CAT_Exception_2,
@@ -18,6 +19,6 @@ typedef enum {
   CAT_VarInvalidValue,
 }t_CAT_ErrorCode;
 
-void CAT_Error(t_CAT_ErrorCode Code, uint32_t SubCode);
+void CAT_Error(t_CAT_ErrorCode Code, uint32_t SubCode) __attribute__ ((noreturn));
 
 #endif /* _FAULTHANDLER_H_ */
