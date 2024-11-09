@@ -18,6 +18,11 @@ static inline void TIMx_CCRy_Set(TIM_TypeDef *tim, uint32_t chIdx, uint16_t val)
     *((&(tim->CCR1)) + (chIdx * 2)) = val;
 }
 
+static inline uint16_t TIMx_CCRy_Get(TIM_TypeDef *tim, uint32_t chIdx)
+{
+    return *((&(tim->CCR1)) + (chIdx * 2));
+}
+
 // 0        - OC1CE: clear is not enabled
 //  110     - PWM mode 1
 //     1    - OC1PE: preload is enabled
