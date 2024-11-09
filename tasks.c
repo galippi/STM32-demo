@@ -13,6 +13,7 @@
 #include "dht11.h"
 #include "timer_app.h"
 #include "version.h"
+#include "battery.h"
 
 #include "tasks.h"
 
@@ -21,7 +22,8 @@ uint8_t uart1RxBuffer[128];
 
 void Task_Init(void)
 {
-  UART1_Init(115200, 1);
+  //UART1_Init(115200, 1);
+  UART1_Init(9600, 1);
   //ESP8266_open();
   TIM2_Init();
   PWM_Init(TIM2, 1);
@@ -32,6 +34,7 @@ void Task_Init(void)
   // DHT11
   TIM4_Init();
   dht11_init();
+  battery_init();
 }
 
 void Task_1ms(void)
@@ -45,11 +48,6 @@ void Task_1ms(void)
     }
   }
 }
-
-uint32_t rxCtr = 0;
-uint32_t rxErrorCtr = 0;
-uint32_t rxOkCtr = 0;
-uint8_t rxLastVal = 'Z';
 
 void DHT_ResultDebug(uint16_t resultCtr, uint16_t resultChecksumCtr)
 {
@@ -75,27 +73,7 @@ void Task_10ms(void)
             dhtCtr++;
         dht11_run();
     }
-  {
-      uint8_t buf[128];
-      uint32_t num = UART1_RX(buf, sizeof(buf));
-      for(uint32_t i = 0; i < num; i++)
-      {
-          rxCtr++;
-          uint8_t rxNextVal = rxLastVal;
-          if (rxNextVal == 'Z')
-              rxNextVal = 'A';
-          else
-              rxNextVal = rxNextVal + 1;
-          if (buf[i] == rxNextVal)
-          {
-              rxOkCtr++;
-          }else
-          {
-              rxErrorCtr++;
-          }
-          rxLastVal = buf[i];
-      }
-  }
+  battery_10ms();
   {
 	  static uint8_t timer = 200;
 	  if (timer == 0)
@@ -190,6 +168,7 @@ void Task_500ms(void)
 	{
 		pulseTimer--;
 	}
+    battery_100ms();
     {
         static uint8_t msgCtr;
         static uint8_t usbDemoLine[] = "Periodic message ctr=xx xx   xx xx xx xx xx xx xx xx xxx xxx xxx xxx xxx xxx *        q\r\n";
@@ -228,8 +207,9 @@ void Task_500ms(void)
         (void)U32_to_HexString(uart2Buffer +  2, 4, ADC_values[ADC_IN0], '0');
         (void)U32_to_HexString(uart2Buffer +  9, 4, ADC_values[ADC_IN1], '0');
         {
-            int32_t du = ADC_values[ADC_IN1] - ADC_values[ADC_IN0];
-            (void)U32_to_HexString(uart2Buffer +  15, 4, ((uint32_t)du) & 0xFFFF, '0');
+            int32_t du = ADC_values[ADC_IN0] - ADC_values[ADC_IN1];
+            int32_t i = (du * (3300 * 10)) / (27 * 4096); // 2.7 Ohm
+            (void)U32_to_HexString(uart2Buffer +  15, 4, ((uint32_t)i) & 0xFFFF, '0');
         }
         UART1_TX_Queue((uint8_t*)uart2Buffer, sizeof(uart2Buffer) - 1);
     }

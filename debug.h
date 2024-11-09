@@ -35,4 +35,12 @@ static inline void DebugOut_Set_u16(uint32_t block, uint32_t idx, uint16_t data)
   TestBuffer[block*10+2+idx+1] = (data >> 8) & 0xFF;
 }
 
+typedef struct {
+    uint32_t uart1_rxCtr;
+}t_dbgBuffer;
+t_dbgBuffer dbgBuffer;
+
+#define DBG_SET(field, val) dbgBuffer.field = (val)
+#define DBG_INC(field) dbgBuffer.field++
+
 #endif /* _DEBUG_H_ */

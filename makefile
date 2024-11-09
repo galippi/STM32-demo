@@ -73,6 +73,7 @@ CFILES  += SysClock.c
 CFILES  += pwm.c
 CFILES  += dht11.c
 CFILES  += queue.c
+CFILES  += battery.c
 #CFILES  += 
 
 SFILES  =
