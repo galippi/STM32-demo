@@ -109,6 +109,9 @@ int main(void)
   SysClock_Init();
   SysTick_Init();
   SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
+
+  DBGMCU->CR |= DBGMCU_CR_DBG_TIM3_STOP;
+
 #if 0
   // MCO out is turned on
   GPIO_PortInit_AFOut(GPIOA, 8); /* Set Port A8 to AF */
