@@ -43,31 +43,31 @@ static inline void TIMx_CCRy_PWM1_Set(TIM_TypeDef *tim, uint32_t chIdx)
     BitfieldSet(tim->CCER, chIdx * 4, 2, 0x01);
 }
 
-void TIM2_Init(void);
+void TIM14_Init(void);
 
-static inline uint32_t TIM2_Cnt_Get(void)
+static inline uint32_t TIM14_Cnt_Get(void)
 {
-  return TIM2->CNT;
+  return TIM14->CNT;
 }
 
-static inline uint32_t TIM2_SR_CC3IF_Get(void)
+static inline uint32_t TIM14_SR_CC3IF_Get(void)
 {
-  return (TIM2->SR & TIM_SR_CC3IF);
+  return (TIM14->SR & TIM_SR_CC3IF);
 }
 
-static inline void TIM2_SR_CC3IF_Reset(void)
+static inline void TIM14_SR_CC3IF_Reset(void)
 {
-  TIM2->SR = ~(TIM_SR_CC3IF); /* reset the CC1-InterrupFlag */
+  TIM14->SR = ~(TIM_SR_CC3IF); /* reset the CC1-InterrupFlag */
 }
 
-static inline uint32_t TIM2_CCR3_Get(void)
+static inline uint32_t TIM14_CCR3_Get(void)
 {
-  return TIM2->CCR3;
+  return TIM14->CCR3;
 }
 
-static inline void TIM2_CCR3_Set(uint32_t new_val)
+static inline void TIM14_CCR3_Set(uint32_t new_val)
 {
-  TIM2->CCR3 = new_val;
+  TIM14->CCR3 = new_val;
 }
 
 void TIM3_Init(void);
@@ -177,111 +177,111 @@ static inline void TIM3_CCR4_Set(uint16_t new_val)
   TIM3->CCR4 = new_val;
 }
 
-void TIM4_Init(void);
+void TIM16_Init(void);
 
-static inline uint32_t TIM4_SR_UIF_Get(void)
+static inline uint32_t TIM16_SR_UIF_Get(void)
 {
-  return (TIM4->SR & TIM_SR_UIF);
+  return (TIM16->SR & TIM_SR_UIF);
 }
 
-static inline void TIM4_SR_UIF_Reset(void)
+static inline void TIM16_SR_UIF_Reset(void)
 {
-  TIM4->SR = ~(TIM_SR_UIF); /* reset the UpdateInterrupFlag */
+  TIM16->SR = ~(TIM_SR_UIF); /* reset the UpdateInterrupFlag */
 }
 
-static inline uint16_t TIM4_Cnt_Get(void)
+static inline uint16_t TIM16_Cnt_Get(void)
 {
-  return TIM4->CNT;
+  return TIM16->CNT;
 }
 
-static inline uint32_t TIM4_SR_CC1IF_Get(void)
+static inline uint32_t TIM16_SR_CC1IF_Get(void)
 {
-  return (TIM4->SR & TIM_SR_CC1IF);
+  return (TIM16->SR & TIM_SR_CC1IF);
 }
 
-static inline void TIM4_SR_CC1IF_Reset(void)
+static inline void TIM16_SR_CC1IF_Reset(void)
 {
-  TIM4->SR = ~(TIM_SR_CC1IF); /* reset the CC1-InterrupFlag */
+  TIM16->SR = ~(TIM_SR_CC1IF); /* reset the CC1-InterrupFlag */
 }
 
-static inline uint16_t TIM4_CCR1_Get(void)
+static inline uint16_t TIM16_CCR1_Get(void)
 {
-  return TIM4->CCR1;
+  return TIM16->CCR1;
 }
 
-static inline void TIM4_CCR1_Set(uint16_t new_val)
+static inline void TIM16_CCR1_Set(uint16_t new_val)
 {
-  TIM4->CCR1 = new_val;
+  TIM16->CCR1 = new_val;
 }
 
-static inline uint32_t TIM4_SR_CC2IF_Get(void)
+static inline uint32_t TIM16_SR_CC2IF_Get(void)
 {
-  return (TIM4->SR & TIM_SR_CC2IF);
+  return (TIM16->SR & TIM_SR_CC2IF);
 }
 
-static inline void TIM4_SR_CC2IF_Reset(void)
+static inline void TIM16_SR_CC2IF_Reset(void)
 {
-  TIM4->SR = ~(TIM_SR_CC2IF); /* reset the CC1-InterrupFlag */
+  TIM16->SR = ~(TIM_SR_CC2IF); /* reset the CC1-InterrupFlag */
 }
 
-static inline uint16_t TIM4_CCR2_Get(void)
+static inline uint16_t TIM16_CCR2_Get(void)
 {
-  return TIM4->CCR2;
+  return TIM16->CCR2;
 }
 
-static inline void TIM4_CCR2_Set(uint16_t new_val)
+static inline void TIM16_CCR2_Set(uint16_t new_val)
 {
-  TIM4->CCR2 = new_val;
+  TIM16->CCR2 = new_val;
 }
 
-static inline uint32_t TIM4_SR_CC3IF_Get(void)
+static inline uint32_t TIM16_SR_CC3IF_Get(void)
 {
-  return (TIM4->SR & TIM_SR_CC3IF);
+  return (TIM16->SR & TIM_SR_CC3IF);
 }
 
-static inline void TIM4_SR_CC3IF_Reset(void)
+static inline void TIM16_SR_CC3IF_Reset(void)
 {
-  TIM4->SR = ~(TIM_SR_CC3IF); /* reset the CC3-InterrupFlag */
+  TIM16->SR = ~(TIM_SR_CC3IF); /* reset the CC3-InterrupFlag */
 }
 
-static inline void TIM4_SR_CC3OF_Reset(void)
+static inline void TIM16_SR_CC3OF_Reset(void)
 {
-  TIM4->SR = ~(TIM_SR_CC3OF); /* reset the CC3-oveflow-InterrupFlag */
+  TIM16->SR = ~(TIM_SR_CC3OF); /* reset the CC3-oveflow-InterrupFlag */
 }
 
-static inline uint16_t TIM4_CCR3_Get(void)
+static inline uint16_t TIM16_CCR3_Get(void)
 {
-  return TIM4->CCR3;
+  return TIM16->CCR3;
 }
 
-static inline void TIM4_CCR3_Set(uint16_t new_val)
+static inline void TIM16_CCR3_Set(uint16_t new_val)
 {
-  TIM4->CCR3 = new_val;
+  TIM16->CCR3 = new_val;
 }
 
-static inline uint32_t TIM4_SR_CC4IF_Get(void)
+static inline uint32_t TIM16_SR_CC4IF_Get(void)
 {
-  return (TIM4->SR & TIM_SR_CC4IF);
+  return (TIM16->SR & TIM_SR_CC4IF);
 }
 
-static inline void TIM4_SR_CC4IF_Reset(void)
+static inline void TIM16_SR_CC4IF_Reset(void)
 {
-  TIM4->SR = ~(TIM_SR_CC4IF); /* reset the CC4-InterrupFlag */
+  TIM16->SR = ~(TIM_SR_CC4IF); /* reset the CC4-InterrupFlag */
 }
 
-static inline void TIM4_SR_CC4OF_Reset(void)
+static inline void TIM16_SR_CC4OF_Reset(void)
 {
-  TIM4->SR = ~(TIM_SR_CC4OF); /* reset the CC3-oveflow-InterrupFlag */
+  TIM16->SR = ~(TIM_SR_CC4OF); /* reset the CC3-oveflow-InterrupFlag */
 }
 
-static inline uint16_t TIM4_CCR4_Get(void)
+static inline uint16_t TIM16_CCR4_Get(void)
 {
-  return TIM4->CCR4;
+  return TIM16->CCR4;
 }
 
-static inline void TIM4_CCR4_Set(uint16_t new_val)
+static inline void TIM16_CCR4_Set(uint16_t new_val)
 {
-  TIM4->CCR4 = new_val;
+  TIM16->CCR4 = new_val;
 }
 
 #endif /* _TIMER_H_ */

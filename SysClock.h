@@ -32,7 +32,7 @@
   #endif
     #define f_PLL_MAX_HZ 72000000
 #else
-    #if HSI_ON != 0
+    #if HSI_ON != 1
     #error HSI_ON is worngly set!
     #endif
     #define F_PLL_INPUT_Hz (f_HSI_Hz / 2)

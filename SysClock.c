@@ -1,14 +1,26 @@
 #include "SysClock.h"
 
-#if f_APB1_Hz > 36000000
-#error f_APB1_Hz is wrongly set!
+#if f_SYSCLK_Hz > 64000000
+#error f_SYSCLK_Hz is wrongly set!
 #endif
 
-#if f_APB2_Hz > 72000000
-#error f_APB2_Hz is wrongly set!
+#if f_HCLK_Hz > 64000000
+#error f_HCLK_Hz is wrongly set!
 #endif
 
-#if (f_USBCLK_Hz != 48000000) || (f_USB_Hz != f_USBCLK_Hz)
+#if f_PCLK_Hz > 64000000
+#error f_PCLK_Hz is wrongly set!
+#endif
+
+#if f_TIMPCLK_Hz > 64000000
+#error f_PCLK_Hz is wrongly set!
+#endif
+
+#if f_APB_Hz > 64000000
+#error f_APB_Hz is wrongly set!
+#endif
+
+#if defined(f_USBCLK_Hz) && ((f_USBCLK_Hz != 48000000) || (f_USB_Hz != f_USBCLK_Hz))
 #error f_USBCLK_Hz is wrongly set!
 #endif
 
@@ -25,13 +37,16 @@
   #endif
 #endif
 
+#if defined(f_PLL_Hz)
 #if f_PLL_CALC_Hz != f_PLL_Hz
 #error PLL_CALC_Hz is wrong!
 #endif
 #if f_PLL_Hz > f_PLL_MAX_HZ
 #error f_PLL_Hz is wrongly set!
 #endif
+#endif
 
+#if 0
 #if f_AHB_CALC_Hz != f_AHB_Hz
 #error f_AHB_CALC_Hz is wrong!
 #endif
@@ -70,60 +85,13 @@
 #define HLFCYA_REG is wrongly set!
 #endif
 
+#endif
+
 void SysClock_Init(void)
 {
   uint32_t StartUpCounter;
-#if !defined(TARGET_ECU)
-#error "Error: TARGET ECU is not defined!"
-#elif TARGET_ECU == TARGET_ECU_STM32F0DISCOVERY
-  /* Enable HSE - high speed external oscillator */
-  RCC->CR |= (uint32_t)(RCC_CR_HSEON | RCC_CR_HSEBYP);
 
-  StartUpCounter = 0;
-  /* Wait till HSE is ready and if Time out is reached exit */
-  while(((RCC->CR & RCC_CR_HSERDY) == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT))
-  {
-    StartUpCounter++;
-  }
-  if ((RCC->CR & RCC_CR_HSERDY))
-  {
-    /* Enable Prefetch Buffer and set Flash Latency */
-    FLASH->ACR = FLASH_ACR_PRFTBE | FLASH_ACR_LATENCY;
-
-    /* HCLK = SYSCLK */
-    RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
-
-    /* PCLK = HCLK */
-    RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE_DIV1;
-
-
-    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
-    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1 | RCC_CFGR_PLLMULL6); /* PLL configuration = HSE * 6 = 48 MHz */
-
-    /* Enable PLL */
-    RCC->CR |= RCC_CR_PLLON;
-
-    /* Wait till PLL is ready */
-    while((RCC->CR & RCC_CR_PLLRDY) == 0)
-    {
-    }
-
-    /* Select PLL as system clock source */
-    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
-    RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
-
-    /* Wait till PLL is used as system clock source */
-    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)RCC_CFGR_SWS_PLL)
-    {
-    }
-  }
-  else
-  { /* If HSE fails to start-up, the application will have wrong clock
-         configuration. User can add here some code to deal with this error */
-  }
-#elif TARGET_ECU == TARGET_ECU_STM32F103C8_ARDUINO
-
-  if ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (RCC_CFGR_SWS_HSI))
+  if ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (RCC_CFGR_SWS_HSISYS))
   {
     /* Enable HSI temporarly - high speed internal oscillator */
     RCC->CR |= (uint32_t)(RCC_CR_HSION);
@@ -138,10 +106,10 @@ void SysClock_Init(void)
       HSI_STARTUP_ERROR();
     }
     /* Select HSI as system clock source */
-    RCC->CFGR = (RCC->CFGR & (uint32_t)((uint32_t)~(RCC_CFGR_SW))) | (RCC_CFGR_SW_HSI);
-    /* Wait till PLL is used as system clock source */
+    RCC->CFGR = (RCC->CFGR & (uint32_t)((uint32_t)~(RCC_CFGR_SW))) | (RCC_CFGR_SWS_HSISYS);
+    /* Wait till HSI is used as system clock source */
     StartUpCounter = 0;
-    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (RCC_CFGR_SWS_HSI))
+    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (RCC_CFGR_SWS_HSISYS))
     {
       StartUpCounter++;
     }
@@ -167,6 +135,7 @@ void SysClock_Init(void)
   RCC->CR &= (uint32_t)(~RCC_CR_HSEON);
   #endif /* HSE_ON != 0 */
   {
+#if 0
     /* Enable Prefetch Buffer and set Flash Latency */
     FLASH->ACR = ((PRFTBE_REG != 0) ? FLASH_ACR_PRFTBE : 0) | LATENCY_VAL | ((HLFCYA_REG != 0) ? FLASH_ACR_HLFCYA : 0);
 
@@ -175,6 +144,7 @@ void SysClock_Init(void)
                            | (RCC_CFGR_PPRE2_0 * PPRE2_REG) /* set PCLK2 / APB2 clock */
                            | (RCC_CFGR_ADCPRE_0 * ADCPRE_REG) /* ADC clock is set */
                            | (RCC_CFGR_PPRE1_0 * PPRE1_REG) /* set PCLK1 */;
+#endif
 
     /* Stop PLL */
     RCC->CR &= ~RCC_CR_PLLON;
@@ -216,7 +186,4 @@ void SysClock_Init(void)
       RCC->BDCR &= ~RCC_BDCR_LSEON;
     #endif
   }
-#else
-#error CPU type is not yet implemented!
-#endif
 }

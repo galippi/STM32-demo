@@ -3,6 +3,21 @@
 
 #include "controller.h"
 
+#define GPIO_MODER_IN  0
+#define GPIO_MODER_OUT 1
+#define GPIO_MODER_AF  2
+#define GPIO_MODER_AN  3
+
+#define GPIO_OSPEEDR_VERY_LOW_SPEED  0
+#define GPIO_OSPEEDR_LOW_SPEED       1
+#define GPIO_OSPEEDR_HIGH_SPEED      2
+#define GPIO_OSPEEDR_VERY_HIGH_SPEED 3
+
+#define GPIO_OTYPER_PP 0
+#define GPIO_OTYPER_OD 1
+
+#define GPIO_PUPDR_NOPULL 0
+
 void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum);
 void GPIO_PortInit_OC(GPIO_TypeDef * const gpio, uint8_t portnum);
 

@@ -17,7 +17,7 @@
 #include "dma_conf.h"
 
 #include "controller.h"
-#include STM32_RCC_HEADER
+//#include STM32_RCC_HEADER
 
 static inline void DMA_Init(DMA_TypeDef *dma)
 {
@@ -27,10 +27,13 @@ static inline void DMA_Init(DMA_TypeDef *dma)
     RCC->AHBENR |= RCC_AHBENR_DMA1EN; /* enable the DMA */
 #elif CPU_TYPE == CPU_TYPE_STM32F4
   RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
+#elif CPU_TYPE == CPU_TYPE_STM32G0
+  RCC->AHBENR |= RCC_AHBENR_DMA1EN;
 #else
 #error Not implemented processor!
 #endif
-#if (defined(RCC_AHBENR_DMA2EN)) || (CPU_TYPE == CPU_TYPE_STM32F4)
+
+#if 0
   }else
   if (dma == DMA2)
   {

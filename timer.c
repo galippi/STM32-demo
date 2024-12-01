@@ -1,6 +1,6 @@
 #include "controller.h"
 
-#include STM32_RCC_HEADER
+#include "core_cm0plus.h"
 
 #include "timer_conf.h"
 
@@ -17,6 +17,7 @@ void SysTick_Init(void)
                    SysTick_CTRL_ENABLE_Msk;                    /* Enable SysTick IRQ and SysTick Timer */
 }
 
+#if 0
 void TIM2_Init(void)
 {
   RCC->APB1ENR |= RCC_APB1Periph_TIM2;
@@ -71,3 +72,5 @@ void TIM4_Init(void)
   TIM4->DIER = (TIM4->DIER & 0xA0A0) | TIM4_DIER_INIT; /* enable update interrupt */
   TIM4->CR1 |= 1; /* enable timer */
 }
+
+#endif
