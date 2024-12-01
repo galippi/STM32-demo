@@ -15,7 +15,8 @@
 
 #include "reset.h"
 #include "main.h"
-#include "uart.h"
+//#include "uart.h"
+#include "util.h"
 
 #include "vector.h"
 
@@ -37,87 +38,38 @@ t_func_ptr const ISR_VectorTable[] =
   ISR_Invalid,       /* 13 RESERVED */
   PendSV_Handler,    /* 14 PendSV */
   ISR_Invalid,       /* 15 SysTick */
-  ISR_Invalid,       /* 16 */
-  ISR_Invalid,       /* 17 */
-  ISR_Invalid,       /* 18 */
-  ISR_Invalid,       /* 19 */
-  ISR_Invalid,       /* 20 */
-  ISR_Invalid,       /* 21 */
-  ISR_Invalid,       /* 22 External Interrupt(0) */
-  ISR_Invalid,       /* 23 External Interrupt(1) */
-  ISR_Invalid,       /* 24 External Interrupt(2) */
-  ISR_Invalid,       /* 25 External Interrupt(3) */
-  ISR_Invalid,       /* 26 External Interrupt(4) */
-  ISR_Invalid,       /*  DMA1 Ch1 */
-  ISR_Invalid,       /*  DMA1 Ch2 */
-  ISR_Invalid,       /*  DMA1 Ch3 */
-  UART1_TxDma_ISR,   /*  DMA1 Ch4 */
-  UART1_RxDma_ISR,   /*  DMA1 Ch5 */
-  ISR_Invalid,       /*  DMA1 Ch6 */
-  ISR_Invalid,       /*  DMA1 Ch7 */
-  ISR_Invalid,       /*  ADC */
-  ISR_Invalid,       /*  CAN1 Tx */
-  ISR_Invalid,       /*  CAN1 Rx0 */
-  ISR_Invalid,       /*  CAN1 Rx1 */
-  ISR_Invalid,       /*  CAN1 SCE   */
-  ISR_Invalid,       /*  EXTI9_5 */
-  ISR_Invalid,       /*  TIM1 */
-  ISR_Invalid,       /*  TIM1 */
-  ISR_Invalid,       /*  TIM1 */
-  ISR_Invalid,       /*  TIM1 */
-  TIM2_ISR,          /*  TIM2 */
-  TIM3_ISR,          /*  TIM3 */
-  TIM4_ISR,          /*  TIM4 */
-  ISR_Invalid,       /*  I2C1 */
-  ISR_Invalid,       /*  I2C1 */
-  ISR_Invalid,       /*  I2C2 */
-  ISR_Invalid,       /*  I2C2 */
-  ISR_Invalid,       /*  SPI1 */
-  ISR_Invalid,       /*  SPI2 */
-  ISR_Invalid,       /*  USART1 */
-  ISR_Invalid,       /*  USART2 */
-  ISR_Invalid,       /*  USART3 */
-  ISR_Invalid,       /*  EXTI15_10 */
-  ISR_Invalid,       /*  RTC_Alarm */
-  ISR_Invalid,       /*  OTG_FS_WKUP */
-  ISR_Invalid,       /*  TIM8 */
-  ISR_Invalid,       /*  TIM8 */
-  ISR_Invalid,       /*  TIM8 */
-  ISR_Invalid,       /*  TIM8 */
-  ISR_Invalid,       /*  DMA1 */
-  ISR_Invalid,       /*  FSMC */
-  ISR_Invalid,       /*  SDIO */
-  ISR_Invalid,       /*  TIM5 */
-  ISR_Invalid,       /*  SPI3 */
-  ISR_Invalid,       /*  UART4 */
-  ISR_Invalid,       /*  UART5 */
-  ISR_Invalid,       /*  TIM6 */
-  ISR_Invalid,       /*  TIM7 */
-  ISR_Invalid,       /*  DMA2 */
-  ISR_Invalid,       /*  DMA2 */
-  ISR_Invalid,       /*  DMA2 */
-  ISR_Invalid,       /*  DMA2 */
-  ISR_Invalid,       /*  DMA2 */
-  ISR_Invalid,       /*  ETH */
-  ISR_Invalid,       /*  ETH */
-  ISR_Invalid,       /*  CAN2 */
-  ISR_Invalid,       /*  CAN2 */
-  ISR_Invalid,       /*  CAN2 */
-  ISR_Invalid,       /*  CAN2 */
-  ISR_Invalid,       /*  OTG_FS*/
-  ISR_Invalid,       /*  DMA2 */
-  ISR_Invalid,       /*  DMA2 */
-  ISR_Invalid,       /*  DMA2 */
-  ISR_Invalid,       /*  USART6 */
-  ISR_Invalid,       /*  I2C3 */
-  ISR_Invalid,       /*  I2C3 */
-  ISR_Invalid,       /*  OTG_HS */
-  ISR_Invalid,       /*  OTG_HS */
-  ISR_Invalid,       /*  OTG_HS */
-  ISR_Invalid,       /*  OTG_HS */
-  ISR_Invalid,       /*  DCMI */
-  ISR_Invalid,       /*  CRYP */
-  ISR_Invalid,       /*  HASH_RNG */
-  ISR_Invalid,       /*  FPU */
-  ISR_Invalid,       /*  */
+  ISR_Invalid,       /* 16 WWDG */
+  ISR_Invalid,       /* 17 RESERVED */
+  ISR_Invalid,       /* 18 RTC / TAMP */
+  ISR_Invalid,       /* 19 FLASH */
+  ISR_Invalid,       /* 20 RCC */
+  ISR_Invalid,       /* 21 EXTI0_1 */
+  ISR_Invalid,       /* 22 EXTI2_3 */
+  ISR_Invalid,       /* 23 EXTI4_15 */
+  ISR_Invalid,       /* 24 RESERVED */
+  ISR_Invalid,       /* 25 DMA1_Channel1 */
+  ISR_Invalid,       /* 26 DMA1_Channel2_3 */
+  ISR_Invalid,       /* 27 DMA1_Channel4_5_6_7 */
+  ISR_Invalid,       /* 28 ADC */
+  ISR_Invalid,       /* 29 TIM1_BRK_UP_TRG_COM */
+  ISR_Invalid,       /* 30 TIM1_CC */
+  ISR_Invalid,       /* 31 RESERVED */
+  ISR_Invalid,       /* 32 TIM3_4 */
+  ISR_Invalid,       /* 33 TIM6 */
+  ISR_Invalid,       /* 34 TIM7 */
+  ISR_Invalid,       /* 35 TIM14 */
+  ISR_Invalid,       /* 36 TIM15 */
+  ISR_Invalid,       /* 37 TIM16 */
+  ISR_Invalid,       /* 38 TIM17 */
+  ISR_Invalid,       /* 39 I2C1 */
+  ISR_Invalid,       /* 40 I2C2_3 */
+  ISR_Invalid,       /* 41 SPI1 */
+  ISR_Invalid,       /* 42 SPI2_3 */
+  ISR_Invalid,       /* 43 USART1 */
+  ISR_Invalid,       /* 44 USART2 */
+  ISR_Invalid,       /* 45 USART3_4_5_6 */
+  ISR_Invalid,       /* 46 RESERVED */
+  ISR_Invalid,       /* 47 RESERVED */
 };
+
+COMP_CHECK_ARRAY(ISR_VectorTable, 48)

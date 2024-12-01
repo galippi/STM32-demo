@@ -11,7 +11,9 @@
  *  @{
  ******************************************************************************/
 
-#include "uart.h"
+#include <stdint.h>
+
+//#include "uart.h"
 
 #include "debug.h"
 
@@ -45,5 +47,5 @@ void DebugOut_Init(void)
 
 void DebugOut(void)
 {
-  UART2_TX(TestBuffer, sizeof(TestBuffer));
+//  UART2_TX(TestBuffer, sizeof(TestBuffer));
 }

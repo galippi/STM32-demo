@@ -4,6 +4,15 @@
 #include <stdint.h>
 #include <string.h>
 
+#define NUMOF(array) (sizeof(array) / sizeof(array[0]))
+
+#define COMP_CHECK_VAL(vall, valr) \
+    extern char __dummy_size_check[(vall) == (valr) ? 1 : -1];
+
+#define COMP_CHECK_SIZE(var, size) COMP_CHECK_VAL(sizeof(var), size)
+
+#define COMP_CHECK_ARRAY(array, length) COMP_CHECK_VAL(NUMOF(array), length)
+
 uint32_t DivU32_U32U32(uint32_t dividend, uint32_t divisor);
 int32_t DivI32_I32I32(int32_t dividend, int32_t divisor);
 

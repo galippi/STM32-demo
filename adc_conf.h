@@ -3,7 +3,7 @@
 
 #include "adc_app.h"
 
-#if (CPU_TYPE == CPU_TYPE_STM32F0)
+#if (CPU_TYPE == CPU_TYPE_STM32G0)
 #define ADC_CR_INIT     (ADC_CR_ADCAL | ADC_CR_ADEN)/* ADC calibration and enable it */
 #define ADC_CFGR1_INIT  (ADC_CFGR1_DISCEN)
 #define ADC_CFGR2_INIT  0x00000000

@@ -5,6 +5,7 @@
 
 typedef enum {
   CAT_NoError,
+  CAT_HSE_Init,
   CAT_Exception_0,
   CAT_Exception_1,
   CAT_Exception_2,

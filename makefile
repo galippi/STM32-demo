@@ -1,8 +1,8 @@
 ##################################################################
 CFLAGS_DEBUG = -gdwarf-2
-SUBDIRS := . ST_lib u32_to_hexstring dht11 hal_STM32F1 hal_STM32F1/ST_lib
+SUBDIRS := . ST_lib u32_to_hexstring dht11 hal_STM32G0 hal_STM32G0/ST_lib
 SUBDIRS += queue
-SUBDIRS_LINKER := hal_STM32F1/lib
+SUBDIRS_LINKER := hal_STM32G0/lib
 
 WARNINGS = -Wall -Wextra
 WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
@@ -30,8 +30,8 @@ OBJCOPY = $(ARMGNU)objcopy
 OBJDUMP = $(ARMGNU)objdump
 
 CFLAGS_TARGET := -mthumb
-#CFLAGS_TARGET += -mcpu=cortex-m0
-CFLAGS_TARGET += -mcpu=cortex-m3
+CFLAGS_TARGET += -mcpu=cortex-m0
+#CFLAGS_TARGET += -mcpu=cortex-m3
 #CFLAGS_TARGET += -mcpu=cortex-m4
 #CFLAGS_TARGET += -march=armv7-m
 
@@ -53,15 +53,15 @@ CPPFILES =
 
 CFILES   = reset.c
 CFILES  += main.c
-CFILES  += adc.c
-CFILES  += adc_app.c
+#CFILES  += adc.c
+#CFILES  += adc_app.c
 #CFILES  += dac.c
 #CFILES  += spi.c
 CFILES  += debug.c
 CFILES  += gpio.c
-CFILES  += scheduler_preemptive.c
-CFILES  += uart.c
-CFILES  += uart_app.c
+#CFILES  += scheduler_preemptive.c
+#CFILES  += uart.c
+#CFILES  += uart_app.c
 CFILES  += tasks.c
 CFILES  += timer.c
 CFILES  += util.c
@@ -70,10 +70,10 @@ CFILES  += ram_init.c
 CFILES  += vector.c
 CFILES  += u32_to_hexstring.c
 CFILES  += SysClock.c
-CFILES  += pwm.c
-CFILES  += dht11.c
-CFILES  += queue.c
-CFILES  += battery.c
+#CFILES  += pwm.c
+#CFILES  += dht11.c
+#CFILES  += queue.c
+#CFILES  += battery.c
 #CFILES  += 
 
 SFILES  =
@@ -102,7 +102,7 @@ $(TARGET_BIN) : $(TARGET_ELF)
 
 $(TARGET_S19) : $(TARGET_ELF)
 	$(OBJCOPY) $^ $@ -O srec
-	python memmap.py $(TARGET_DIR)/$(TARGET).map
+	#python memmap.py $(TARGET_DIR)/$(TARGET).map
 
 $(TARGET_LIST) : $(TARGET_ELF)
 	$(OBJDUMP) -D $^ > $@

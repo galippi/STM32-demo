@@ -1,27 +1,32 @@
 #ifndef _SYSCLOCK_CONF_H_
 #define _SYSCLOCK_CONF_H_
 
-#define f_HSE_Hz 8000000
+#define f_HSI_Hz 8000000
+//#define f_HSE_Hz 8000000
 //#define f_LSE_Hz 32768
-#define f_PLL_Hz 72000000
+//#define f_PLL_Hz 72000000
+#define f_HCLK_Hz 8000000
+#define f_PCLK_Hz 8000000
+#define f_TIMPCLK_Hz 8000000
 #define f_AHB_Hz 72000000
-#define f_APB1_Hz 36000000 /* PCLK1 */
+#define f_APB_Hz 8000000 /* PCLK1 */
 #define f_APB2_Hz 72000000 /* PCLK2 */
 #define f_TIMXCLK_Hz 72000000
 #define f_TIM1CLK_Hz 72000000
 #define f_ADCCLK_Hz 12000000
-#define f_USBCLK_Hz 48000000
+//#define f_USBCLK_Hz 48000000
 #define f_RTCCLK_Hz 32768
 
 #define HSI_ON 1
-#define HSE_ON 1
+#define HSE_ON 0
 #define HSE_BYP 0
-#define PLL_ON 1
+#define PLL_ON 0
 
 #define PLLXTPRE_REG 0
-#define PLLSRC   1
+#define PLLSRC   0
 #define PLLMUL_VAL 9
-#define SWS 2 /* PLL */
+//#define SWS 2 /* PLL */
+#define SWS 0 /* HSISYS */
 #define HPRE_REG  0
 #define PPRE1_REG 4 /* APB1 prescaler */
 #define PPRE2_REG 0 /* APB2 prescaler */

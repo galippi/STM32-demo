@@ -3,14 +3,14 @@
 
 #include "SysClock.h"
 #include "gpio_app.h"
-#include "adc.h"
-#include "adc_app.h"
+//#include "adc.h"
+//#include "adc_app.h"
 #include "timer.h"
 #include "util.h"
 #include "system_conf.h"
 #include "timer_conf.h"
 #include "timer_app.h"
-#include "scheduler_preemptive.h"
+//#include "scheduler_preemptive.h"
 #include "tasks.h"
 #include "FaultHandler.h"
 #include "vector.h"
@@ -26,9 +26,8 @@
 	DBG_PORT(RCC_TypeDef, rcc, RCC) \
 	DBG_PORT(SysTick_Type, systick, SysTick) \
 	DBG_PORT(ADC_TypeDef, adc1, ADC1) \
-	DBG_PORT(TIM_TypeDef, tim2, TIM2) \
 	DBG_PORT(TIM_TypeDef, tim3, TIM3) \
-	DBG_PORT(TIM_TypeDef, tim4, TIM4) \
+    DBG_PORT(TIM_TypeDef, tim2, TIM14) \
 	DBG_PORT(SCB_Type, scb, SCB) \
 	DBG_PORT(NVIC_Type, nvic, NVIC) \
 	DBG_PORT(DMA_TypeDef, dma1, DMA1) \
@@ -78,7 +77,7 @@ __attribute__( ( always_inline ) ) static __INLINE uint32_t __get_PC(void)
 void RAM_StartCheck(void)
 {
 #define RAM_START_ADDR 0x20000000
-#define RAM_END_ADDR 0x20005000
+#define RAM_END_ADDR   0x20001FFF
 #define VECTOR_START_ADDR ((uint32_t *)RAM_START_ADDR)
 #define NUM_VECTOR_NUMBER 32
 #define VECTOR_END_ADDR (VECTOR_START_ADDR + NUM_VECTOR_NUMBER)
@@ -106,11 +105,11 @@ void RAM_StartCheck(void)
 
 int main(void)
 {
+  SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
   SysClock_Init();
   SysTick_Init();
-  SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
 
-  DBGMCU->CR |= DBGMCU_CR_DBG_TIM3_STOP;
+  DBG->APBFZ2 |= DBG_APB_FZ2_DBG_TIM14_STOP; /* stop scheduler timer */
 
 #if 0
   // MCO out is turned on
@@ -118,8 +117,8 @@ int main(void)
   RCC->CFGR &= RCC_CFGR_MCO;
   RCC->CFGR |= RCC_CFGR_MCO_PLL; // MCO output is configured to PLL
 #endif
-  RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
-  AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE; /* disable JTAG, enable SWD - PA15, PB3, PB4: free; PA13, PA14: in use */
+  //RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+  //AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE; /* disable JTAG, enable SWD - PA15, PB3, PB4: free; PA13, PA14: in use */
   LED3_Init();
   LED3_Set(0);
   LED3_Set(1);
@@ -133,14 +132,14 @@ int main(void)
   PB13_Init();
   GPIO_PortInit_Analog(GPIOA, 0);
   GPIO_PortInit_Analog(GPIOA, 1);
-  ADC_HandlerInit();
+  //ADC_HandlerInit();
   //UART2_Init();
   Task_Init();
-  SchedulerPre_Init();
-  TIM3_Init();
-  TIM3_CCR1_Set(TIM3_Cnt_Get() + TIM3_FREQ); /* set the first scheduler interrupt to 1ms */
-  NVIC->ISER[29/32] = NVIC->ISER[29/32] | (1 << (29%32)); /* enable TIM3 interrupt */
-  NVIC->IP[29] = 0x80; /* set TIM3 interrupt priority to medium */
+  //SchedulerPre_Init();
+  //TIM3_Init();
+  //TIM3_CCR1_Set(TIM3_Cnt_Get() + TIM3_FREQ); /* set the first scheduler interrupt to 1ms */
+  //NVIC->ISER[29/32] = NVIC->ISER[29/32] | (1 << (29%32)); /* enable TIM3 interrupt */
+  //NVIC->IP[29] = 0x80; /* set TIM3 interrupt priority to medium */
   /* set PENDSV prio to 0xFF */
   SCB->SHP[14-4] = 0xFF; /* it shall be lower than the prio of the scheduler-timer interrupt */
   /* set SVC prio to 0x00 */
@@ -180,10 +179,10 @@ void ExceptionHandler_4(void)
 }
 
 uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
-/* INTERRUPT */ void TIM2_ISR(void)
+/* INTERRUPT */ void TIM14_ISR(void)
 {
     {
-      CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) | ((TIM2->SR) << 16));
+      CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) | ((TIM14->SR) << 16));
     }
 }
 
@@ -203,19 +202,20 @@ uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
   {
     TIM3_SR_CC3IF_Reset();
     TIM3_SR_CC3OF_Reset();
-    TIM3_CC3IF_Callback();
+    //TIM3_CC3IF_Callback();
   }else
    if (TIM3_SR_CC4IF_Get())
   {
     TIM3_SR_CC4IF_Reset();
     TIM3_SR_CC4OF_Reset();
-    TIM3_CC4IF_Callback();
+    //TIM3_CC4IF_Callback();
   }else
   {
     CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) | ((TIM3->SR) << 16));
   }
 }
 
+#if 0
 /* INTERRUPT */ void TIM4_ISR(void)
 {
   if (TIM4_SR_UIF_Get())
@@ -244,6 +244,7 @@ uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
     CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) | ((TIM4->SR) << 16));
   }
 }
+#endif
 
 void ISR_Invalid0(void)
 {
@@ -270,17 +271,6 @@ void ISR_Invalid(void)
   CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF));
 }
 
-#if       (__CORTEX_M >= 0x03)
-//#error _CORTEX_M >= 3
-static __INLINE uint32_t  __get_BASEPRI2(void)
-{
-  register uint32_t __regBasePri         __ASM("basepri");
-  return(__regBasePri);
-}
-#else
-#error _CORTEX_M < 3
-#endif
-
 extern void svc_ret(void);
 void svc_ret(void)
 {
@@ -292,6 +282,7 @@ void svc_ret(void)
   __ASM("SVC #0");
 }
 
+#if 0
 /* INTERRUPT */ void PendSV_Handler(void)
 {
   //PendSV_Ctr++;
@@ -307,6 +298,13 @@ void svc_ret(void)
   __ASM("MVNS r0,r0"); /* r0:=~0x6=0xFFFFFFF9 */
   __ASM("BX r0"); /* exception-return to the scheduler */
 }
+#else
+/* INTERRUPT */ void PendSV_Handler(void)
+{
+    CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF));
+}
+
+#endif
 
 /* INTERRUPT */ void SVC_Handler(void)
 {
