@@ -22,8 +22,24 @@
 #define SchedPreTask_Enable() __enable_irq()
 
 /* atomic function to set the new task status, if it was in the given state */
+#if 1
+inline static char atomic_check_and_set_u8(uint8_t *var, uint8_t val_old, uint8_t val_new)
+{
+    char ret;
+    SchedPreTask_Disable();
+    if (*(var) == (val_old)) {
+        *(var) = (val_new);
+        ret = 1;
+    }else{
+        ret = 0;
+    }
+    SchedPreTask_Enable();
+    return ret;
+}
+#else
 #define atomic_check_and_set_u8(var, val_old, val_new) \
     ( (__LDREXB(&var) == val_old) ? (__STREXB(val_new, &var) == 0) : (__CLREX(), 0))
+#endif
 
 #define SchedPreTask_TaskStart(func) { \
   func(); \

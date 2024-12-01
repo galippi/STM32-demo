@@ -31,6 +31,7 @@ OBJDUMP = $(ARMGNU)objdump
 
 CFLAGS_TARGET := -mthumb
 CFLAGS_TARGET += -mcpu=cortex-m0
+#CFLAGS_TARGET += -mcpu=cortex-m0plus
 #CFLAGS_TARGET += -mcpu=cortex-m3
 #CFLAGS_TARGET += -mcpu=cortex-m4
 #CFLAGS_TARGET += -march=armv7-m
@@ -40,6 +41,7 @@ LDFLAGS  += $(LDFLAGS_STRIP_DEBUG_INFO) $(addprefix -L, $(SUBDIRS_LINKER))
 
 LDLIBS :=
 LDLIBS += -lc
+#LDLIBS += -lgcc
 
 ##################################################################
 TARGET=demo1
@@ -59,7 +61,7 @@ CFILES  += main.c
 #CFILES  += spi.c
 CFILES  += debug.c
 CFILES  += gpio.c
-#CFILES  += scheduler_preemptive.c
+CFILES  += scheduler_preemptive.c
 #CFILES  += uart.c
 #CFILES  += uart_app.c
 CFILES  += tasks.c

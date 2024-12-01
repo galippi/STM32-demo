@@ -65,6 +65,13 @@ uint32_t DivU32_U32U32(uint32_t dividend, uint32_t divisor)
   }
 }
 
+extern uint32_t __aeabi_uidiv(uint32_t dividend, uint32_t divisor);
+
+uint32_t __aeabi_uidiv(uint32_t dividend, uint32_t divisor)
+{
+    return DivU32_U32U32(dividend, divisor);
+}
+
 int32_t DivI32_I32I32(int32_t dividend, int32_t divisor)
 {
   int32_t sign = 1;

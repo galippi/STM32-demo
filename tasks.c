@@ -14,8 +14,6 @@ uint8_t uart1RxBuffer[128];
 
 void Task_Init(void)
 {
-    TIM14_Init();
-    NVIC_EnableIRQ(TIM14_IRQn);
 }
 
 void Task_1ms(void)

@@ -41,10 +41,11 @@
 //#define TIM14_FREQ 65536 /* Hz */
 #define TIM14_ARR_INIT 65535 /* continuous counter */
 #define TIM14_PSC_INIT 7 /* prescaler of TIM14 -> 1MHz / bit */
+#define TIM14_1ms 1000
 #define TIM14_CCER_INIT 0x0000
 #define TIM14_CCMR1_INIT 0x0000
 #define TIM14_CCMR2_INIT 0x0000
-#define TIM14_DIER_INIT 0x0001 /* enable update interrupt */
+#define TIM14_DIER_INIT 0x0002 /* enable CC1 (scheduler) interrupt */
 
 static inline void TIM3_UIF_Callback(void)
 { /* call back function of TIM3 UIF - counter underflow */

@@ -135,11 +135,11 @@ int main(void)
   //ADC_HandlerInit();
   //UART2_Init();
   Task_Init();
-  //SchedulerPre_Init();
-  //TIM3_Init();
-  //TIM3_CCR1_Set(TIM3_Cnt_Get() + TIM3_FREQ); /* set the first scheduler interrupt to 1ms */
-  //NVIC->ISER[29/32] = NVIC->ISER[29/32] | (1 << (29%32)); /* enable TIM3 interrupt */
-  //NVIC->IP[29] = 0x80; /* set TIM3 interrupt priority to medium */
+  SchedulerPre_Init();
+  TIM14_Init();
+  TIM14_CCR1_Set(TIM14_Cnt_Get() + TIM14_1ms); /* set the first scheduler interrupt to 1ms */
+  NVIC_EnableIRQ(TIM14_IRQn); /* enable TIM14 interrupt */
+  NVIC->IP[TIM14_IRQn] = 0x80; /* set TIM14 interrupt priority to medium */
   /* set PENDSV prio to 0xFF */
   SCB->SHP[14-4] = 0xFF; /* it shall be lower than the prio of the scheduler-timer interrupt */
   /* set SVC prio to 0x00 */
@@ -185,6 +185,11 @@ uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
     {
       TIM14_SR_UIF_Reset();
       TIM14_UIF_Callback();
+    }else
+    if (TIM14_SR_CC1IF_Get())
+    {
+      TIM14_SR_CC1IF_Reset();
+      TIM14_CC1IF_Callback();
     }else
     {
       CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) | ((TIM14->SR) << 16));
@@ -287,29 +292,18 @@ void svc_ret(void)
   __ASM("SVC #0");
 }
 
-#if 0
 /* INTERRUPT */ void PendSV_Handler(void)
 {
   //PendSV_Ctr++;
   //SchedulerPre_TaskManagement();
-  __ASM("MOVS r3,#1");
-  __ASM("LSLS r3,r3,#24"); /* r3:=(1 << 24), set the T bit (new xpsr) */
+    asm("MOV r3,%0" : : "r" (1 << 24));
   __ASM("LDR r2,=SchedulerPre_TaskManagement"); /* address of the QK scheduler (new pc) */
   __ASM("LDR r1,=svc_ret"); /* return address after the call (new lr) */
   __ASM("PUSH {r1-r3}"); /* push xpsr,pc,lr */
   __ASM("SUB sp,sp,#(4*4)"); /* don't care for r12,r3,r2,r1 */
   __ASM("PUSH {r0}"); /* push the prio argument (new r0) */
-  __ASM("MOVS r0,#0x6");
-  __ASM("MVNS r0,r0"); /* r0:=~0x6=0xFFFFFFF9 */
-  __ASM("BX r0"); /* exception-return to the scheduler */
+  asm("BX %0" : : "r" (0xFFFFFFF9));
 }
-#else
-/* INTERRUPT */ void PendSV_Handler(void)
-{
-    CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF));
-}
-
-#endif
 
 /* INTERRUPT */ void SVC_Handler(void)
 {

@@ -138,7 +138,7 @@ void SchedulerPre_TaskManagement(void)
       break;
     }else
     {
-      if (atomic_check_and_set_u8(SchedPreTask_RAM[i].state, SCHED_PRE_TASK_STATE_READY, SCHED_PRE_TASK_STATE_RUNNING))
+      if (atomic_check_and_set_u8(&SchedPreTask_RAM[i].state, SCHED_PRE_TASK_STATE_READY, SCHED_PRE_TASK_STATE_RUNNING))
       { /* task is ready to running -> start it */
         SchedPreTask_TaskStart(SchedPreTask_ROM[i].func); /* start the task */
         #if SchedPreTask_EnableTaskLoadMeas
