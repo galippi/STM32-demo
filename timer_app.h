@@ -74,4 +74,12 @@ static inline void wait_us(uint32_t time)
 #define TIM4_CC4IF_Callback() /* do nothing */
 #endif
 
+uint16_t tim14_uif_ctr;
+
+static inline void TIM14_UIF_Callback(void)
+{
+  tim14_uif_ctr++;
+  LED3_Set(!LED3_Get());
+}
+
 #endif /* _TIMER_APP_H_ */

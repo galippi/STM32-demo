@@ -58,8 +58,15 @@
     } \
   }
 
+#define LEDx_Get(x) \
+  static /*inline*/ uint8_t LED##x##_Get(void) \
+  { \
+      return (((LED##x##_PORT->ODR) >> LED##x##_PIN_NUM) & 1); \
+  }
+
 LEDx_Init(3)
 LEDx_Set(3)
+LEDx_Get(3)
 
 #ifdef LED4_PORT
 LEDx_Init(4)

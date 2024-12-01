@@ -36,6 +36,16 @@
 //#define TIM4_DIER_INIT 0x0018 /* disable update interrupt, enable CC3/CC4 interrupts */
 #define TIM4_DIER_INIT 0x0000 /* all interrupts are disabled */
 
+#define TIM14_CR1_INIT 0x00 /* up counter mode */
+#define TIM14_CR2_INIT 0x0
+#define TIM14_FREQ 2 /* Hz */
+#define TIM14_ARR_INIT 65535 /* continuous counter */
+#define TIM14_PSC_INIT  ((f_TIMPCLK_Hz / (TIM14_FREQ * (TIM14_ARR_INIT + 1))) - 1) /* prescaler of TIM14 -> 1MHz */
+#define TIM14_CCER_INIT 0x0000
+#define TIM14_CCMR1_INIT 0x0000
+#define TIM14_CCMR2_INIT 0x0000
+#define TIM14_DIER_INIT 0x0001 /* enable update interrupt */
+
 static inline void TIM3_UIF_Callback(void)
 { /* call back function of TIM3 UIF - counter underflow */
   static uint8_t TIM3_UIF_ctr = 0;

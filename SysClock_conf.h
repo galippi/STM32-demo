@@ -28,8 +28,7 @@
 //#define SWS 2 /* PLL */
 #define SWS 0 /* HSISYS */
 #define HPRE_REG  0
-#define PPRE1_REG 4 /* APB1 prescaler */
-#define PPRE2_REG 0 /* APB2 prescaler */
+#define PPRE_REG  0 /* APB prescaler */
 #define ADCPRE_REG 2
 #define USBPRE_REG 0
 
