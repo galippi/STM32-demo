@@ -60,24 +60,24 @@ static inline uint32_t TIM14_Cnt_Get(void)
   return TIM14->CNT;
 }
 
-static inline uint32_t TIM14_SR_CC3IF_Get(void)
+static inline uint32_t TIM14_SR_CC1IF_Get(void)
 {
-  return (TIM14->SR & TIM_SR_CC3IF);
+  return (TIM14->SR & TIM_SR_CC1IF);
 }
 
-static inline void TIM14_SR_CC3IF_Reset(void)
+static inline void TIM14_SR_CC1IF_Reset(void)
 {
-  TIM14->SR = ~(TIM_SR_CC3IF); /* reset the CC1-InterrupFlag */
+  TIM14->SR = ~(TIM_SR_CC1IF); /* reset the CC1-InterrupFlag */
 }
 
-static inline uint32_t TIM14_CCR3_Get(void)
+static inline uint32_t TIM14_CCR1_Get(void)
 {
-  return TIM14->CCR3;
+  return TIM14->CCR1;
 }
 
-static inline void TIM14_CCR3_Set(uint32_t new_val)
+static inline void TIM14_CCR1_Set(uint32_t new_val)
 {
-  TIM14->CCR3 = new_val;
+  TIM14->CCR1 = new_val;
 }
 
 void TIM3_Init(void);
