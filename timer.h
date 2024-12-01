@@ -45,6 +45,16 @@ static inline void TIMx_CCRy_PWM1_Set(TIM_TypeDef *tim, uint32_t chIdx)
 
 void TIM14_Init(void);
 
+static inline uint32_t TIM14_SR_UIF_Get(void)
+{
+  return (TIM14->SR & TIM_SR_UIF);
+}
+
+static inline void TIM14_SR_UIF_Reset(void)
+{
+  TIM14->SR = ~(TIM_SR_UIF); /* reset the UpdateInterrupFlag */
+}
+
 static inline uint32_t TIM14_Cnt_Get(void)
 {
   return TIM14->CNT;

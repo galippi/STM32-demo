@@ -56,46 +56,32 @@
 #endif
 
 #if HPRE_REG < 0x08
-  #define HPRE_VAL 1
+  #define AHB_PRESC_VAL 1
 #elif HPRE_REG <= 15
-  #define HPRE_VAL (2 << (HPRE_REG - 8))
+  #define AHB_PRESC_VAL (2 << (HPRE_REG - 8))
 #else
 #error HPRE_REG is wrongly set!
 #endif
 
 #define f_AHB_CALC_Hz (f_SYSCLK_Hz / HPRE_VAL)
 
-#if PPRE1_REG < 4
-  #define PPRE1_VAL 1
-#elif PPRE1_REG < 8
-  #define PPRE1_VAL (2 << (PPRE1_REG - 4))
+#if PPRE_REG < 4
+  #define APB_PRESC_VAL 1
+#elif PPRE_REG < 8
+  #define APB_PRESC_VAL (2 << (PPRE_REG - 4))
 #else
-#error PPRE1_REG is wrongly set!
+#error PPRE_REG is wrongly set!
 #endif
 
 #define f_APB1_CALC_Hz (f_AHB_Hz / PPRE1_VAL)
 
-#if PPRE1_VAL == 1
-  #define f_TIMXCLK_CALC_Hz f_APB1_Hz
+#if APB_PRESC_VAL == 1
+  #define f_TIMPCLK_CALC_Hz f_APB2_Hz
 #else
-  #define f_TIMXCLK_CALC_Hz (f_APB1_Hz * 2)
-#endif
-
-#if PPRE2_REG < 4
-  #define PPRE2_VAL 1
-#elif PPRE2_REG < 8
-  #define PPRE2_VAL (2 << (PPRE2_REG - 4))
-#else
-#error PPRE2_REG is wrongly set!
+  #define f_TIMPCLK_CALC_Hz (f_APB2_Hz * 2)
 #endif
 
 #define f_APB2_CALC_Hz (f_AHB_Hz / PPRE2_VAL)
-
-#if PPRE2_VAL == 1
-  #define f_TIM1CLK_CALC_Hz f_APB2_Hz
-#else
-  #define f_TIM1CLK_CALC_Hz (f_APB2_Hz * 2)
-#endif
 
 #if (ADCPRE_REG >= 0) && (ADCPRE_REG <= 3)
 #define ADCPRE_VAL (2 + (ADCPRE_REG * 2))

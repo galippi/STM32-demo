@@ -74,3 +74,22 @@ void TIM4_Init(void)
 }
 
 #endif
+
+void TIM14_Init(void)
+{
+  if (!(RCC->APBENR2 & RCC_APBENR2_TIM14EN))
+  {
+    RCC->APBENR2 |= RCC_APBENR2_TIM14EN;
+  }
+  TIM14->CR1 = (TIM14->CR1 & 0xFC00) | TIM14_CR1_INIT;
+  TIM14->CR2 = (TIM14->CR2 & 0xFF07) | TIM14_CR2_INIT;
+  TIM14->ARR = TIM14_ARR_INIT;
+  TIM14->PSC = TIM14_PSC_INIT;
+  TIM14->EGR = 0x01; /* immediate reload */
+  TIM14->CCMR1 = TIM14_CCMR1_INIT;
+  TIM14->CCMR2 = TIM14_CCMR2_INIT;
+  TIM14->CCER = TIM14_CCER_INIT;
+  TIM14->SR = 0x0000; /* clear all IT requests */
+  TIM14->DIER = (TIM14->DIER & 0xA0A0) | TIM14_DIER_INIT; /* enable update interrupt */
+  TIM14->CR1 |= 1; /* enable timer */
+}
