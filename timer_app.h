@@ -79,7 +79,8 @@ uint16_t tim14_uif_ctr;
 static inline void TIM14_UIF_Callback(void)
 {
   tim14_uif_ctr++;
-  LED3_Set(!LED3_Get());
+  if ((tim14_uif_ctr & 0x0F) == 0)
+      LED3_Set(!LED3_Get());
 }
 
 #endif /* _TIMER_APP_H_ */

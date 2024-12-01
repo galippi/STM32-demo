@@ -38,9 +38,9 @@
 
 #define TIM14_CR1_INIT 0x00 /* up counter mode */
 #define TIM14_CR2_INIT 0x0
-#define TIM14_FREQ 2 /* Hz */
+//#define TIM14_FREQ 65536 /* Hz */
 #define TIM14_ARR_INIT 65535 /* continuous counter */
-#define TIM14_PSC_INIT  ((f_TIMPCLK_Hz / (TIM14_FREQ * (TIM14_ARR_INIT + 1))) - 1) /* prescaler of TIM14 -> 1MHz */
+#define TIM14_PSC_INIT 7 /* prescaler of TIM14 -> 1MHz / bit */
 #define TIM14_CCER_INIT 0x0000
 #define TIM14_CCMR1_INIT 0x0000
 #define TIM14_CCMR2_INIT 0x0000
