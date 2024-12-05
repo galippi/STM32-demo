@@ -1,6 +1,8 @@
 #ifndef _SYSCLOCK_CONF_H_
 #define _SYSCLOCK_CONF_H_
 
+#include "FaultHandler.h"
+
 #define f_HSI_Hz 8000000
 //#define f_HSE_Hz 8000000
 //#define f_LSE_Hz 32768
@@ -26,7 +28,7 @@
 #define PLLSRC   0
 #define PLLMUL_VAL 9
 //#define SWS 2 /* PLL */
-#define SWS 0 /* HSISYS */
+#define SWS RCC_CFGR_SWS_HSISYS /* HSISYS */
 #define HPRE_REG  0
 #define PPRE_REG  0 /* APB prescaler */
 #define ADCPRE_REG 2
@@ -38,6 +40,7 @@
 #define FLASH_ACR (FLASH_ACR_PRFTBE | FLASH_ACR_LATENCY)
 
 #define HSI_STARTUP_TIMEOUT 5000
+#define HSE_STARTUP_TIMEOUT 5000
 
 #define HSI_STARTUP_DEBUG(x) /* do nothing */
 #define HSE_STARTUP_DEBUG(x) /* do nothing */
@@ -45,9 +48,9 @@
 #define SYSCLK_SET_DEBUG(x) /* do nothing */
 
 
-#define HSI_STARTUP_ERROR() /* do nothing */
+#define HSI_STARTUP_ERROR() CAT_Error(CAT_HSI_Init, 0)
 /* If HSE fails to start-up, the application will have wrong clock
    configuration. User can add here some code to deal with this error */
-#define HSE_STARTUP_ERROR() /* do nothing */
+#define HSE_STARTUP_ERROR(data) CAT_Error(CAT_HSE_Init, data)
 
 #endif /* _SYSCLOCK_CONF_H_ */
