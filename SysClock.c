@@ -89,7 +89,7 @@
 
 void SysClock_Init(void)
 {
-  uint32_t StartUpCounter;
+  volatile uint32_t StartUpCounter;
 
   if ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (RCC_CFGR_SWS_HSISYS))
   {
@@ -128,7 +128,7 @@ void SysClock_Init(void)
   HSE_STARTUP_DEBUG(StartUpCounter);
   if (!(RCC->CR & RCC_CR_HSERDY))
   {
-    HSE_STARTUP_ERROR();
+    HSE_STARTUP_ERROR(0);
   }
   #else /* HSE_ON == 0 */
   /* Stop HSE - high speed external oscillator */
@@ -165,6 +165,28 @@ void SysClock_Init(void)
     }
     PLL_STARTUP_DEBUG(StartUpCounter);
     #endif /* PLL_ON != 0 */
+
+#if (SWS == RCC_CFGR_SWS_HSISYS) && (HSI_ON == 0)
+#error HSI / SWS config error!
+#endif
+
+#if (SWS == RCC_CFGR_SWS_HSE)
+#if !defined(HSE_EXTERNAL_OSC)
+    #error HSE / SWS config error!
+#endif
+    if (!(RCC->CR & RCC_CR_HSERDY))
+    {
+      HSE_STARTUP_ERROR(1);
+    }
+#endif
+
+#if (SWS == RCC_CFGR_SWS_PLLRCLK) && (PLL_ON == 0)
+#error PLL / SWS config error!
+#endif
+
+#if (SWS == RCC_CFGR_SWS_LSI) || (SWS == RCC_CFGR_SWS_LSE)
+#error SWS config error!
+#endif
 
     /* Select system clock source */
     RCC->CFGR = (RCC->CFGR & (uint32_t)((uint32_t)~(RCC_CFGR_SW))) | (SWS);
