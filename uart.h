@@ -4,6 +4,11 @@
 #include "controller.h"
 #include "uart_conf.h"
 
+#define RCC_CCIPR_USART1SEL_PCLK   0
+#define RCC_CCIPR_USART1SEL_SYSCLK 1
+#define RCC_CCIPR_USART1SEL_HSI16  2
+#define RCC_CCIPR_USART1SEL_LSE    3
+
 void UART1_Init(uint32_t baudRate, uint8_t uartRemap);
 void UART1_Poll(void);
 
@@ -21,12 +26,22 @@ static inline void UART1_TX(const uint8_t *data, uint32_t len)
   DMA1_Channel4->CMAR = (uint32_t)data;
   DMA1_Channel4->CNDTR = len;
   DMA1_Channel4->CCR |= DMA_CCR1_EN;
+#else
+  do {
+      while((USART1->ISR & USART_ISR_TXE_TXFNF) == 0)
+          ;
+      USART1->TDR = *data;
+      data++;
+      len--;
+  }while (len != 0);
 #endif
 }
 
+#if UART1_DMA != 0
 void UART1_TxDma_ISR(void);
-
 void UART1_RxDma_ISR(void);
+#endif
+
 uint32_t UART1_RX(uint8_t *data, uint32_t len);
 
 void UART2_Init(uint32_t BaudRate);

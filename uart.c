@@ -4,7 +4,7 @@
 #include "gpio.h"
 #include "dma.h"
 #include "bitfield_lib.h"
-#include "SysClock_conf.h"
+#include "SysClock.h"
 
 #include "uart.h"
 
@@ -12,25 +12,27 @@
 #define UART1_TX_QUEUE 0
 #endif
 
+#if UART1_DMA != 0
 static void UART1_RxDma_Update(void);
+#endif
 
 void UART1_Init(uint32_t baudRate, uint8_t uartRemap)
 {
   if (uartRemap == 0)
   {
-    GPIO_PortInit_AFOut(GPIOA,  9); /* PA9  USART1_TX */
-    GPIO_PortInit_In(GPIOA, 10);    /* PA10 USART1_RX */
-    BitfieldSet(AFIO->MAPR, 2, 1, 0); /* AFIO_MAPR_USART1_REMAP */
+    GPIO_PortInit_AFOut(GPIOA,  9, 1); /* PA9  USART1_TX */
+    GPIO_PortInit_AFOut(GPIOA, 10, 1); /* PA10 USART1_RX */
+    SYSCFG->CFGR1 |= (SYSCFG_CFGR1_PA11_RMP | SYSCFG_CFGR1_PA12_RMP); // TSSOP20 package pin remap
   }else
   {
-    GPIO_PortInit_AFOut(GPIOB,  6); /* PB6 USART1_TX */
-    GPIO_PortInit_In(GPIOB,  7);    /* PB7 USART1_RX */
-    BitfieldSet(AFIO->MAPR, 2, 1, 1); /* AFIO_MAPR_USART1_REMAP */
+    GPIO_PortInit_AFOut(GPIOB,  6, 0); /* PB6 USART1_TX */
+    GPIO_PortInit_In(   GPIOB,  7);    /* PB7 USART1_RX */
   }
-  RCC->APB2ENR |= RCC_APB2ENR_USART1EN;   /* enable the USART1 */
+  RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_USART1SEL_Msk) | ((USART1SEL) << RCC_CCIPR_USART1SEL_Pos);
+  RCC->APBENR2 |= RCC_APBENR2_USART1EN;   /* enable the USART1 */
   USART1->CR1 = USART_CR1_TE | USART_CR1_RE; /* TX/RX are enabled */
-  USART1->BRR = ((((f_APB2_Hz) / 1) + (baudRate / 2)) / baudRate);
-  USART1->CR2 = 0; /* 1 stop bit */
+  USART1->BRR = ((((f_USART1_Hz) / 1) + (baudRate / 2)) / baudRate);
+  USART1->CR2 = 0 | USART_CR2_ABREN | USART_CR2_ABRMODE; /* 1 stop bit, auto baud rate mode to 0x55 - 'U' */
 #if UART1_DMA == 0
   USART1->CR3 = 0x00; /* DMA is disabled (???) for the channel */
 #else
@@ -53,12 +55,6 @@ void UART1_Init(uint32_t baudRate, uint8_t uartRemap)
   USART1->CR1 |= USART_CR1_UE; /* USART1 is enabled */
 }
 
-static t_UART1_idx UART1_RxDmaLastCnt = 0;
-static t_UART1_idx UART1_RxIn = 0;
-static t_UART1_idx UART1_RxOut = 0;
-
-uint8_t UART1_RxOverrun = 0;
-
 static inline t_UART1_idx idxUpdate(t_UART1_idx prev, t_UART1_idx increment, t_UART1_idx limit)
 {
     uint32_t newVal = (uint32_t)prev + increment;
@@ -67,6 +63,7 @@ static inline t_UART1_idx idxUpdate(t_UART1_idx prev, t_UART1_idx increment, t_U
     return (t_UART1_idx)newVal;
 }
 
+#if UART1_DMA != 0
 uint8_t UART1_TxDmaCtr;
 void UART1_TxDma_ISR(void)
 {
@@ -76,7 +73,9 @@ void UART1_TxDma_ISR(void)
     UART1_TxDma_Update();
 #endif /* UART1_TX_QUEUE */
 }
+#endif
 
+#if UART1_DMA != 0
 uint32_t UART1_RxDmaCtr;
 void UART1_RxDma_ISR(void)
 {
@@ -143,6 +142,25 @@ uint32_t UART1_RX(uint8_t *data, uint32_t len)
             return rxNumAll;
     }
 }
+
+#else /* UART1_DMA == 0 */
+
+uint32_t UART1_RX(uint8_t *data, uint32_t len)
+{
+    uint32_t rxNumAll = 0;
+
+    do {
+        if((USART1->ISR & USART_ISR_RXNE_RXFNE) == 0)
+            return rxNumAll;
+        *data = USART1->RDR;
+        data++;
+        len--;
+        rxNumAll++;
+    }while(len != 0);
+    return rxNumAll;
+}
+
+#endif /* UART1_DMA != 0 */
 
 #if defined(UART2_IS_ENABLED) && (UART2_IS_ENABLED != 0)
 
