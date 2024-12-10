@@ -4,7 +4,7 @@
 #include "controller.h"
 
 #define f_LSI_Hz 40000
-#define f_HSI_Hz 8000000
+#define f_HSI_Hz 16000000
 
 #include "SysClock_conf.h"
 
@@ -90,6 +90,16 @@
 #endif
 
 #define f_ADC_Hz (f_APB2_Hz / ADCPRE_VAL)
+
+#ifndef f_LSE_Hz
+#define f_LSE_USART_Hz 0
+#else
+#define f_LSE_USART_Hz f_LSE_Hz
+#endif
+
+#define f_USART1_Hz (((USART1SEL) == RCC_CCIPR_USART1SEL_PCLK)   ? (f_PCLK_Hz)   : \
+                    (((USART1SEL) == RCC_CCIPR_USART1SEL_SYSCLK) ? (f_SYSCLK_Hz) : \
+                    (((USART1SEL) == RCC_CCIPR_USART1SEL_HSI16)  ? (f_HSI_Hz)    : (f_LSE_USART_Hz))))
 
 #if USBPRE_REG == 0
   #define USBPRE_VAL 2 / 3
