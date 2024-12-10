@@ -96,10 +96,16 @@ void Task_500ms(void)
 	}
     {
         static uint8_t c = 32;
-        UART1_TX(&c, 1);
-        c++;
-        if (c > 127)
+        if (c < 127) {
+            UART1_TX(&c, 1);
+            c++;
+        }else{
+            c = 0x0D;
+            UART1_TX(&c, 1);
+            c = 0x0A;
+            UART1_TX(&c, 1);
             c = 32;
+        }
     }
     {
         static uint8_t rxIdx = 0;
