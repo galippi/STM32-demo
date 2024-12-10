@@ -17,13 +17,14 @@
 
 #include "uart_app.h"
 
-#define UART1_DMA 1
-#define UART1_TX_QUEUE 1
+#define USART1SEL RCC_CCIPR_USART1SEL_SYSCLK
+#define UART1_DMA 0
+#define UART1_TX_QUEUE 0
 #define UART1_DMA_RX_BUFFER uart1RxBuffer
 extern uint8_t UART1_TxOverrun;
 #define UART1_OverrunCallback() (UART1_TxOverrun++)
 typedef uint8_t t_UART1_idx;
 
-#define UART2_DMA 1
+#define UART2_DMA 0
 
 #endif /* _UART_CONF_H_ */

@@ -20,6 +20,7 @@
 #define VDD 3.0 /* Volt */
 
 #define DBG_PORTS \
+    DBG_PORT(SYSCFG_TypeDef, syscfg, SYSCFG) \
 	DBG_PORT(GPIO_TypeDef, gpioa, GPIOA) \
 	DBG_PORT(GPIO_TypeDef, gpiob, GPIOB) \
 	DBG_PORT(GPIO_TypeDef, gpioc, GPIOC) \
@@ -110,6 +111,8 @@ int main(void)
   SysTick_Init();
 
   DBG->APBFZ2 |= DBG_APB_FZ2_DBG_TIM14_STOP; /* stop scheduler timer */
+
+  RCC->APBENR2 |= RCC_APBENR2_SYSCFGEN;
 
 #if 0
   // MCO out is turned on

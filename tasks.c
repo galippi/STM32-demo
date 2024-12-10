@@ -6,6 +6,7 @@
 #include "scheduler_preemptive.h"
 #include "version.h"
 #include "timer.h"
+#include "uart.h"
 
 #include "tasks.h"
 
@@ -14,6 +15,7 @@ uint8_t uart1RxBuffer[128];
 
 void Task_Init(void)
 {
+    UART1_Init(1200, 0);
 }
 
 void Task_1ms(void)
@@ -92,4 +94,20 @@ void Task_500ms(void)
 	{
 		pulseTimer--;
 	}
+    {
+        static uint8_t c = 32;
+        UART1_TX(&c, 1);
+        c++;
+        if (c > 127)
+            c = 32;
+    }
+    {
+        static uint8_t rxIdx = 0;
+        uint8_t len = UART1_RX(uart1RxBuffer + rxIdx, sizeof(uart1RxBuffer) - rxIdx);
+        if (len > 0) {
+            rxIdx = rxIdx + len;
+            if (rxIdx >= sizeof(uart1RxBuffer))
+                rxIdx  = 0;
+        }
+    }
 }

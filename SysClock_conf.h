@@ -3,7 +3,6 @@
 
 #include "FaultHandler.h"
 
-#define f_HSI_Hz 8000000
 //#define f_HSE_Hz 8000000
 //#define f_LSE_Hz 32768
 //#define f_PLL_Hz 72000000
