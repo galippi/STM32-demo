@@ -97,6 +97,8 @@ void ADC_Init(void)
                        DMA_CCR1_MSIZE_0 /* Memory size 16 bits */ | \
                        DMA_CCR1_PSIZE_0 /* Peripheral size 16 bits */ | \
                        0 /* per2mem - DMA_CCR1_DIR */ | \
+                       DMA_CCR1_HTIE | \
+                       DMA_CCR1_TCIE | \
                        0;
   DMA1_Channel1->CMAR = ADC1_DMA_CMAR;
   DMA1_Channel1->CNDTR = ADC1_DMA_CNDTR;
