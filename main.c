@@ -47,7 +47,7 @@ typedef struct {
 #undef DBG_PORT
 #define DBG_PORT(type, field, val) val,
 
-t_DBG_Ports dbg_ports = {
+const t_DBG_Ports dbg_ports = {
 	DBG_PORTS
 };
 
