@@ -78,7 +78,7 @@
 
 #endif
 
-#define ADC1_DMA_CMAR ((uint32_t)ADC_values)
+#define ADC1_DMA_CMAR ((uint32_t)ADC_values_raw)
 #define ADC1_DMA_CNDTR (ADC_Ch_Num)
 
 #endif

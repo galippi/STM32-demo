@@ -5,8 +5,12 @@
 #include "debug.h"
 
 #include "adc_app.h"
+#include "adc_conf.h"
 
 uint16_t ADC_values[ADC_Ch_Num];
+uint16_t ADC_values_raw[ADC_Ch_Num];
+
+COMP_CHECK_VAL(ADC_Ch_Num, ((ADC_SQR1_INIT) >> 20) + 1)
 
 int16_t Temperature = -32768;
 int16_t Temperature_raw = -32768;
@@ -16,7 +20,43 @@ void ADC_HandlerInit(void)
   //GPIO_PortInit_Analog(GPIOB, 0);
   //GPIO_PortInit_Analog(GPIOB, 1);
   ADC_Init();
+  //NVIC_EnableIRQ(ADC1_2_IRQn);
+  NVIC_EnableIRQ(DMA1_Channel1_IRQn);
   ADC_Start();
+}
+
+typedef struct {
+    uint16_t timer;
+    uint8_t size;
+    uint8_t cndtr;
+}t_dbg_adc;
+t_dbg_adc dbg_adc[16];
+uint8_t adcIdx;
+
+static void adcFilter(uint8_t lowIdx, uint8_t highIdx)
+{
+#define ADC_FILTER_CONST 16
+    for (uint8_t i = lowIdx; i < highIdx; i++) {
+        ADC_values[i] = ((ADC_values[i] * (ADC_FILTER_CONST - 1)) + ADC_values_raw[i]) / ADC_FILTER_CONST;
+    }
+}
+
+void ADC_Handler(void)
+{
+    dbg_adc[adcIdx].timer = TIM3->CNT;
+    dbg_adc[adcIdx].size = (ADC_SQR1_INIT) >> 20;
+    dbg_adc[adcIdx].cndtr = DMA1_Channel1->CNDTR;
+    adcIdx++;
+    if (adcIdx == NUMOF(dbg_adc))
+        adcIdx = 0;
+    //ADC1->SR = ADC_SR_EOC;
+    if (DMA1->ISR & DMA_ISR_HTIF1) {
+        DMA1->IFCR = DMA_IFCR_CHTIF1;
+        adcFilter(0, ((ADC_Ch_Num) / 2));
+    } else {
+        DMA1->IFCR = DMA_IFCR_CTCIF1;
+        adcFilter(((ADC_Ch_Num) / 2), ADC_Ch_Num);
+    }
 }
 
 #if 0
@@ -85,7 +125,8 @@ void ADC_Handler_10ms(void)
   uart2Buffer[26] = ' ';
   memset(uart2Buffer + 27, ' ', sizeof(uart2Buffer) - 27 - 1);
   uart2Buffer[sizeof(uart2Buffer) - 1] = '\r';
-  UART2_TX((uint8_t*)uart2Buffer, sizeof(uart2Buffer));
+  UART1_TX((uint8_t*)uart2Buffer, sizeof(uart2Buffer));
   ctr++;
 }
+
 #endif
