@@ -36,10 +36,19 @@ static inline void DebugOut_Set_u16(uint32_t block, uint32_t idx, uint16_t data)
 }
 
 typedef struct {
+    uint16_t timer;
+    uint8_t size;
+    uint8_t cndtr;
+}t_dbg_adc;
+
+typedef struct {
     uint32_t uart1_rxCtr;
+    t_dbg_adc dbg_adc[16];
+    uint8_t adcIdx;
 }t_dbgBuffer;
 t_dbgBuffer dbgBuffer;
 
+#define DBG_GET(field) dbgBuffer.field
 #define DBG_SET(field, val) dbgBuffer.field = (val)
 #define DBG_INC(field) dbgBuffer.field++
 

@@ -20,18 +20,9 @@ void ADC_HandlerInit(void)
   //GPIO_PortInit_Analog(GPIOB, 0);
   //GPIO_PortInit_Analog(GPIOB, 1);
   ADC_Init();
-  //NVIC_EnableIRQ(ADC1_2_IRQn);
   NVIC_EnableIRQ(DMA1_Channel1_IRQn);
   ADC_Start();
 }
-
-typedef struct {
-    uint16_t timer;
-    uint8_t size;
-    uint8_t cndtr;
-}t_dbg_adc;
-t_dbg_adc dbg_adc[16];
-uint8_t adcIdx;
 
 static void adcFilter(uint8_t lowIdx, uint8_t highIdx)
 {
@@ -43,13 +34,11 @@ static void adcFilter(uint8_t lowIdx, uint8_t highIdx)
 
 void ADC_Handler(void)
 {
-    dbg_adc[adcIdx].timer = TIM3->CNT;
-    dbg_adc[adcIdx].size = (ADC_SQR1_INIT) >> 20;
-    dbg_adc[adcIdx].cndtr = DMA1_Channel1->CNDTR;
-    adcIdx++;
-    if (adcIdx == NUMOF(dbg_adc))
-        adcIdx = 0;
-    //ADC1->SR = ADC_SR_EOC;
+    DBG_SET(dbg_adc[DBG_GET(adcIdx)].timer, TIM3->CNT);
+    DBG_SET(dbg_adc[DBG_GET(adcIdx)].cndtr, DMA1_Channel1->CNDTR);
+    DBG_INC(adcIdx);
+    if (DBG_GET(adcIdx) == NUMOF(DBG_GET(dbg_adc)))
+        DBG_SET(adcIdx, 0);
     if (DMA1->ISR & DMA_ISR_HTIF1) {
         DMA1->IFCR = DMA_IFCR_CHTIF1;
         adcFilter(0, ((ADC_Ch_Num) / 2));
