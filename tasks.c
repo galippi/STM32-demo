@@ -95,16 +95,27 @@ void Task_500ms(void)
 		pulseTimer--;
 	}
     {
-        static uint8_t c = 32;
-        if (c < 127) {
-            UART1_TX(&c, 1);
-            c++;
-        }else{
-            c = 0x0D;
-            UART1_TX(&c, 1);
-            c = 0x0A;
-            UART1_TX(&c, 1);
-            c = 32;
+        static char usart1AbrfSentState = 0;
+        if ((usart1AbrfSentState == 0) && (USART1->ISR & USART_ISR_ABRF_Msk))
+        {
+            usart1AbrfSentState = 1;
+            uint8_t msg[] = {'\n', '\r', 'A', '?', '?', '\n', '\r'};
+            msg[3] = ((USART1->ISR & USART_ISR_ABRF_Msk) ? '1' : '0');
+            msg[4] = ((USART1->ISR & USART_ISR_ABRE_Msk) ? '1' : '0');
+            UART1_TX(msg, sizeof(msg));
+        }else
+        {
+            static uint8_t c = 127;
+            if (c < 127) {
+                UART1_TX(&c, 1);
+                c++;
+            }else{
+                c = 0x0D;
+                UART1_TX(&c, 1);
+                c = 0x0A;
+                UART1_TX(&c, 1);
+                c = 32;
+            }
         }
     }
     {
