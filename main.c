@@ -138,9 +138,9 @@ int main(void)
   Task_Init();
   SchedulerPre_Init();
   TIM3_Init();
-  TIM3_CCR1_Set(TIM3_Cnt_Get() + TIM3_FREQ); /* set the first scheduler interrupt to 1ms */
-  NVIC->ISER[29/32] = NVIC->ISER[29/32] | (1 << (29%32)); /* enable TIM3 interrupt */
-  NVIC->IP[29] = 0x80; /* set TIM3 interrupt priority to medium */
+  TIM3_CCR1_Set(TIM3_Cnt_Get() + TIM3_1ms); /* set the first scheduler interrupt to 1ms */
+  NVIC_EnableIRQ(TIM3_IRQn);
+  NVIC->IP[TIM3_IRQn] = 0x80; /* set TIM3 interrupt priority to medium */
   /* set PENDSV prio to 0xFF */
   SCB->SHP[14-4] = 0xFF; /* it shall be lower than the prio of the scheduler-timer interrupt */
   /* set SVC prio to 0x00 */

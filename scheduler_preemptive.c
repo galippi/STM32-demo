@@ -47,7 +47,7 @@ typedef enum
 #undef SCHED_PRE_TASK_DEF
 
 #if SchedPreTask_EnableTaskLoadMeas
-  #define TIMER_CLICK(T) ,((T) * SchedPreTask_LoadMeasResolution)
+  #define TIMER_CLICK(T) ,((T) * (uint16_t)(SchedPreTask_LoadMeasResolution * 0.001))
 #else
   #define TIMER_CLICK(T)
 #endif
