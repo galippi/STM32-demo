@@ -34,6 +34,7 @@ CFLAGS_TARGET := -mthumb
 CFLAGS_TARGET += -mcpu=cortex-m3
 #CFLAGS_TARGET += -mcpu=cortex-m4
 #CFLAGS_TARGET += -march=armv7-m
+#CFLAGS_TARGET += --short-enums
 
 #LDFLAGS_STRIP_DEBUG_INFO = -s
 LDFLAGS  += $(LDFLAGS_STRIP_DEBUG_INFO) $(addprefix -L, $(SUBDIRS_LINKER))
@@ -86,6 +87,8 @@ TARGET_LIST = $(TARGET_DIR)/$(TARGET).list
 TARGET_MAP = $(TARGET_DIR)/$(TARGET).map
 
 all : $(TARGET_S19) $(TARGET_BIN) $(TARGET_LIST)
+
+tasks.o: version.h
 
 OBJECTS = $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 DEPFILES = $(addprefix $(TARGET_DIR)/,$(CPPFILES:.cpp=.d) $(CFILES:.c=.d))
