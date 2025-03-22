@@ -7,6 +7,17 @@
 void UART1_Init(uint32_t baudRate, uint8_t uartRemap);
 void UART1_Poll(void);
 
+static inline uint32_t UART1_TXE_Get(void)
+{
+#if CPU_TYPE == CPU_TYPE_STM32F0
+  return USART1->ISR & USART_ISR_TXE;
+#elif CPU_TYPE == CPU_TYPE_STM32F1
+  return USART1->SR & USART_SR_TXE;
+#else
+  return 0;
+#endif
+}
+
 static inline void UART1_TX(const uint8_t *data, uint32_t len)
 {
 #if UART1_DMA != 0
