@@ -111,7 +111,7 @@ void *memset(void *ptr_, int data, size_t size)
 
 void wait_us_rough(uint32_t t_us)
 {
-  volatile uint32_t wait = t_us * (f_AHB_Hz / 1000000 / 2);
+  volatile uint32_t wait = t_us * (f_AHB_Hz / 1000000 / 12);
   while (wait > 0)
   {
     wait--;
