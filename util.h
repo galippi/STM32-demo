@@ -36,4 +36,11 @@ void wait_us_rough(uint32_t t_us);
 
 void systemSleepMs(uint32_t ms);
 
+inline char toHexDigit(uint32_t val) {
+    if (val < 10)
+        return (char)('0' + val);
+    else
+        return (char)('A' - 10 + val);
+}
+
 #endif /* _UTIL_H_ */
