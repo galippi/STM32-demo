@@ -1,3 +1,5 @@
+#include "bitfield_lib.h"
+
 #include "SysClock.h"
 
 #if f_SYSCLK_Hz > 64000000
@@ -16,9 +18,9 @@
 #error f_PCLK_Hz is wrongly set!
 #endif
 
-#if f_APB_Hz > 64000000
-#error f_APB_Hz is wrongly set!
-#endif
+//#if f_APB_Hz > 64000000
+//#error f_APB_Hz is wrongly set!
+//#endif
 
 #if defined(f_USBCLK_Hz) && ((f_USBCLK_Hz != 48000000) || (f_USB_Hz != f_USBCLK_Hz))
 #error f_USBCLK_Hz is wrongly set!
@@ -105,6 +107,7 @@ void SysClock_Init(void)
     {
       HSI_STARTUP_ERROR();
     }
+    BitfieldSet(RCC->CR,RCC_CR_HSIDIV_Pos, 3,  HSIDIV_REG);
     /* Select HSI as system clock source */
     RCC->CFGR = (RCC->CFGR & (uint32_t)((uint32_t)~(RCC_CFGR_SW))) | (RCC_CFGR_SWS_HSISYS);
     /* Wait till HSI is used as system clock source */
@@ -114,7 +117,10 @@ void SysClock_Init(void)
       StartUpCounter++;
     }
     SYSCLK_SET_DEBUG(StartUpCounter);
+  }else{
+      BitfieldSet(RCC->CR,RCC_CR_HSIDIV_Pos, 3,  HSIDIV_REG);
   }
+
   #if HSE_ON != 0
   /* Enable HSE - high speed external oscillator */
   RCC->CR |= (uint32_t)(RCC_CR_HSEON);
@@ -150,10 +156,19 @@ void SysClock_Init(void)
     RCC->CR &= ~RCC_CR_PLLON;
     #if PLL_ON != 0
     /* PLL configuration */
+    RCC->PLLCFGR = (((PLLSRC) << RCC_PLLCFGR_PLLSRC_Pos) | ((PLLMUL_VAL) << RCC_PLLCFGR_PLLN_Pos));
+    RCC->CFGR = ((SWS) << RCC_CFGR_SW_Pos);
+#if 0
+    RCC->CFGR = (RCC->CFGR & (~(uint32_t)(RCC_CFGR_ | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL)))
+                           | (RCC_CFGR_PLLSRC * PLLSRC)
+                           | (RCC_CFGR_PLLXTPRE * PLLXTPRE_REG)
+                           | (RCC_CFGR_PLLMULL3 * (PLLMUL_VAL - 2));
+
     RCC->CFGR = (RCC->CFGR & (~(uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL)))
                            | (RCC_CFGR_PLLSRC * PLLSRC)
                            | (RCC_CFGR_PLLXTPRE * PLLXTPRE_REG)
                            | (RCC_CFGR_PLLMULL3 * (PLLMUL_VAL - 2));
+#endif
 
     /* Start PLL */
     RCC->CR |= RCC_CR_PLLON;
@@ -189,11 +204,15 @@ void SysClock_Init(void)
 #endif
 
     /* Select system clock source */
-    RCC->CFGR = (RCC->CFGR & (uint32_t)((uint32_t)~(RCC_CFGR_SW))) | (SWS);
+    RCC->CFGR = (RCC->CFGR & (uint32_t)((uint32_t)~(RCC_CFGR_SW))) | ((SWS) << RCC_CFGR_SW_Pos);
+
+#if (SWS == RCC_CFGR_SW_PLLRCLK)
+    RCC->PLLCFGR |= RCC_PLLCFGR_PLLREN;
+#endif
 
     /* Wait till system clock source is set */
     StartUpCounter = 0;
-    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (RCC_CFGR_SWS_0 * SWS))
+    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != ((SWS) << RCC_CFGR_SWS_Pos))
     {
       StartUpCounter++;
     }
@@ -208,4 +227,8 @@ void SysClock_Init(void)
       RCC->BDCR &= ~RCC_BDCR_LSEON;
     #endif
   }
+#if defined(f_USBCLK_Hz) && (0 == 0)
+  RCC->CCIPR2 = (RCC->CCIPR2 & ~(RCC_CCIPR2_USBSEL_Msk)) | (CLOCK_USBSEL << RCC_CCIPR2_USBSEL_Pos);
+  RCC->PLLCFGR |= RCC_PLLCFGR_PLLQEN;
+#endif
 }

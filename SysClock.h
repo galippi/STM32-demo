@@ -11,9 +11,21 @@
 #ifndef HSI_ON
   #define HSI_ON 0
 #endif
+
+#define HSIDIV_VAL (1 << HSIDIV_REG)
+#define F_HSISYS_Hz ((f_HSI_Hz) / (HSIDIV_VAL))
+
 #ifndef HSE_ON
   #define HSE_ON 0
 #endif
+#if (defined(f_HSE_Hz) && (HSE_ON == 0)) || (!defined(f_HSE_Hz) && (HSE_ON != 0))
+  #error HSE config error!
+#endif
+
+#if (defined(f_HSE_Hz) && ((f_HSE_Hz < 4000000) || (f_HSE_Hz > 48000000)))
+  #error HSE value config error!
+#endif
+
 #if !defined(HSE_BYP)
   #define HSE_BYP 0
 #endif
@@ -21,7 +33,16 @@
   #define PLL_ON 0
 #endif
 
-#if PLLSRC != 0
+#define PLLSRC_NONE 0
+//#define PLLSRC_RESERVED 1
+#define PLLSRC_HSI16 2
+#define PLLSRC_HSE 3
+
+#ifndef PLLSRC
+#define PLLSRC PLLSRC_NONE
+#endif
+
+#if (PLLSRC != PLLSRC_NONE)
   #if (HSE_ON == 0)
     #error HSE_ON is worngly set!
   #endif
@@ -45,11 +66,15 @@
 
 #define f_PLL_CALC_Hz (F_PLL_INPUT_Hz * PLLMUL_VAL)
 
-#if SWS == 0
-  #define f_SYSCLK_Hz f_HSI_Hz
-#elif SWS == 1 && (HSE_ON != 0)
+#define RCC_CFGR_SW_HSISYS  0
+#define RCC_CFGR_SW_HSE     1
+#define RCC_CFGR_SW_PLLRCLK 2
+
+#if SWS == RCC_CFGR_SW_HSISYS
+  #define f_SYSCLK_Hz F_HSISYS_Hz
+#elif SWS == RCC_CFGR_SW_HSE && (HSE_ON != 0)
   #define f_SYSCLK_Hz f_HSE_Hz
-#elif SWS == 2 && (PLL_ON != 0)
+#elif SWS == RCC_CFGR_SW_PLLRCLK && (PLL_ON != 0)
   #define f_SYSCLK_Hz f_PLL_Hz
 #else
 #error SWS is wrongly set!
@@ -100,6 +125,10 @@
 #define f_USART1_Hz (((USART1SEL) == RCC_CCIPR_USART1SEL_PCLK)   ? (f_PCLK_Hz)   : \
                     (((USART1SEL) == RCC_CCIPR_USART1SEL_SYSCLK) ? (f_SYSCLK_Hz) : \
                     (((USART1SEL) == RCC_CCIPR_USART1SEL_HSI16)  ? (f_HSI_Hz)    : (f_LSE_USART_Hz))))
+
+#define RCC_CCIPR2_USBSEL_HSI48 0
+#define RCC_CCIPR2_USBSEL_HSE   1
+#define RCC_CCIPR2_USBSEL_PLL   2
 
 #if USBPRE_REG == 0
   #define USBPRE_VAL 2 / 3
