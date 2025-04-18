@@ -2,21 +2,38 @@
 
 #include "SysClock.h"
 
+#if defined(f_PLL_INPUT_Hz) && (((f_PLL_INPUT_Hz) < 2600000) || ((f_PLL_INPUT_Hz) > 16000000))
+#error PLL input is wrongly configured!
+#endif
+
 #if f_SYSCLK_Hz > 64000000
 #error f_SYSCLK_Hz is wrongly set!
 #endif
 
-#if f_HCLK_Hz > 64000000
-#error f_HCLK_Hz is wrongly set!
+#if f_SYSCLK_CALC_Hz != f_SYSCLK_Hz
+#error System clock config error!
 #endif
 
-#if f_PCLK_Hz > 64000000
-#error f_PCLK_Hz is wrongly set!
+//#if f_HCLK_Hz > 64000000
+//#error f_HCLK_Hz is wrongly set!
+//#endif
+
+//#define f_HCLK_CALC_Hz ((f_SYSCLK_Hz) / AHB_PRESC)
+#if (f_HCLK_CALC_Hz) != (f_HCLK_Hz)
+#error f_HCLK_Hz config error!
 #endif
 
-#if f_TIMPCLK_Hz > 64000000
-#error f_PCLK_Hz is wrongly set!
+//#if f_PCLK_Hz > 64000000
+//#error f_PCLK_Hz is wrongly set!
+//#endif
+
+#if (f_PCLK_CALC_Hz) != (f_PCLK_Hz)
+#error f_PCLK_Hz config error!
 #endif
+
+//#if f_TIMPCLK_Hz > 64000000
+//#error f_PCLK_Hz is wrongly set!
+//#endif
 
 //#if f_APB_Hz > 64000000
 //#error f_APB_Hz is wrongly set!
@@ -40,10 +57,10 @@
 #endif
 
 #if defined(f_PLL_Hz)
-#if f_PLL_CALC_Hz != f_PLL_Hz
-#error PLL_CALC_Hz is wrong!
+#if f_VCO_CALC_Hz != f_PLL_Hz
+#error f_PLL_Hz is wrong!
 #endif
-#if f_PLL_Hz > f_PLL_MAX_HZ
+#if ((f_PLL_Hz) < 64000000) || ((f_PLL_Hz) > 344000000)
 #error f_PLL_Hz is wrongly set!
 #endif
 #endif
@@ -88,6 +105,8 @@
 #endif
 
 #endif
+
+volatile char start_enable = 0;
 
 void SysClock_Init(void)
 {
@@ -154,11 +173,33 @@ void SysClock_Init(void)
 
     /* Stop PLL */
     RCC->CR &= ~RCC_CR_PLLON;
+    StartUpCounter = 0;
+    while((RCC->CR & RCC_CR_PLLRDY) != 0)
+    {
+      StartUpCounter++;
+    }
+    PLL_STOP_DEBUG(StartUpCounter);
+
+    {
+        //while(start_enable == 0)
+            ;
+    }
     #if PLL_ON != 0
     /* PLL configuration */
-    RCC->PLLCFGR = (((PLLSRC) << RCC_PLLCFGR_PLLSRC_Pos) | ((PLLMUL_VAL) << RCC_PLLCFGR_PLLN_Pos));
-    RCC->CFGR = ((SWS) << RCC_CFGR_SW_Pos);
-#if 0
+    RCC->PLLCFGR = ((PLLM_VAL) - 1) << (RCC_PLLCFGR_PLLM_Pos) |
+                   (((PLLSRC) << RCC_PLLCFGR_PLLSRC_Pos) | \
+                   ((PLLN_VAL) << RCC_PLLCFGR_PLLN_Pos));
+
+    #if (SWS == 2) // RCC_CFGR_SWS_PLLRCLK
+      #if ((f_PLL_RCLK_Hz) > 64000000)
+        #error PLLR config failure!
+      #endif
+    //RCC->PLLCFGR = (RCC->PLLCFGR & ~RCC_PLLCFGR_PLLR_Msk) | (RCC_PLLCFGR_PLLREN | ((PLLR_VAL) << RCC_PLLCFGR_PLLR_Pos));
+    RCC->PLLCFGR = (RCC->PLLCFGR & ~RCC_PLLCFGR_PLLR_Msk) | (((PLLR_VAL) - 1) << RCC_PLLCFGR_PLLR_Pos);
+    RCC->PLLCFGR = RCC->PLLCFGR | RCC_PLLCFGR_PLLREN;
+    #endif
+
+    #if 0
     RCC->CFGR = (RCC->CFGR & (~(uint32_t)(RCC_CFGR_ | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL)))
                            | (RCC_CFGR_PLLSRC * PLLSRC)
                            | (RCC_CFGR_PLLXTPRE * PLLXTPRE_REG)
@@ -179,6 +220,9 @@ void SysClock_Init(void)
       StartUpCounter++;
     }
     PLL_STARTUP_DEBUG(StartUpCounter);
+
+    RCC->CFGR = ((SWS) << RCC_CFGR_SW_Pos);
+
     #endif /* PLL_ON != 0 */
 
 #if (SWS == RCC_CFGR_SWS_HSISYS) && (HSI_ON == 0)
@@ -206,10 +250,6 @@ void SysClock_Init(void)
     /* Select system clock source */
     RCC->CFGR = (RCC->CFGR & (uint32_t)((uint32_t)~(RCC_CFGR_SW))) | ((SWS) << RCC_CFGR_SW_Pos);
 
-#if (SWS == RCC_CFGR_SW_PLLRCLK)
-    RCC->PLLCFGR |= RCC_PLLCFGR_PLLREN;
-#endif
-
     /* Wait till system clock source is set */
     StartUpCounter = 0;
     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != ((SWS) << RCC_CFGR_SWS_Pos))
@@ -227,6 +267,9 @@ void SysClock_Init(void)
       RCC->BDCR &= ~RCC_BDCR_LSEON;
     #endif
   }
+
+  BitfieldSet(RCC->CFGR, RCC_CFGR_HPRE_Pos, 4, HPRE_REG);
+
 #if defined(f_USBCLK_Hz) && (0 == 0)
   RCC->CCIPR2 = (RCC->CCIPR2 & ~(RCC_CCIPR2_USBSEL_Msk)) | (CLOCK_USBSEL << RCC_CCIPR2_USBSEL_Pos);
   RCC->PLLCFGR |= RCC_PLLCFGR_PLLQEN;

@@ -29,8 +29,13 @@
 #if !defined(HSE_BYP)
   #define HSE_BYP 0
 #endif
+
 #ifndef PLL_ON
-  #define PLL_ON 0
+  #ifdef f_PLL_Hz
+    #define PLL_ON 1
+  #else
+    #define PLL_ON 0
+  #endif
 #endif
 
 #define PLLSRC_NONE 0
@@ -42,40 +47,41 @@
 #define PLLSRC PLLSRC_NONE
 #endif
 
-#if (PLLSRC != PLLSRC_NONE)
+#if (PLLSRC == PLLSRC_HSE)
   #if (HSE_ON == 0)
     #error HSE_ON is worngly set!
   #endif
-  #if PLLXTPRE_REG != 0
-    #define F_PLL_INPUT_Hz (f_HSE_Hz / 2)
-  #else
-    #define F_PLL_INPUT_Hz (f_HSE_Hz)
-  #endif
-    #define f_PLL_MAX_HZ 72000000
-#else
+  #define f_PLL_INPUT_Hz (f_HSE_Hz / (PLLM_VAL))
+#elif (PLLSRC == PLLSRC_HSI16)
     #if HSI_ON != 1
     #error HSI_ON is worngly set!
     #endif
-    #define F_PLL_INPUT_Hz (f_HSI_Hz / 2)
-    #define f_PLL_MAX_HZ 64000000
+    #define f_PLL_INPUT_Hz ((f_HSI_Hz) / (PLLM_VAL))
+#else
+#error The PLLSRC is wrongly set!
 #endif
 
-#if (PLLMUL_VAL < 2) || (PLLMUL_VAL > 16)
-#error PLLMUL_VAL is wrongly set!
+#if ((PLLM_VAL) < 1) || ((PLLM_VAL) > 8)
+#error PLLM_VAL is wrongly set!
 #endif
 
-#define f_PLL_CALC_Hz (F_PLL_INPUT_Hz * PLLMUL_VAL)
+#if ((PLLN_VAL) < 8) || ((PLLN_VAL) > 86)
+#error PLLN is wrongly set!
+#endif
+
+#define f_VCO_CALC_Hz ((f_PLL_INPUT_Hz) * (PLLN_VAL))
+#define f_PLL_RCLK_Hz ((f_VCO_CALC_Hz) / (PLLR_VAL))
 
 #define RCC_CFGR_SW_HSISYS  0
 #define RCC_CFGR_SW_HSE     1
 #define RCC_CFGR_SW_PLLRCLK 2
 
 #if SWS == RCC_CFGR_SW_HSISYS
-  #define f_SYSCLK_Hz F_HSISYS_Hz
+  #define f_SYSCLK_CALC_Hz F_HSISYS_Hz
 #elif SWS == RCC_CFGR_SW_HSE && (HSE_ON != 0)
-  #define f_SYSCLK_Hz f_HSE_Hz
+  #define f_SYSCLK_CALC_Hz f_HSE_Hz
 #elif SWS == RCC_CFGR_SW_PLLRCLK && (PLL_ON != 0)
-  #define f_SYSCLK_Hz f_PLL_Hz
+  #define f_SYSCLK_CALC_Hz f_PLL_RCLK_Hz
 #else
 #error SWS is wrongly set!
 #endif
@@ -88,7 +94,7 @@
 #error HPRE_REG is wrongly set!
 #endif
 
-#define f_AHB_CALC_Hz (f_SYSCLK_Hz / HPRE_VAL)
+#define f_HCLK_CALC_Hz (f_SYSCLK_Hz / AHB_PRESC_VAL)
 
 #if PPRE_REG < 4
   #define APB_PRESC_VAL 1
@@ -98,12 +104,12 @@
 #error PPRE_REG is wrongly set!
 #endif
 
-#define f_APB1_CALC_Hz (f_AHB_Hz / PPRE1_VAL)
+#define f_PCLK_CALC_Hz (f_HCLK_Hz / APB_PRESC_VAL)
 
 #if APB_PRESC_VAL == 1
-  #define f_TIMPCLK_CALC_Hz f_APB2_Hz
+  #define f_TIMPCLK_CALC_Hz f_HCLK_Hz
 #else
-  #define f_TIMPCLK_CALC_Hz (f_APB2_Hz * 2)
+  #define f_TIMPCLK_CALC_Hz (f_HCLK_Hz * 2)
 #endif
 
 #define f_APB2_CALC_Hz (f_AHB_Hz / PPRE2_VAL)
