@@ -3,35 +3,45 @@
 
 #include "FaultHandler.h"
 
+#define HSIDIV_REG 1
+
 //#define f_HSE_Hz 8000000
 //#define f_LSE_Hz 32768
-//#define f_PLL_Hz 72000000
+//#define f_PLL_Hz 48000000
 #define f_HCLK_Hz 8000000
 #define f_PCLK_Hz 8000000
 #define f_TIMPCLK_Hz 8000000
-#define f_AHB_Hz 72000000
-#define f_APB_Hz 8000000 /* PCLK1 */
-#define f_APB2_Hz 72000000 /* PCLK2 */
-#define f_TIMXCLK_Hz 72000000
-#define f_TIM1CLK_Hz 72000000
+#define f_HCLK_Hz 8000000
+#define f_PCLK_Hz 8000000 /* PCLK1 */
+//#define f_APB2_Hz 72000000 /* PCLK2 */
+//#define f_TIMXCLK_Hz 72000000
+//#define f_TIM1CLK_Hz 72000000
 #define f_ADCCLK_Hz 12000000
-//#define f_USBCLK_Hz 48000000
 #define f_RTCCLK_Hz 32768
 
 #define HSI_ON 1
-#define HSE_ON 0
+//#define HSE_ON 1
 #define HSE_BYP 0
-#define PLL_ON 0
+//#define PLL_ON 1
 
 #define PLLXTPRE_REG 0
-#define PLLSRC   0
-#define PLLMUL_VAL 9
+//#define PLLSRC   PLLSRC_HSE
+#define PLLMUL_VAL 6
 //#define SWS 2 /* PLL */
-#define SWS RCC_CFGR_SWS_HSISYS /* HSISYS */
+//#define SWS RCC_CFGR_SW_PLLRCLK
+
+#define AHB_PRESC 1
+#define APB_PRESC 1
+
+#define SWS RCC_CFGR_SW_HSISYS
+
 #define HPRE_REG  0
 #define PPRE_REG  0 /* APB prescaler */
 #define ADCPRE_REG 2
-#define USBPRE_REG 0
+
+//#define f_USBCLK_Hz 48000000
+#define USBPRE_REG 1
+#define CLOCK_USBSEL RCC_CCIPR2_USBSEL_PLL
 
 #define LATENCY_VAL 3
 #define PRFTBE_REG 1

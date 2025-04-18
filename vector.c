@@ -18,6 +18,12 @@
 //#include "uart.h"
 #include "util.h"
 
+#ifdef f_USBCLK_Hz
+#include "usbd_conf.h"
+#else
+#define USB_LP_IRQHandler ISR_Invalid
+#endif
+
 #include "vector.h"
 
 t_func_ptr const ISR_VectorTable[] =
@@ -46,7 +52,7 @@ t_func_ptr const ISR_VectorTable[] =
   ISR_Invalid,       /* 21 EXTI0_1 */
   ISR_Invalid,       /* 22 EXTI2_3 */
   ISR_Invalid,       /* 23 EXTI4_15 */
-  ISR_Invalid,       /* 24 UCPD1 / UCPD2 / USB */
+  USB_LP_IRQHandler, /* 24 UCPD1 / UCPD2 / USB */
   ISR_Invalid,       /* 25 DMA1_Channel1 */
   ISR_Invalid,       /* 26 DMA1_Channel2_3 */
   ISR_Invalid,       /* 27 DMA1_Channel4_5_6_7 / DMA2_Channel1_2_3_4_5 */

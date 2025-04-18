@@ -1,7 +1,8 @@
 ##################################################################
 CFLAGS_DEBUG = -gdwarf-2
 SUBDIRS := . ST_lib u32_to_hexstring dht11 hal_STM32G0 hal_STM32G0/ST_lib
-SUBDIRS += queue
+SUBDIRS += hal_STM32G0/ST_lib/usb
+#SUBDIRS += queue
 SUBDIRS_LINKER := hal_STM32G0/lib
 
 WARNINGS = -Wall -Wextra
@@ -35,6 +36,7 @@ CFLAGS_TARGET += -mcpu=cortex-m0
 #CFLAGS_TARGET += -mcpu=cortex-m3
 #CFLAGS_TARGET += -mcpu=cortex-m4
 #CFLAGS_TARGET += -march=armv7-m
+#CFLAGS_TARGET += --short-enums
 
 #LDFLAGS_STRIP_DEBUG_INFO = -s
 LDFLAGS  += $(LDFLAGS_STRIP_DEBUG_INFO) $(addprefix -L, $(SUBDIRS_LINKER))
@@ -55,7 +57,7 @@ CPPFILES =
 
 CFILES   = reset.c
 CFILES  += main.c
-#CFILES  += adc.c
+CFILES  += adc.c
 #CFILES  += adc_app.c
 #CFILES  += dac.c
 #CFILES  += spi.c
@@ -76,7 +78,17 @@ CFILES  += SysClock.c
 #CFILES  += dht11.c
 #CFILES  += queue.c
 #CFILES  += battery.c
-#CFILES  += 
+CFILES  += stm32g0xx_hal_pcd.c
+CFILES  += stm32g0xx_hal_pcd_ex.c
+
+#CFILES  += usbd_conf.c
+#CFILES  += stm32g0xx_ll_usb.c
+#CFILES  += usbd_core.c
+#CFILES  += usbd_desc.c
+#CFILES  += usbd_cdc.c
+#CFILES  += usbd_ctlreq.c
+#CFILES  += usbd_ioreq.c
+#CFILES  += usbd_cdc_if.c
 
 SFILES  =
 #SFILES += vectors.s
@@ -133,11 +145,20 @@ $(TARGET_LIST) : $(TARGET_ELF)
 #	$(CC) --version
 
 $(DUMMY_DIR_FILE):
+	make tool_check
 	-mkdir $(TARGET_DIR)
 	echo Dummy file >$@
 
 targetdir:
 	-mkdir $(sort $(dir $(OBJECTS)))
+
+tool_check:
+	$(AS) --version | grep "2.26.2.20160923"
+	$(CC) --version | grep "5.4.1.20160919"
+	$(LL) --version | grep "2.26.2.20160923"
+	$(OBJCOPY) --version | grep "2.26.2.20160923"
+	$(OBJDUMP) --version | grep "2.26.2.20160923"
+	echo $@ is ok!
 
 ##################################################################
 # cleaning rule

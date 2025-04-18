@@ -3,7 +3,7 @@
 
 #include "SysClock.h"
 #include "gpio_app.h"
-//#include "adc.h"
+#include "adc.h"
 //#include "adc_app.h"
 #include "timer.h"
 #include "util.h"
@@ -14,6 +14,8 @@
 #include "tasks.h"
 #include "FaultHandler.h"
 #include "vector.h"
+
+#include "stm32g0xx_hal_rcc.h"
 
 #include "main.h"
 
@@ -35,7 +37,13 @@
     DBG_PORT(DMA_Channel_TypeDef, dma1_4, DMA1_Channel4) \
     DBG_PORT(DMA_Channel_TypeDef, dma1_5, DMA1_Channel5) \
 	DBG_PORT(USART_TypeDef, uart1, USART1) \
+    DBG_PORT(const uint16_t * const, ts_cal1, &TS_CAL1) \
+    DBG_PORT(const uint16_t * const, ts_cal2, &TS_CAL2) \
+    DBG_PORT(const uint16_t * const, vrefint_cal, &VREFINT_CAL) \
   /* no more peripheries */
+
+//    DBG_PORT(USB_DRD_TypeDef, usb_drd_fs, USB_DRD_FS)
+//    DBG_PORT(USB_DRD_PMABuffDescTypeDef, usb_drd_pma_buff, USB_DRD_PMA_BUFF)
 
 #undef DBG_PORT
 #define DBG_PORT(type, field, val) type * const field;
@@ -135,6 +143,12 @@ int main(void)
   PB13_Init();
   GPIO_PortInit_Analog(GPIOA, 0);
   GPIO_PortInit_Analog(GPIOA, 1);
+  GPIO_PortInit_AFOut(GPIOA,  8, 0); /* PA8  MCO */
+  //BitfieldSet(RCC->CFGR, RCC_CFGR_MCOSEL_Pos, 4, RCC_MCO1SOURCE_SYSCLK);
+  RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_MCOSEL_Msk)) | RCC_MCO1SOURCE_SYSCLK;
+  BitfieldSet(RCC->CFGR, RCC_CFGR_MCOPRE_Pos, 4, 2); // division by 4
+  //RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_MCOPRE_Msk)) | RCC_MCO1SOURCE_SYSCLK;
+
   //ADC_HandlerInit();
   //UART2_Init();
   Task_Init();

@@ -1,6 +1,6 @@
 #include <string.h> /* necessary for memset */
 
-#include "SysClock_conf.h"
+#include "SysClock.h"
 #include "util.h"
 
 uint32_t DivU32_U32U32(uint32_t dividend, uint32_t divisor)
@@ -72,6 +72,14 @@ uint32_t __aeabi_uidiv(uint32_t dividend, uint32_t divisor)
     return DivU32_U32U32(dividend, divisor);
 }
 
+extern uint32_t __aeabi_uidivmod(uint32_t dividend, uint32_t divisor);
+
+uint32_t __aeabi_uidivmod(uint32_t dividend, uint32_t divisor)
+{
+    (void)dividend;
+    (void)divisor;
+    return 0;
+}
 int32_t DivI32_I32I32(int32_t dividend, int32_t divisor)
 {
   int32_t sign = 1;
@@ -118,7 +126,7 @@ void *memset(void *ptr_, int data, size_t size)
 
 void wait_us_rough(uint32_t t_us)
 {
-  volatile uint32_t wait = t_us * (f_AHB_Hz / 1000000 / 2);
+  volatile uint32_t wait = t_us * (f_SYSCLK_Hz / 1000000 / 2);
   while (wait > 0)
   {
     wait--;

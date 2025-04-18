@@ -8,6 +8,10 @@
 #include "timer.h"
 #include "uart.h"
 
+#ifdef f_USBCLK_Hz
+#include "usbd_conf.h"
+#endif
+
 #include "tasks.h"
 
 uint8_t uart1RxBuffer[128];
@@ -16,10 +20,16 @@ uint8_t uart1RxBuffer[128];
 void Task_Init(void)
 {
     UART1_Init(1200, 0);
+#ifdef f_USBCLK_Hz
+    USB_task_init();
+#endif
 }
 
 void Task_1ms(void)
 {
+#ifdef f_USBCLK_Hz
+  USB_task_1ms();
+#endif
   /*PB13_Set(!PB13_Get());*/ /* toggling debug port */
   {
     static uint16_t t_ug;
