@@ -146,8 +146,7 @@ int main(void)
   GPIO_PortInit_AFOut(GPIOA,  8, 0); /* PA8  MCO */
   //BitfieldSet(RCC->CFGR, RCC_CFGR_MCOSEL_Pos, 4, RCC_MCO1SOURCE_SYSCLK);
   RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_MCOSEL_Msk)) | RCC_MCO1SOURCE_SYSCLK;
-  BitfieldSet(RCC->CFGR, RCC_CFGR_MCOPRE_Pos, 4, 2); // division by 4
-  //RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_MCOPRE_Msk)) | RCC_MCO1SOURCE_SYSCLK;
+  BitfieldSet(RCC->CFGR, RCC_CFGR_MCOPRE_Pos, 4, 3); // division by 8
 
   //ADC_HandlerInit();
   //UART2_Init();

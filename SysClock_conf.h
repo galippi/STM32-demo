@@ -3,16 +3,17 @@
 
 #include "FaultHandler.h"
 
-#define HSIDIV_REG 1
+#define HSIDIV_REG 1 // div by 2
 
 //#define f_HSE_Hz 8000000
 //#define f_LSE_Hz 32768
-//#define f_PLL_Hz 48000000
+#define f_PLL_Hz 64000000
+#define f_SYSCLK_Hz 8000000
+//#define f_HCLK_Hz 8000000
+//#define f_PCLK_Hz 8000000
+//#define f_TIMPCLK_Hz 8000000
 #define f_HCLK_Hz 8000000
 #define f_PCLK_Hz 8000000
-#define f_TIMPCLK_Hz 8000000
-#define f_HCLK_Hz 8000000
-#define f_PCLK_Hz 8000000 /* PCLK1 */
 //#define f_APB2_Hz 72000000 /* PCLK2 */
 //#define f_TIMXCLK_Hz 72000000
 //#define f_TIM1CLK_Hz 72000000
@@ -22,20 +23,20 @@
 #define HSI_ON 1
 //#define HSE_ON 1
 #define HSE_BYP 0
+
 //#define PLL_ON 1
+#define PLLM_VAL 4
+#define PLLSRC   PLLSRC_HSI16
+#define PLLN_VAL 16
 
-#define PLLXTPRE_REG 0
-//#define PLLSRC   PLLSRC_HSE
-#define PLLMUL_VAL 6
-//#define SWS 2 /* PLL */
-//#define SWS RCC_CFGR_SW_PLLRCLK
+#define PLLR_VAL 8
 
-#define AHB_PRESC 1
-#define APB_PRESC 1
+//#define AHB_PRESC 1
+//#define APB_PRESC 1
 
-#define SWS RCC_CFGR_SW_HSISYS
+#define SWS RCC_CFGR_SW_PLLRCLK
 
-#define HPRE_REG  0
+#define HPRE_REG  0 // AHB prescaler
 #define PPRE_REG  0 /* APB prescaler */
 #define ADCPRE_REG 2
 
@@ -53,6 +54,7 @@
 
 #define HSI_STARTUP_DEBUG(x) /* do nothing */
 #define HSE_STARTUP_DEBUG(x) /* do nothing */
+#define PLL_STOP_DEBUG(x) /* do nothing */
 #define PLL_STARTUP_DEBUG(x) /* do nothing */
 #define SYSCLK_SET_DEBUG(x) /* do nothing */
 
