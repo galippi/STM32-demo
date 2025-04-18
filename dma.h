@@ -29,6 +29,8 @@ static inline void DMA_Init(DMA_TypeDef *dma)
   RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
 #elif CPU_TYPE == CPU_TYPE_STM32G0
   RCC->AHBENR |= RCC_AHBENR_DMA1EN;
+#elif CPU_TYPE == CPU_TYPE_STM32G0B1
+  RCC->AHBENR |= RCC_AHBENR_DMA1EN;
 #else
 #error Not implemented processor!
 #endif

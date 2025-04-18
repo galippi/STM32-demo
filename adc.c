@@ -10,7 +10,8 @@ uint8_t ADC_calibration = 64; /* calibration factor - default value -> no calibr
 
 void ADC_Init(void)
 {
-#if CPU_TYPE == CPU_TYPE_STM32G0
+#if (CPU_TYPE == CPU_TYPE_STM32G0) || (CPU_TYPE == CPU_TYPE_STM32G0B1)
+#elif 0
   if (!(RCC->APBENR2 & RCC_APBENR2_ADCEN))
   { /* enable the ADC1 */
     RCC->APBENR2 |= RCC_APBENR2_ADCEN;
