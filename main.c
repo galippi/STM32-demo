@@ -37,6 +37,7 @@
     DBG_PORT(DMA_Channel_TypeDef, dma1_4, DMA1_Channel4) \
     DBG_PORT(DMA_Channel_TypeDef, dma1_5, DMA1_Channel5) \
 	DBG_PORT(USART_TypeDef, uart1, USART1) \
+	DBG_PORT(FLASH_TypeDef, flash, FLASH) \
     DBG_PORT(const uint16_t * const, ts_cal1, &TS_CAL1) \
     DBG_PORT(const uint16_t * const, ts_cal2, &TS_CAL2) \
     DBG_PORT(const uint16_t * const, vrefint_cal, &VREFINT_CAL) \
@@ -55,7 +56,7 @@ typedef struct {
 #undef DBG_PORT
 #define DBG_PORT(type, field, val) val,
 
-t_DBG_Ports dbg_ports = {
+const t_DBG_Ports dbg_ports = {
 	DBG_PORTS
 };
 
