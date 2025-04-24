@@ -221,8 +221,6 @@ void SysClock_Init(void)
     }
     PLL_STARTUP_DEBUG(StartUpCounter);
 
-    RCC->CFGR = ((SWS) << RCC_CFGR_SW_Pos);
-
     #endif /* PLL_ON != 0 */
 
 #if (SWS == RCC_CFGR_SWS_HSISYS) && (HSI_ON == 0)
