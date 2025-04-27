@@ -15,17 +15,6 @@ static inline void TIM3_UIF_PollHandler(void)
   }
 }
 
-static inline void TIM3_CC1IF_Callback(void)
-{ /* call back function of TIM3 UIF - counter underflow */
-  TIM3_CCR1_Set(TIM3_CCR1_Get() + TIM3_FREQ); /* set next interrupt to the next 1ms slot */
-#if 0
-  if (((TIM3_CCR1_Get() - TIM3_Cnt_Get()) & 0xFFFF) > TIM3_FREQ)
-    SchedulerPre_LostInterrupt();
-  SchedulerPre_TaskTableUpdate();
-#endif
-  SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; /* activate PendSV handler */
-}
-
 extern uint8_t tim3_cc3_ctr;
 
 static inline void TIM3_CC3IF_Callback(void)
@@ -84,7 +73,7 @@ static inline void TIM14_UIF_Callback(void)
 static inline void TIM14_CC1IF_Callback(void)
 { /* call back function of TIM3 UIF - counter underflow */
   TIM14_CCR1_Set(TIM14_CCR1_Get() + TIM14_1ms); /* set next interrupt to the next 1ms slot */
-  if (((TIM3_CCR1_Get() - TIM3_Cnt_Get()) & 0xFFFF) > TIM14_1ms)
+  if (((TIM14_CCR1_Get() - TIM14_Cnt_Get()) & 0xFFFF) > TIM14_1ms)
     SchedulerPre_LostInterrupt();
   SchedulerPre_TaskTableUpdate();
   SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; /* activate PendSV handler */
