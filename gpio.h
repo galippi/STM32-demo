@@ -16,7 +16,9 @@
 #define GPIO_OTYPER_PP 0
 #define GPIO_OTYPER_OD 1
 
-#define GPIO_PUPDR_NOPULL 0
+#define GPIO_PUPDR_NOPULL   0
+#define GPIO_PUPDR_PULLUP   1
+#define GPIO_PUPDR_PULLDOWN 2
 
 void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum);
 void GPIO_PortInit_OC(GPIO_TypeDef * const gpio, uint8_t portnum);

@@ -37,6 +37,15 @@ void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum)
   BitfieldSet(gpio->PUPDR, portnum * 2, 2, GPIO_PUPDR_NOPULL);
 }
 
+void GPIO_PortInit_OC(GPIO_TypeDef * const gpio, uint8_t portnum)
+{ // the port is set to open-collector/drain output with 2MHz
+  GPIO_PortEnable(gpio);
+  BitfieldSet(gpio->OSPEEDR, portnum * 2, 2, GPIO_OSPEEDR_VERY_HIGH_SPEED);
+  BitfieldSet(gpio->OTYPER, portnum, 1, GPIO_OTYPER_OD);
+  BitfieldSet(gpio->MODER, portnum * 2, 2, GPIO_MODER_OUT);
+  BitfieldSet(gpio->PUPDR, portnum * 2, 2, GPIO_PUPDR_PULLUP);
+}
+
 void GPIO_PortInit_AFOut(GPIO_TypeDef * const gpio, uint8_t portnum, uint8_t AFR_val)
 {
   GPIO_PortEnable(gpio);
