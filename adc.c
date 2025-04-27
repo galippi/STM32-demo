@@ -2,9 +2,8 @@
 #include "adc.h"
 #include "adc_conf.h"
 
-const uint16_t * const TS_CAL1 = (uint16_t*)0x1FFFF7B8; /* ADC value of temp. sensor at 30C */
-const uint16_t * const TS_CAL2 = (uint16_t*)0x1FFFF7C2; /* ADC value of temp. sensor at 110C */
-const uint16_t * const VREFINT_CAL = (uint16_t*)0x1FFFF7BA; /* ADC value of reference voltage at 30C */
+const uint16_t * const TS_CAL1 = (uint16_t*)0x1FFF75A8; /* ADC value of temp. sensor at 30C */
+const uint16_t * const VREFINT_CAL = (uint16_t*)0x1FFF75AA; /* ADC value of reference voltage at 30C */
 
 uint8_t ADC_calibration = 64; /* calibration factor - default value -> no calibration */
 
