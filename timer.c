@@ -2,6 +2,8 @@
 
 #include "core_cm0plus.h"
 
+#include "SysClock.h"
+
 #include "timer_conf.h"
 
 #include "timer.h"
@@ -34,12 +36,13 @@ void TIM2_Init(void)
   TIM2->DIER = (TIM2->DIER & 0xA0A0) | TIM2_DIER_INIT; /* enable update interrupt */
   TIM2->CR1 |= 1; /* enable timer */
 }
+#endif
 
 void TIM3_Init(void)
 {
-  if (!(RCC->APB1ENR & RCC_APB1Periph_TIM3))
+  if (!(RCC->APBENR1 & RCC_APBENR1_TIM3EN))
   {
-    RCC->APB1ENR |= RCC_APB1Periph_TIM3;
+    RCC->APBENR1 |= RCC_APBENR1_TIM3EN;
   }
   TIM3->CR1 = (TIM3->CR1 & 0xFC00) | TIM3_CR1_INIT;
   TIM3->CR2 = (TIM3->CR2 & 0xFF07) | TIM3_CR2_INIT;
@@ -54,6 +57,7 @@ void TIM3_Init(void)
   TIM3->CR1 |= 1; /* enable timer */
 }
 
+#if 0
 void TIM4_Init(void)
 {
   if (!(RCC->APB1ENR & RCC_APB1Periph_TIM4))
