@@ -24,6 +24,25 @@ static inline void GPIO_PortEnable(GPIO_TypeDef * const gpio)
     CAT_Error(CAT_InvalidParameter, 0);
 }
 
+/**
+ * GPIO_PortInit
+ */
+void GPIO_PortInit(GPIO_TypeDef * const gpio, uint8_t portnum, uint8_t ospeed, uint8_t otyper, uint8_t moder, uint8_t pupdr, uint8_t AFR_val)
+{
+  GPIO_PortEnable(gpio);
+  BitfieldSet(gpio->OSPEEDR, portnum * 2, 2, ospeed);
+  BitfieldSet(gpio->OTYPER, portnum, 1, otyper);
+  BitfieldSet(gpio->MODER, portnum * 2, 2, moder);
+  BitfieldSet(gpio->PUPDR, portnum * 2, 2, pupdr);
+  if (portnum <= 7)
+  {
+    BitfieldSet(gpio->AFR[0], portnum * 4, 4, AFR_val);
+  }else
+  {
+    BitfieldSet(gpio->AFR[1], (portnum - 8) * 4, 4, AFR_val);
+  }
+}
+
 void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum)
 {
   GPIO_PortEnable(gpio);

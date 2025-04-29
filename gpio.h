@@ -20,6 +20,10 @@
 #define GPIO_PUPDR_PULLUP   1
 #define GPIO_PUPDR_PULLDOWN 2
 
+/**
+ *
+ */
+void GPIO_PortInit(GPIO_TypeDef * const gpio, uint8_t portnum, uint8_t ospeed, uint8_t otyper, uint8_t moder, uint8_t pupdr, uint8_t AFR_val);
 void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum);
 void GPIO_PortInit_OC(GPIO_TypeDef * const gpio, uint8_t portnum);
 
@@ -33,6 +37,7 @@ void GPIO_PortInit_Analog(GPIO_TypeDef * const gpio, uint8_t portnum);
 
 static inline void GPIO_Set(GPIO_TypeDef *port, uint32_t pin_num, uint32_t val)
 {
+#if 0
   if (val)
   {
     port->ODR |= (1 << pin_num);
@@ -40,6 +45,15 @@ static inline void GPIO_Set(GPIO_TypeDef *port, uint32_t pin_num, uint32_t val)
   {
     port->ODR &= ~(1 << pin_num);
   }
+#else
+  if (val)
+  {
+    port->BSRR = (1 << pin_num);
+  }else
+  {
+    port->BRR = (1 << pin_num);
+  }
+#endif
 }
 
 static inline uint8_t GPIO_GetI(GPIO_TypeDef *port, uint32_t pin)
