@@ -60,7 +60,7 @@ t_func_ptr const ISR_VectorTable[] =
   ISR_Invalid,       /* 29 TIM1_BRK_UP_TRG_COM */
   ISR_Invalid,       /* 30 TIM1_CC */
   ISR_Invalid,       /* 31 TIM2 */
-  ISR_Invalid,       /* 32 TIM3_4 */
+  TIM3_ISR,          /* 32 TIM3_4 */
   ISR_Invalid,       /* 33 TIM6 / DAC / LPTIM1 */
   ISR_Invalid,       /* 34 TIM7 / LPTIM2 */
   TIM14_ISR,         /* 35 TIM14 */

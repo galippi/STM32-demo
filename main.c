@@ -10,7 +10,7 @@
 #include "system_conf.h"
 #include "timer_conf.h"
 #include "timer_app.h"
-//#include "scheduler_preemptive.h"
+#include "scheduler_preemptive_conf.h"
 #include "tasks.h"
 #include "FaultHandler.h"
 #include "vector.h"
@@ -29,7 +29,7 @@
 	DBG_PORT(RCC_TypeDef, rcc, RCC) \
 	DBG_PORT(SysTick_Type, systick, SysTick) \
 	DBG_PORT(ADC_TypeDef, adc1, ADC1) \
-	DBG_PORT(TIM_TypeDef, tim3, TIM3) \
+    DBG_PORT(TIM_TypeDef, tim3, TIM3) \
     DBG_PORT(TIM_TypeDef, tim2, TIM14) \
 	DBG_PORT(SCB_Type, scb, SCB) \
 	DBG_PORT(NVIC_Type, nvic, NVIC) \
@@ -39,7 +39,6 @@
 	DBG_PORT(USART_TypeDef, uart1, USART1) \
 	DBG_PORT(FLASH_TypeDef, flash, FLASH) \
     DBG_PORT(const uint16_t * const, ts_cal1, &TS_CAL1) \
-    DBG_PORT(const uint16_t * const, ts_cal2, &TS_CAL2) \
     DBG_PORT(const uint16_t * const, vrefint_cal, &VREFINT_CAL) \
   /* no more peripheries */
 
@@ -119,6 +118,7 @@ int main(void)
   SysClock_Init();
   SysTick_Init();
 
+  DBG->APBFZ1 |= DBG_APB_FZ1_DBG_TIM3_STOP;
   DBG->APBFZ2 |= DBG_APB_FZ2_DBG_TIM14_STOP; /* stop scheduler timer */
 
   RCC->APBENR2 |= RCC_APBENR2_SYSCFGEN;
@@ -141,7 +141,7 @@ int main(void)
   LED4_Init();
   LED5_Init();
   LED6_Init();
-  PB13_Init();
+  //PB13_Init();
   GPIO_PortInit_Analog(GPIOA, 0);
   GPIO_PortInit_Analog(GPIOA, 1);
   GPIO_PortInit_AFOut(GPIOA,  8, 0); /* PA8  MCO */
@@ -215,23 +215,29 @@ uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
 
 /* INTERRUPT */ void TIM3_ISR(void)
 {
-  if (TIM3_SR_UIF_Get())
+  uint32_t tim3_sr = TIM3->SR & TIM3->DIER;
+  if (tim3_sr & TIM_SR_UIF) // (TIM3_SR_UIF_Get())
   {
     TIM3_SR_UIF_Reset();
     TIM3_UIF_Callback();
   }else
-  if (TIM3_SR_CC1IF_Get())
+  if (tim3_sr & TIM_SR_CC1IF) // (TIM3_SR_CC1IF_Get())
   {
     TIM3_SR_CC1IF_Reset();
     TIM3_CC1IF_Callback();
   }else
-  if (TIM3_SR_CC3IF_Get())
+  if (tim3_sr & TIM_SR_CC2IF) // (TIM3_SR_CC2IF_Get())
+  {
+    TIM3_SR_CC2IF_Reset();
+    TIM3_CC2IF_Callback();
+  }else
+  if (tim3_sr & TIM_SR_CC3IF) // (TIM3_SR_CC3IF_Get())
   {
     TIM3_SR_CC3IF_Reset();
     TIM3_SR_CC3OF_Reset();
     //TIM3_CC3IF_Callback();
   }else
-   if (TIM3_SR_CC4IF_Get())
+   if (tim3_sr & TIM_SR_CC4IF) // (TIM3_SR_CC4IF_Get())
   {
     TIM3_SR_CC4IF_Reset();
     TIM3_SR_CC4OF_Reset();

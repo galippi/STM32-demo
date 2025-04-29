@@ -17,13 +17,13 @@
 
 #define TIM3_CR1_INIT 0x00 /* up counter mode */
 #define TIM3_CR2_INIT 0x0
-#define TIM3_FREQ 1000 /* Hz */
-#define TIM3_PSC_INIT  ((f_TIMXCLK_Hz / (TIM3_FREQ * 1000)) - 1) /* prescaler of TIM3 -> 1MHz */
+#define TIM3_FREQ 1000000 /* Hz */
+#define TIM3_PSC_INIT  ((f_TIMPCLK_CALC_Hz / (TIM3_FREQ)) - 1) /* prescaler of TIM3 -> 1MHz */
 #define TIM3_ARR_INIT 65535 /* continuous counter */
-#define TIM3_CCER_INIT 0x0101 /* enable CC1 out high, CC3/CC4 input */
-#define TIM3_CCMR1_INIT 0x0000
-#define TIM3_CCMR2_INIT 0x00F1 /* enable CC3/CC4 as input capture */
-#define TIM3_DIER_INIT 0x0003 /* enable update and CC1 (scheduler) interrupt */
+#define TIM3_CCER_INIT 0x0031 /* enable CC1/CC2 input, CC1 input rising edge/CC2 input falling edge */
+#define TIM3_CCMR1_INIT 0x0201 /* enable CC1/CC2 as input capture, both for TI1 */
+#define TIM3_CCMR2_INIT 0x0000 /* disable CC3/CC4 */
+#define TIM3_DIER_INIT 0x0006 /* enable CC1 and CC2 (DHT11) interrupt */
 
 #define TIM4_CR1_INIT 0x00 /* up counter mode */
 #define TIM4_CR2_INIT 0x0

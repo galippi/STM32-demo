@@ -7,6 +7,8 @@
 #include "version.h"
 #include "timer.h"
 #include "uart.h"
+#include "u32_to_hexstring.h"
+#include "dht11.h"
 
 #ifdef f_USBCLK_Hz
 #include "usbd_conf.h"
@@ -20,7 +22,11 @@ uint8_t uart1RxBuffer[128];
 void Task_Init(void)
 {
     UART1_Init(1200, 0);
-#ifdef f_USBCLK_Hz
+
+    TIM3_Init();
+    dht11_init();
+
+    #ifdef f_USBCLK_Hz
     USB_task_init();
 #endif
 }
@@ -40,8 +46,32 @@ void Task_1ms(void)
   }
 }
 
+void DHT_ResultDebug(uint16_t resultCtr, uint16_t resultChecksumCtr)
+{
+    static char dhtData[] = "DHTxxxxxxxxxxxx\r";
+    t_DHT11_Result dhtResult = dht_getResult();
+    U32_to_HexString(dhtData + 3, 4, dhtResult.temperature, '0');
+    U32_to_HexString(dhtData + 7, 4, dhtResult.humidity, '0');
+    U32_to_HexString(dhtData + 11, 2, resultCtr, '0');
+    U32_to_HexString(dhtData + 13, 2, resultChecksumCtr, '0');
+    //UART1_TX_Queue(dhtData, sizeof(dhtData)-1);
+}
+
 void Task_10ms(void)
 {
+    {
+        static uint8_t dhtCtr = 0;
+        if (dhtCtr == 210) {
+            dht11_request();
+            dhtCtr = 0;
+        }else
+            dhtCtr++;
+        dht11_run();
+        static uint8_t db = 0; // TODO:
+        //GPIO_Set(DHT11_PORT_OUT, db);
+        GPIO_Set(GPIOA, 5, db);
+        db = 1 - db;
+    }
 }
 
 typedef enum

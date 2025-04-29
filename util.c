@@ -112,6 +112,13 @@ int32_t DivI32_I32I32(int32_t dividend, int32_t divisor)
   }
 }
 
+extern uint32_t __aeabi_idiv(int32_t dividend, int32_t divisor);
+
+uint32_t __aeabi_idiv(int32_t dividend, int32_t divisor)
+{
+    return DivI32_I32I32(dividend, divisor);
+}
+
 void *memset(void *ptr_, int data, size_t size)
 {
   uint8_t *ptr = ptr_;
