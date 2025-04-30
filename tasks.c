@@ -9,6 +9,7 @@
 #include "uart.h"
 #include "u32_to_hexstring.h"
 #include "dht11.h"
+#include "queue.h"
 
 #ifdef f_USBCLK_Hz
 #include "usbd_conf.h"
@@ -31,6 +32,26 @@ void Task_Init(void)
 #endif
 }
 
+QUEUE_CREATE(uart1TxQueue, 128);
+char uart1TxOverflowCtr1;
+
+static void UART_TX(const void *ptr, uint8_t len)
+{
+    uint32_t written = queueWrite(&uart1TxQueue, ptr, len);
+    if (written != len)
+        uart1TxOverflowCtr1++;
+}
+
+void Task_Bgnd(void)
+{
+    uint8_t data;
+    char len = queueRead(&uart1TxQueue, &data, 1);
+    if (len)
+    {
+        UART1_TX(&data, 1);
+    }
+}
+
 void Task_1ms(void)
 {
 #ifdef f_USBCLK_Hz
@@ -48,13 +69,15 @@ void Task_1ms(void)
 
 void DHT_ResultDebug(uint16_t resultCtr, uint16_t resultChecksumCtr)
 {
-    static char dhtData[] = "DHTxxxxxxxxxxxx\r";
+    UART_TX("\r\n", 2);
+    char dhtData[] = "DHTxxxxxxxxxxxx\r\n";
     t_DHT11_Result dhtResult = dht_getResult();
     U32_to_HexString(dhtData + 3, 4, dhtResult.temperature, '0');
     U32_to_HexString(dhtData + 7, 4, dhtResult.humidity, '0');
     U32_to_HexString(dhtData + 11, 2, resultCtr, '0');
     U32_to_HexString(dhtData + 13, 2, resultChecksumCtr, '0');
     //UART1_TX_Queue(dhtData, sizeof(dhtData)-1);
+    UART_TX((uint8_t*)dhtData, sizeof(dhtData)-1);
 }
 
 void Task_10ms(void)
@@ -142,18 +165,18 @@ void Task_500ms(void)
             uint8_t msg[] = {'\n', '\r', 'A', '?', '?', '\n', '\r'};
             msg[3] = ((USART1->ISR & USART_ISR_ABRF_Msk) ? '1' : '0');
             msg[4] = ((USART1->ISR & USART_ISR_ABRE_Msk) ? '1' : '0');
-            UART1_TX(msg, sizeof(msg));
+            UART_TX(msg, sizeof(msg));
         }else
         {
             static uint8_t c = 127;
             if (c < 127) {
-                UART1_TX(&c, 1);
+                UART_TX(&c, 1);
                 c++;
             }else{
                 c = 0x0D;
-                UART1_TX(&c, 1);
+                UART_TX(&c, 1);
                 c = 0x0A;
-                UART1_TX(&c, 1);
+                UART_TX(&c, 1);
                 c = 32;
             }
         }

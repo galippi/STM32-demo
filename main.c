@@ -165,6 +165,7 @@ int main(void)
   while (1)
   {
     //ADC_Handler();
+    Task_Bgnd();
   }
 
   return 0;
