@@ -185,6 +185,7 @@ typedef struct
   __IO uint32_t CNDTR;       /*!< DMA channel x number of data register       */
   __IO uint32_t CPAR;        /*!< DMA channel x peripheral address register   */
   __IO uint32_t CMAR;        /*!< DMA channel x memory address register       */
+  const uint32_t reserved;
 } DMA_Channel_TypeDef;
 
 typedef struct
@@ -644,6 +645,9 @@ typedef struct
 #define DMA1_Channel3       ((DMA_Channel_TypeDef *) DMA1_Channel3_BASE)
 #define DMA1_Channel4       ((DMA_Channel_TypeDef *) DMA1_Channel4_BASE)
 #define DMA1_Channel5       ((DMA_Channel_TypeDef *) DMA1_Channel5_BASE)
+
+#define DMA1_Channel       ((DMA_Channel_TypeDef *) DMA1_Channel1_BASE)
+
 #define DMAMUX1                ((DMAMUX_Channel_TypeDef *) DMAMUX1_BASE)
 #define DMAMUX1_Channel0       ((DMAMUX_Channel_TypeDef *) DMAMUX1_Channel0_BASE)
 #define DMAMUX1_Channel1       ((DMAMUX_Channel_TypeDef *) DMAMUX1_Channel1_BASE)

@@ -39,18 +39,24 @@ void UART1_Init(uint32_t baudRate, uint8_t uartRemap)
   USART1->CR3 = 0xC0; /* DMA is enabled for the channel */
   /* configuring DMA for USART1-TX */
   DMA_Init(DMA1);
-  DMA1_Channel4->CCR &= ~DMA_CCR1_EN;
-  DMA1_Channel4->CPAR = (uint32_t)&(USART1->DR);
-  DMA1_Channel4->CCR = DMA_CCR1_DIR | DMA_CCR1_MINC | DMA_CCR1_TCIE; /* mem2per, no-circ, no-per-inc, mem-inc, psize=8, memsize=8,ch-prio=low, no-mem2mem */
+  DMA1_Channel_USART1_TX->CCR &= ~DMA_CCR_EN;
+  DMA1_Channel_USART1_TX->CPAR = (uint32_t)&(USART1->TDR);
+  DMA1_Channel_USART1_TX->CCR = DMA_CCR_DIR | DMA_CCR_MINC | DMA_CCR_TCIE; /* mem2per, no-circ, no-per-inc, mem-inc, psize=8, memsize=8,ch-prio=low, no-mem2mem */
+  DMAMUX1[DMA1_ChIdx_USART1_TX].CCR = 51;
 #if UART1_TX_QUEUE
-  DMA1_Channel4->CCR |= DMA_CCR1_TCIE; /* enable DMA interrupt */
+  //DMA1_Channel_USART1_TX->CCR |= DMA_CCR_TCIE; /* enable DMA interrupt */
 #endif // UART1_TX_QUEUE
+
+#if 0
   /* configuring DMA for USART1-RX */
-  DMA1_Channel5->CCR &= ~DMA_CCR1_EN;
-  DMA1_Channel5->CPAR = (uint32_t)&(USART1->DR);
-  DMA1_Channel5->CCR = DMA_CCR1_MINC | DMA_CCR1_TCIE; /* per2mem, circ, no-per-inc, mem-inc, psize=8, memsize=8, ch-prio=low, no-mem2mem */
+  DMA1_Channel_USART1_RX->CCR &= ~DMA_CCR1_EN;
+  DMA1_Channel_USART1_RX->CPAR = (uint32_t)&(USART1->DR);
+  DMA1_Channel_USART1_RX->CCR = DMA_CCR1_MINC | DMA_CCR1_TCIE; /* per2mem, circ, no-per-inc, mem-inc, psize=8, memsize=8, ch-prio=low, no-mem2mem */
+  DMAMUX1[DMA1_ChIdx_USART1_RX].CCR = 51;
   UART1_RxDma_Update();
-  NVIC_EnableIRQ(DMA1_Channel5_IRQn);
+#endif
+
+  //NVIC_EnableIRQ(DMA1_Channel5_IRQn);
 #endif
   USART1->CR1 |= USART_CR1_UE; /* USART1 is enabled */
 }
@@ -84,15 +90,22 @@ void UART1_RxDma_ISR(void)
     UART1_RxDma_Update();
 }
 
+static t_UART1_idx UART1_RxDmaLastCnt = 0;
+static t_UART1_idx UART1_RxIn = 0;
+static t_UART1_idx UART1_RxOut = 0;
+static uint8_t UART1_RxOverrun;
+
+#if 1
+
 static void UART1_RxDma_Update(void)
 {
-    DMA1_Channel5->CCR &= ~DMA_CCR1_EN;
+    DMA1_Channel_USART1_RX->CCR &= ~DMA_CCR_EN;
     /* ??? */ /* wait till the DMA-channel is stopped */
-    uint32_t num = UART1_RxDmaLastCnt - DMA1_Channel5->CNDTR;
-    if (USART1->SR & USART_SR_ORE)
+    uint32_t num = UART1_RxDmaLastCnt - DMA1_Channel_USART1_RX->CNDTR;
+    if (USART1->ISR & USART_ISR_ORE)
     {
         UART1_RxOverrun++;
-        (void)USART1->DR;
+        (void)USART1->RDR;
     }
     UART1_RxIn = idxUpdate(UART1_RxIn, (t_UART1_idx)num, sizeof(UART1_DMA_RX_BUFFER));
     if (UART1_RxOut > UART1_RxIn)
@@ -110,11 +123,12 @@ static void UART1_RxDma_Update(void)
         return;
     }
     UART1_RxDmaLastCnt = num;
-    DMA1_Channel5->CMAR = (uint32_t)UART1_DMA_RX_BUFFER + UART1_RxIn;
-    DMA1_Channel5->CNDTR = num;
+    DMA1_Channel_USART1_RX->CMAR = (uint32_t)UART1_DMA_RX_BUFFER + UART1_RxIn;
+    DMA1_Channel_USART1_RX->CNDTR = num;
     //DMA1->IFCR = DMA_IFCR_CTCIF5;
-    DMA1_Channel5->CCR |= DMA_CCR1_EN;
+    DMA1_Channel_USART1_RX->CCR |= DMA_CCR_EN;
 }
+#endif
 
 uint32_t UART1_RX(uint8_t *data, uint32_t len)
 {

@@ -3,6 +3,7 @@
 
 #include "controller.h"
 #include "uart_conf.h"
+#include "dma_conf.h"
 
 #define RCC_CCIPR_USART1SEL_PCLK   0
 #define RCC_CCIPR_USART1SEL_SYSCLK 1
@@ -22,10 +23,10 @@ static inline void UART1_TX(const uint8_t *data, uint32_t len)
   { /* resetting Transfer Complete flag */
     //DMA1->IFCR = DMA_ISR_TCIF7;
   }
-  DMA1_Channel4->CCR &= ~DMA_CCR1_EN;
-  DMA1_Channel4->CMAR = (uint32_t)data;
-  DMA1_Channel4->CNDTR = len;
-  DMA1_Channel4->CCR |= DMA_CCR1_EN;
+  DMA1_Channel_USART1_TX->CCR &= ~DMA_CCR_EN;
+  DMA1_Channel_USART1_TX->CMAR = (uint32_t)data;
+  DMA1_Channel_USART1_TX->CNDTR = len;
+  DMA1_Channel_USART1_TX->CCR |= DMA_CCR_EN;
 #else
   do {
       while((USART1->ISR & USART_ISR_TXE_TXFNF) == 0)
