@@ -32,24 +32,32 @@ void Task_Init(void)
 #endif
 }
 
-QUEUE_CREATE(uart1TxQueue, 128);
+//QUEUE_CREATE(uart1TxQueue, 128);
 char uart1TxOverflowCtr1;
 
 static void UART_TX(const void *ptr, uint8_t len)
 {
+#if 0
     uint32_t written = queueWrite(&uart1TxQueue, ptr, len);
     if (written != len)
         uart1TxOverflowCtr1++;
+#else
+    UART1_TX_Queue(ptr, len);
+#endif
 }
+
+uint8_t UART1_TxOverrun;
 
 void Task_Bgnd(void)
 {
+#if 0
     uint8_t data;
     char len = queueRead(&uart1TxQueue, &data, 1);
     if (len)
     {
         UART1_TX(&data, 1);
     }
+#endif
 }
 
 void Task_1ms(void)
@@ -168,6 +176,7 @@ void Task_500ms(void)
             UART_TX(msg, sizeof(msg));
         }else
         {
+            //__disable_irq();
             static uint8_t c = 127;
             if (c < 127) {
                 UART_TX(&c, 1);
@@ -179,6 +188,7 @@ void Task_500ms(void)
                 UART_TX(&c, 1);
                 c = 32;
             }
+            //__enable_irq();
         }
     }
     {
