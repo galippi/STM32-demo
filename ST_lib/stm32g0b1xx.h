@@ -312,6 +312,7 @@ typedef struct
   __IO uint32_t CNDTR;       /*!< DMA channel x number of data register       */
   __IO uint32_t CPAR;        /*!< DMA channel x peripheral address register   */
   __IO uint32_t CMAR;        /*!< DMA channel x memory address register       */
+  const uint32_t reserved;
 } DMA_Channel_TypeDef;
 
 typedef struct
@@ -954,11 +955,17 @@ typedef struct
 #define DMA1_Channel5       ((DMA_Channel_TypeDef *) DMA1_Channel5_BASE)
 #define DMA1_Channel6       ((DMA_Channel_TypeDef *) DMA1_Channel6_BASE)
 #define DMA1_Channel7       ((DMA_Channel_TypeDef *) DMA1_Channel7_BASE)
+
+#define DMA1_Channel       ((DMA_Channel_TypeDef *) DMA1_Channel1_BASE)
+
 #define DMA2_Channel1       ((DMA_Channel_TypeDef *) DMA2_Channel1_BASE)
 #define DMA2_Channel2       ((DMA_Channel_TypeDef *) DMA2_Channel2_BASE)
 #define DMA2_Channel3       ((DMA_Channel_TypeDef *) DMA2_Channel3_BASE)
 #define DMA2_Channel4       ((DMA_Channel_TypeDef *) DMA2_Channel4_BASE)
 #define DMA2_Channel5       ((DMA_Channel_TypeDef *) DMA2_Channel5_BASE)
+
+#define DMA2_Channel       ((DMA_Channel_TypeDef *) DMA2_Channel1_BASE)
+
 #define DMAMUX1                ((DMAMUX_Channel_TypeDef *) DMAMUX1_BASE)
 #define DMAMUX1_Channel0       ((DMAMUX_Channel_TypeDef *) DMAMUX1_Channel0_BASE)
 #define DMAMUX1_Channel1       ((DMAMUX_Channel_TypeDef *) DMAMUX1_Channel1_BASE)
