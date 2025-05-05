@@ -17,11 +17,16 @@ enum e_ADC_values
   ADC_IN9,
   ADC_TemperatureSensor,
   ADC_Vref,
+#elif (CPU_TYPE == CPU_TYPE_STM32G0) || (CPU_TYPE == CPU_TYPE_STM32G0B1)
+  ADC_IN0,
+  ADC_IN1,
+  ADC_TemperatureSensor,
+  ADC_Vref,
 #endif
   ADC_Ch_Num /* this must be the last one */
 };
-extern uint16_t ADC_values[ADC_Ch_Num];
-#define ADC_VALUES_NUM (sizeof(ADC_values)/sizeof(ADC_values[0]))
+extern uint16_t ADC_values_raw[ADC_Ch_Num];
+#define ADC_VALUES_NUM (sizeof(ADC_values_raw)/sizeof(ADC_values_raw[0]))
 #define TEMP_SCALE 10
 //extern int8_t Temperature = -128;
 extern int16_t Temperature;

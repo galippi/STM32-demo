@@ -10,6 +10,8 @@
 #include "u32_to_hexstring.h"
 #include "dht11.h"
 #include "queue.h"
+#include "adc_app.h"
+#include "dma.h"
 
 #ifdef f_USBCLK_Hz
 #include "usbd_conf.h"
@@ -22,14 +24,18 @@ uint8_t uart1RxBuffer[128];
 
 void Task_Init(void)
 {
-    UART1_Init(1200, 0);
+    DMA_Init(DMA1);
+
+    UART1_Init(9600, 0);
 
     TIM3_Init();
     dht11_init();
 
+    ADC_HandlerInit();
+
     #ifdef f_USBCLK_Hz
     USB_task_init();
-#endif
+    #endif
 }
 
 //QUEUE_CREATE(uart1TxQueue, 128);
@@ -199,5 +205,13 @@ void Task_500ms(void)
             if (rxIdx >= sizeof(uart1RxBuffer))
                 rxIdx  = 0;
         }
+    }
+    {
+        char adcData[] = "ADCxxxxxxxxxxxxxxxx\r\n";
+        U32_to_HexString(adcData +  3, 4, ADC_values_raw[0], '0');
+        U32_to_HexString(adcData +  7, 4, ADC_values_raw[1], '0');
+        U32_to_HexString(adcData + 11, 4, ADC_values_raw[2], '0');
+        U32_to_HexString(adcData + 15, 4, ADC_values_raw[3], '0');
+        UART_TX(adcData, sizeof(adcData) - 1);
     }
 }

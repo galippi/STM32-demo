@@ -1,6 +1,9 @@
 #ifndef _DMA_CONF_H_
 #define _DMA_CONF_H_
 
+#define DMA1_ChIdx_ADC1   0
+#define DMA1_Channel_ADC1 DMA1_Channel1
+
 #define DMA1_ChIdx_USART1_TX   3
 #define DMA1_Channel_USART1_TX DMA1_Channel4
 

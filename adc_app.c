@@ -6,15 +6,15 @@
 
 #include "adc_app.h"
 
-uint16_t ADC_values[ADC_Ch_Num];
+uint16_t ADC_values_raw[ADC_Ch_Num];
 
 int16_t Temperature = -32768;
 int16_t Temperature_raw = -32768;
 
 void ADC_HandlerInit(void)
 {
-  //GPIO_PortInit_Analog(GPIOB, 0);
-  //GPIO_PortInit_Analog(GPIOB, 1);
+  GPIO_PortInit_Analog(GPIOA, 0);
+  GPIO_PortInit_Analog(GPIOA, 1);
   ADC_Init();
   ADC_Start();
 }

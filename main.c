@@ -30,10 +30,11 @@
 	DBG_PORT(SysTick_Type, systick, SysTick) \
 	DBG_PORT(ADC_TypeDef, adc1, ADC1) \
     DBG_PORT(TIM_TypeDef, tim3, TIM3) \
-    DBG_PORT(TIM_TypeDef, tim2, TIM14) \
+    DBG_PORT(TIM_TypeDef, tim14, TIM14) \
 	DBG_PORT(SCB_Type, scb, SCB) \
 	DBG_PORT(NVIC_Type, nvic, NVIC) \
 	DBG_PORT(DMA_TypeDef, dma1, DMA1) \
+    DBG_PORT(DMA_Channel_TypeDef, dma1_1, DMA1_Channel1) \
     DBG_PORT(DMA_Channel_TypeDef, dma1_4, DMA1_Channel4) \
     DBG_PORT(DMA_Channel_TypeDef, dma1_5, DMA1_Channel5) \
 	DBG_PORT(USART_TypeDef, uart1, USART1) \
@@ -118,6 +119,8 @@ int main(void)
   SysClock_Init();
   SysTick_Init();
 
+  TIM14_Init(); // scheduler timer init
+
   DBG->APBFZ1 |= DBG_APB_FZ1_DBG_TIM3_STOP;
   DBG->APBFZ2 |= DBG_APB_FZ2_DBG_TIM14_STOP; /* stop scheduler timer */
 
@@ -152,8 +155,8 @@ int main(void)
   //ADC_HandlerInit();
   //UART2_Init();
   Task_Init();
+  //TIM14_Init();
   SchedulerPre_Init();
-  TIM14_Init();
   TIM14_CCR1_Set(TIM14_Cnt_Get() + TIM14_1ms); /* set the first scheduler interrupt to 1ms */
   NVIC_EnableIRQ(TIM14_IRQn); /* enable TIM14 interrupt */
   NVIC->IP[TIM14_IRQn] = 0x80; /* set TIM14 interrupt priority to medium */

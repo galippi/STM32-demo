@@ -4,15 +4,19 @@
 #include "adc_app.h"
 
 #if (CPU_TYPE == CPU_TYPE_STM32G0)
-#define ADC_CR_INIT     (ADC_CR_ADCAL | ADC_CR_ADEN)/* ADC calibration and enable it */
-#define ADC_CFGR1_INIT  (ADC_CFGR1_DISCEN)
+#define ADC_CR_INIT    (ADC_CR_ADCAL | ADC_CR_ADVREGEN | ADC_CR_ADEN)/* ADC calibration and enable it */
+#define ADC_CFGR1_INIT  (ADC_CFGR1_CONT | ADC_CFGR1_DMACFG | ADC_CFGR1_DMAEN)
 #define ADC_CFGR2_INIT  0x00000000
 #define ADC_SMPR_INIT   0x00000007
 #define ADC_TR_INIT     0x00000000
 /* enable ADC channels: DAC1-out, VBat, temperature sensor, Vref */
-#define ADC_CHSELR_INIT (ADC_CHSELR_CHSEL4 |ADC_CHSELR_CHSEL5|ADC_CHSELR_CHSEL6| ADC_CHSELR_CHSEL16 | ADC_CHSELR_CHSEL17 | ADC_CHSELR_CHSEL18)
+#define ADC_CHSELR_INIT (ADC_CHSELR_CHSEL0 | ADC_CHSELR_CHSEL1 | ADC_CHSELR_CHSEL12 | ADC_CHSELR_CHSEL13)
 #define ADC_CCR_INIT    (ADC_CCR_VBATEN | ADC_CCR_TSEN | ADC_CCR_VREFEN)
 #define ADC_IER_INIT    0x00000000
+
+extern uint16_t ADC_values_raw[4];
+#define ADC1_DMA_CMAR ((uint32_t)ADC_values_raw)
+#define ADC1_DMA_CNDTR (ADC_Ch_Num)
 
 #elif (CPU_TYPE == CPU_TYPE_STM32F1)
 #define ADC_CR1_INIT ( /* single channel, end of conversion interrupt is disabled */ \
