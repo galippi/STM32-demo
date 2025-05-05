@@ -48,7 +48,23 @@ static void UART_TX(const void *ptr, uint8_t len)
     if (written != len)
         uart1TxOverflowCtr1++;
 #else
-    UART1_TX_Queue(ptr, len);
+    static char usart1AbrfSentState = 0;
+    if (usart1AbrfSentState == 0)
+    {
+        if (USART1->ISR & USART_ISR_ABRF_Msk)
+        {
+            usart1AbrfSentState = 1;
+            uint8_t msg[] = {'\n', '\r', 'A', '?', '?', '\n', '\r'};
+            msg[3] = ((USART1->ISR & USART_ISR_ABRF_Msk) ? '1' : '0');
+            msg[4] = ((USART1->ISR & USART_ISR_ABRE_Msk) ? '1' : '0');
+            UART_TX(msg, sizeof(msg));
+        }else{
+            uint8_t c = 'U';
+            UART1_TX_Queue(&c, 1);
+        }
+    }else{
+        UART1_TX_Queue(ptr, len);
+    }
 #endif
 }
 
@@ -83,7 +99,6 @@ void Task_1ms(void)
 
 void DHT_ResultDebug(uint16_t resultCtr, uint16_t resultChecksumCtr)
 {
-    UART_TX("\r\n", 2);
     char dhtData[] = "DHTxxxxxxxxxxxx\r\n";
     t_DHT11_Result dhtResult = dht_getResult();
     U32_to_HexString(dhtData + 3, 4, dhtResult.temperature, '0');
@@ -171,32 +186,6 @@ void Task_500ms(void)
 	{
 		pulseTimer--;
 	}
-    {
-        static char usart1AbrfSentState = 0;
-        if ((usart1AbrfSentState == 0) && (USART1->ISR & USART_ISR_ABRF_Msk))
-        {
-            usart1AbrfSentState = 1;
-            uint8_t msg[] = {'\n', '\r', 'A', '?', '?', '\n', '\r'};
-            msg[3] = ((USART1->ISR & USART_ISR_ABRF_Msk) ? '1' : '0');
-            msg[4] = ((USART1->ISR & USART_ISR_ABRE_Msk) ? '1' : '0');
-            UART_TX(msg, sizeof(msg));
-        }else
-        {
-            //__disable_irq();
-            static uint8_t c = 127;
-            if (c < 127) {
-                UART_TX(&c, 1);
-                c++;
-            }else{
-                c = 0x0D;
-                UART_TX(&c, 1);
-                c = 0x0A;
-                UART_TX(&c, 1);
-                c = 32;
-            }
-            //__enable_irq();
-        }
-    }
     {
         static uint8_t rxIdx = 0;
         uint8_t len = UART1_RX(uart1RxBuffer + rxIdx, sizeof(uart1RxBuffer) - rxIdx);
