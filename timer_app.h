@@ -33,6 +33,10 @@ static inline uint16_t getTimer_us(void)
   return TIM14_Cnt_Get();
 }
 
+/**
+ * Waiting specified microsec
+ * @param time - waiting time in us
+ */
 static inline void wait_us(uint32_t time)
 {
   uint16_t t_start = getTimer_us();
