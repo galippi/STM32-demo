@@ -5,6 +5,8 @@ ifeq ($(GIT_COMMIT_ID),)
 GIT_COMMIT_ID := (git error)
 endif
 
+VERSION_FILE = $(wildcard version.h)
+
 VERSION_NEW := \#define GIT_COMMIT_ID "$(GIT_COMMIT_ID)"
 
 #VERSIONFLAGS += -DFILE_SYNC_VERSION=\"$(VERSION_OLD)\" -DFILE_SYNC_GIT=\"$(GIT_COMMIT_ID)\"
@@ -14,8 +16,21 @@ VERSIONFLAGS += -DFILE_SYNC_VERSION="$(VERSION_OLD)" -DFILE_SYNC_GIT="$(GIT_COMM
 #CPPFLAGS += $(VERSIONFLAGS)
 
 ifneq ($(VERSION_OLD),$(VERSION_NEW))
-.PHONY : version.h
+
+.PHONY: version.h
+
 version.h:
 	@echo Generating $@
 	echo '$(VERSION_NEW)' >$@
+
+else
+
+version.h:
+	@echo Generating $@ is skipped
+
 endif
+
+version_test:
+	@echo VERSION_OLD=$(VERSION_OLD)
+	@echo VERSION_NEW=$(VERSION_NEW)
+	@echo VERSION_FILE=$(VERSION_FILE)

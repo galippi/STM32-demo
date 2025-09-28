@@ -107,7 +107,7 @@ $(TARGET_LIST) : $(TARGET_ELF)
 	$(AS) -as $< -o $(TARGET_DIR)/$@
 
 #%.o: %.c $(MAKEFILE)
-%.o: %.c $(DUMMY_DIR_FILE)
+%.o: %.c $(DUMMY_DIR_FILE) version.h
 	@echo Building $(notdir $@)
 	-@rm -f $(@:.o=.d)
 	$(CC_DEP) -M $(CFLAGS_DEP) -c -o $(TARGET_DIR)/$(@:.o=.d) $<
