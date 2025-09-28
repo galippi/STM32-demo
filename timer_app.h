@@ -1,6 +1,7 @@
 #ifndef _TIMER_APP_H_
 #define _TIMER_APP_H_
 
+#include "FaultHandler.h"
 #include "gpio_app.h"
 
 #include "timer.h"
@@ -34,26 +35,14 @@ static inline void TIM3_CC1IF_PollHandler(void)
   }
 }
 
-extern uint8_t tim3_cc3_ctr;
-extern uint16_t encoder;
 static inline void TIM3_CC3IF_Callback(void)
 {
-  tim3_cc3_ctr++;
-  {
-	  if (GPIO_GetI(GPIOB, 1))
-	  {
-	    encoder++;
-	  }else
-	  {
-	    encoder--;
-	  }
-  }
+    CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF));
 }
 
-extern uint8_t tim3_cc4_ctr;
 static inline void TIM3_CC4IF_Callback(void)
 {
-  tim3_cc4_ctr++;
+    CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF));
 }
 
 static inline uint16_t getTimer_us(void)

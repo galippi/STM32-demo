@@ -3,7 +3,6 @@
 #include "gpio_app.h"
 #include "debug.h"
 #include "adc_app.h"
-//#include "spi.h"
 #include "FaultHandler.h"
 #include "uart.h"
 #include "scheduler_preemptive.h"
@@ -17,23 +16,23 @@ uint8_t uart1TxBuffer[128];
 
 void Task_Init(void)
 {
-  LED3_Init();
-  LED3_Set(0);
-  Button1_Init();
-  ADC_HandlerInit();
-  //UART2_Init();
-  //SPI_Init();
-  //DebugOut_Init();
-  UART1_Init(38400, 1);
-  GPIO_PortInit_In(   GPIOB,  8); /* CAN1-Rx */
-  GPIO_PortInit_AFOut(GPIOB,  9); /* CAN1-Tx */
-  AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_CAN_REMAP) | AFIO_MAPR_CAN_REMAP_REMAP2;
-  //can1_init();
+    LED3_Init();
+    LED3_Set(0);
+    Button1_Init();
+    ADC_HandlerInit();
+    //UART2_Init();
+    //SPI_Init();
+    //DebugOut_Init();
+    UART1_Init(38400, 1);
+    GPIO_PortInit_In(   GPIOB,  8); /* CAN1-Rx */
+    GPIO_PortInit_AFOut(GPIOB,  9); /* CAN1-Tx */
+    AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_CAN_REMAP) | AFIO_MAPR_CAN_REMAP_REMAP2;
+    //can1_init();
 }
 
 void Task_1ms(void)
 {
-  //if (ADC_values[ADC_IN5_Ub] > (uint32_t)(0.7 * 4095/3.3))
+    //if (ADC_values[ADC_IN5_Ub] > (uint32_t)(0.7 * 4095/3.3))
 }
 
 uint8_t CAN_rxCtr;
@@ -41,120 +40,112 @@ uint8_t CAN_txCtr;
 uint8_t CAN_txFull;
 void Task_10ms(void)
 {
-  ADC_Handler_10ms();
-  {
-    CAN_msg msgTx = { .id = 0x8000F200, .dlc = 8};
-    msgTx.data.data32[0] = 0x11224466;
-    msgTx.data.data32[1] = 0xFEDCBA98;
-    if (CAN_STM32_tx(&msgTx))
-      CAN_txCtr++;
-    else
-      CAN_txFull++;
-  }
-  {
-	{
-	  CAN_msg msgTx = { .id = 0x100, .dlc = 8};
-	  msgTx.data.data32[0] = 0x01234567;
-	  msgTx.data.data32[1] = 0xFEDCBA98;
-	  if (CAN_STM32_tx(&msgTx))
-		CAN_txCtr++;
-	  else
-		CAN_txFull++;
-	}
-  }
-
-  {
-      CAN_msg msg;
-      while (CAN_STM32_rx(&msg))
-      {
-        CAN_rxCtr++;
-        {
-          CAN_msg msgTx = { .id = 0x101, .dlc = 8};
-          msgTx.data.data32[0] = msg.id;
-          msgTx.data.data8[4] = msg.dlc;
-          msgTx.data.data8[5] = msg.data.data8[0];
-          msgTx.data.data8[6] = msg.data.data8[1];
-          msgTx.data.data8[7] = msg.data.data8[2];
-          if (CAN_STM32_tx(&msgTx))
+    ADC_Handler_10ms();
+    {
+        CAN_msg msgTx = { .id = 0x8000F200, .dlc = 8};
+        msgTx.data.data32[0] = 0x11224466;
+        msgTx.data.data32[1] = 0xFEDCBA98;
+        if (CAN_STM32_tx(&msgTx))
             CAN_txCtr++;
-          else
+        else
             CAN_txFull++;
+    }
+    {
+        {
+            CAN_msg msgTx = { .id = 0x100, .dlc = 8};
+            msgTx.data.data32[0] = 0x01234567;
+            msgTx.data.data32[1] = 0xFEDCBA98;
+            if (CAN_STM32_tx(&msgTx))
+                CAN_txCtr++;
+            else
+                CAN_txFull++;
         }
-      }
-  }
+    }
 
-  //wait_us(4500);
+    {
+        CAN_msg msg;
+        while (CAN_STM32_rx(&msg))
+        {
+            CAN_rxCtr++;
+            {
+                CAN_msg msgTx = { .id = 0x101, .dlc = 8};
+                msgTx.data.data32[0] = msg.id;
+                msgTx.data.data8[4] = msg.dlc;
+                msgTx.data.data8[5] = msg.data.data8[0];
+                msgTx.data.data8[6] = msg.data.data8[1];
+                msgTx.data.data8[7] = msg.data.data8[2];
+                if (CAN_STM32_tx(&msgTx))
+                    CAN_txCtr++;
+                else
+                    CAN_txFull++;
+            }
+        }
+    }
 }
-
-uint8_t UART1_TxOverrun;
-uint8_t tim3_cc3_ctr;
-uint8_t tim3_cc4_ctr;
-uint16_t encoder;
-uint32_t UART1_RxNum;
 
 typedef enum
 {
-  e_Pulse_ShortHigh,
-  e_Pulse_ShortLow,
-  e_Pulse_LongHigh,
-  e_Pulse_LongLow,
+    e_Pulse_ShortHigh,
+    e_Pulse_ShortLow,
+    e_Pulse_LongHigh,
+    e_Pulse_LongLow,
 }e_PulseType;
 
 void Task_500ms(void)
 {
-	static const e_PulseType pulseConfig[] =
-	{
-		e_Pulse_LongLow,
-		e_Pulse_ShortHigh, e_Pulse_ShortLow,
-		e_Pulse_ShortHigh, e_Pulse_ShortLow,
-		e_Pulse_ShortHigh, e_Pulse_ShortLow,
-		e_Pulse_LongHigh, e_Pulse_ShortLow,
-		e_Pulse_LongHigh, e_Pulse_ShortLow,
-		e_Pulse_LongHigh, e_Pulse_ShortLow,
-		e_Pulse_ShortHigh, e_Pulse_ShortLow,
-		e_Pulse_ShortHigh, e_Pulse_ShortLow,
-		e_Pulse_ShortHigh, e_Pulse_ShortLow,
-	};
-	static uint8_t pulseIdx = 0;
-	static uint8_t pulseTimer = 0;
-	if (pulseTimer == 0)
-	{
-		if (pulseIdx < ((sizeof(pulseConfig)/sizeof(pulseConfig[0])) - 1))
-		{
-			pulseIdx++;
-		}else
-		{
-			pulseIdx = 0;
-		}
-		switch(pulseConfig[pulseIdx])
-		{
-		case e_Pulse_ShortHigh:
-		  LED3_Set(0);
-		  pulseTimer = 0;
-			break;
-		case e_Pulse_ShortLow:
-		  LED3_Set(1);
-		  pulseTimer = 0;
-			break;
-		case e_Pulse_LongHigh:
-		  LED3_Set(0);
-		  pulseTimer = 2;
-			break;
-		case e_Pulse_LongLow:
-		  LED3_Set(1);
-		  pulseTimer = 2;
-			break;
+    static const e_PulseType pulseConfig[] =
+    {
+        e_Pulse_LongLow,
+        e_Pulse_ShortHigh, e_Pulse_ShortLow,
+        e_Pulse_ShortHigh, e_Pulse_ShortLow,
+        e_Pulse_ShortHigh, e_Pulse_ShortLow,
+        e_Pulse_LongHigh, e_Pulse_ShortLow,
+        e_Pulse_LongHigh, e_Pulse_ShortLow,
+        e_Pulse_LongHigh, e_Pulse_ShortLow,
+        e_Pulse_ShortHigh, e_Pulse_ShortLow,
+        e_Pulse_ShortHigh, e_Pulse_ShortLow,
+        e_Pulse_ShortHigh, e_Pulse_ShortLow,
+    };
+    static uint8_t pulseIdx = 0;
+    static uint8_t pulseTimer = 0;
+    if (pulseTimer == 0)
+    {
+        if (pulseIdx < ((sizeof(pulseConfig)/sizeof(pulseConfig[0])) - 1))
+        {
+            pulseIdx++;
+        }else
+        {
+            pulseIdx = 0;
+        }
+        switch(pulseConfig[pulseIdx])
+        {
+        case e_Pulse_ShortHigh:
+            LED3_Set(0);
+            pulseTimer = 0;
+            break;
+        case e_Pulse_ShortLow:
+            LED3_Set(1);
+            pulseTimer = 0;
+            break;
+        case e_Pulse_LongHigh:
+            LED3_Set(0);
+            pulseTimer = 2;
+            break;
+        case e_Pulse_LongLow:
+            LED3_Set(1);
+            pulseTimer = 2;
+            break;
         default:
             CAT_Error(CAT_VarInvalidValue, 0);
             break;
-		}
-	}else
-	{
-		pulseTimer--;
-	}
+        }
+    }else
+    {
+        pulseTimer--;
+    }
 }
 
 void Task_Bgrd(void)
 {
-  ADC_Handler();
+    ADC_Handler();
 }
