@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+#define CAN_EXT_ID(id) ((id) | 0x80000000)
+#define CAN_IS_EXT_ID(id) (((id) & 0x80000000) != 0)
+
 typedef enum
 {
   CAN_Filter_MASK_16bit,

@@ -7,7 +7,7 @@
 void UART1_Init(uint32_t baudRate, uint8_t uartRemap);
 void UART1_Poll(void);
 
-static inline void UART1_TX(const uint8_t *data, uint32_t len)
+static inline void UART1_TX(const void *data, uint32_t len)
 {
 #if UART1_DMA != 0
   if (DMA1_Channel4->CNDTR != 0)
@@ -23,6 +23,8 @@ static inline void UART1_TX(const uint8_t *data, uint32_t len)
   DMA1_Channel4->CCR |= DMA_CCR1_EN;
 #endif
 }
+
+uint32_t UART1_RX(uint8_t *data, uint32_t len);
 
 void UART2_Init(uint32_t BaudRate);
 void UART2_Poll(void);

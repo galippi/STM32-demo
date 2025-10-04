@@ -1,0 +1,6 @@
+[submodule "LwSlcan"]
+	path = LwSlcan
+	url = S:\\git\\LwSlcan
+[submodule "u32_to_hexstring"]
+	path = u32_to_hexstring
+	url = S:\\git\\u32_to_hexstring.git

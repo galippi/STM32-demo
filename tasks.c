@@ -8,6 +8,7 @@
 #include "scheduler_preemptive.h"
 #include "timer_app.h"
 #include "can_app.h"
+#include "lwslcan.h"
 
 #include "tasks.h"
 
@@ -28,6 +29,7 @@ void Task_Init(void)
     GPIO_PortInit_AFOut(GPIOB,  9); /* CAN1-Tx */
     AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_CAN_REMAP) | AFIO_MAPR_CAN_REMAP_REMAP2;
     //can1_init();
+    slcan_init();
 }
 
 void Task_1ms(void)
@@ -145,7 +147,10 @@ void Task_500ms(void)
     }
 }
 
+uint8_t UART1_TxOverrun; // only for debugging
+
 void Task_Bgrd(void)
 {
     ADC_Handler();
+    slcan_handler();
 }

@@ -1,6 +1,6 @@
 ##################################################################
 CFLAGS_DEBUG = -gdwarf-2
-SUBDIRS := ST_lib
+SUBDIRS := . ST_lib LwSlcan
 
 WARNINGS = -Wall -Wextra
 WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
@@ -36,14 +36,14 @@ CFLAGS_TARGET += -mcpu=cortex-m3
 LDFLAGS  += $(LDFLAGS_STRIP_DEBUG_INFO)
 
 LDLIBS :=
-LDLIBS += -lgcc
+LDLIBS += -lgcc -lc
 
 ##################################################################
 TARGET=demo1
 TARGET_DIR=bin
 DUMMY_DIR_FILE = $(TARGET_DIR)/dummy
 
-VPATH := $(TARGET_DIR) u32_to_hexstring
+VPATH := $(TARGET_DIR) u32_to_hexstring LwSlcan
 
 CPPFILES =
 #CPPFILES+=
@@ -69,6 +69,7 @@ CFILES  += ram_init.c
 CFILES  += vector.c
 CFILES  += u32_to_hexstring.c
 CFILES  += SysClock.c
+CFILES  += LwSlcan.c
 #CFILES  += 
 
 SFILES  =
