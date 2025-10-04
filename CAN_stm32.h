@@ -3,8 +3,9 @@
 
 #include <stdint.h>
 
-#define CAN_EXT_ID(id) ((id) | 0x80000000)
-#define CAN_IS_EXT_ID(id) (((id) & 0x80000000) != 0)
+#define CAN_EXT_ID_MASK 0x80000000
+#define CAN_EXT_ID(id) ((id) | CAN_EXT_ID_MASK)
+#define CAN_IS_EXT_ID(id) (((id) & CAN_EXT_ID_MASK) != 0)
 
 typedef enum
 {
