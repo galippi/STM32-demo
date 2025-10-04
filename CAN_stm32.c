@@ -32,6 +32,11 @@ void CAN_STM32_init(uint32_t baud)
   CAN1->MCR &= ~CAN_MCR_INRQ;                      /* normal operating mode, reset INRQ */
 }
 
+void CAN_STM32_deinit(void)
+{
+    CAN1->MCR &= ~(CAN_MCR_INRQ);       /* init mode - stop sending / receiving */
+}
+
 void CAN_STM32_setFilter(CAN_TypeDef *can, uint8_t filterIdx, t_CAN_FilterMode mode, uint32_t id, uint32_t mask)
 {
   can->FMR  |=  CAN_FMR_FINIT;      // set Initialisation mode for filter banks

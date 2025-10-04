@@ -4,3 +4,5 @@ static inline void can1_init(uint32_t baud)
 {
   CAN_STM32_init(baud);
 }
+
+#define can1_deinit() CAN_STM32_deinit()

@@ -27,6 +27,7 @@ typedef struct
 }CAN_msg;
 
 void CAN_STM32_init(uint32_t baud);
+void CAN_STM32_deinit(void);
 void CAN_STM32_setFilter(CAN_TypeDef *can, uint8_t filterIdx, t_CAN_FilterMode mode, uint32_t id, uint32_t mask);
 uint32_t CAN_STM32_tx(const CAN_msg *msg);
 uint32_t CAN_STM32_rx(CAN_msg *msg);
