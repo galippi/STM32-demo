@@ -108,7 +108,7 @@ $(TARGET_LIST) : $(TARGET_ELF)
 	$(AS) -as $< -o $(TARGET_DIR)/$@
 
 #%.o: %.c $(MAKEFILE)
-%.o: %.c $(DUMMY_DIR_FILE) version.h
+%.o: %.c $(DUMMY_DIR_FILE)
 	@echo Building $(notdir $@)
 	-@rm -f $(@:.o=.d)
 	$(CC_DEP) -M $(CFLAGS_DEP) -c -o $(TARGET_DIR)/$(@:.o=.d) $<
@@ -148,6 +148,7 @@ dep_test:
 	@echo wildcard=$(wildcard $(DEPFILES))
 
 include version.mk
-#$(TARGET_ELF): version.h
+
+LwSlcan.o: version.h
 
 include $(wildcard $(DEPFILES))
