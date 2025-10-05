@@ -214,4 +214,5 @@ void Task_500ms(void)
         UART1_TX_Queue((uint8_t*)uart2Buffer, sizeof(uart2Buffer) - 1);
     }
 #endif
+    //while(1);
 }
