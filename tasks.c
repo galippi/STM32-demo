@@ -8,11 +8,12 @@
 #include "scheduler_preemptive.h"
 #include "timer_app.h"
 #include "can_app.h"
-#include "lwslcan.h"
+#include "LwSlcan.h"
+#include "LwSlcan_conf.h"
 
 #include "tasks.h"
 
-uint8_t uart1RxBuffer[16];
+uint8_t uart1RxBuffer[64];
 uint8_t uart1TxBuffer[128];
 
 void Task_Init(void)
@@ -25,6 +26,7 @@ void Task_Init(void)
     //SPI_Init();
     //DebugOut_Init();
     UART1_Init(38400, 1);
+    //UART1_Init(1200, 1);
     GPIO_PortInit_In(   GPIOB,  8); /* CAN1-Rx */
     GPIO_PortInit_AFOut(GPIOB,  9); /* CAN1-Tx */
     AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_CAN_REMAP) | AFIO_MAPR_CAN_REMAP_REMAP2;
@@ -43,46 +45,6 @@ uint8_t CAN_txFull;
 void Task_10ms(void)
 {
     ADC_Handler_10ms();
-    {
-        CAN_msg msgTx = { .id = 0x8000F200, .dlc = 8};
-        msgTx.data.data32[0] = 0x11224466;
-        msgTx.data.data32[1] = 0xFEDCBA98;
-        if (CAN_STM32_tx(&msgTx))
-            CAN_txCtr++;
-        else
-            CAN_txFull++;
-    }
-    {
-        {
-            CAN_msg msgTx = { .id = 0x100, .dlc = 8};
-            msgTx.data.data32[0] = 0x01234567;
-            msgTx.data.data32[1] = 0xFEDCBA98;
-            if (CAN_STM32_tx(&msgTx))
-                CAN_txCtr++;
-            else
-                CAN_txFull++;
-        }
-    }
-
-    {
-        CAN_msg msg;
-        while (CAN_STM32_rx(&msg))
-        {
-            CAN_rxCtr++;
-            {
-                CAN_msg msgTx = { .id = 0x101, .dlc = 8};
-                msgTx.data.data32[0] = msg.id;
-                msgTx.data.data8[4] = msg.dlc;
-                msgTx.data.data8[5] = msg.data.data8[0];
-                msgTx.data.data8[6] = msg.data.data8[1];
-                msgTx.data.data8[7] = msg.data.data8[2];
-                if (CAN_STM32_tx(&msgTx))
-                    CAN_txCtr++;
-                else
-                    CAN_txFull++;
-            }
-        }
-    }
 }
 
 typedef enum
@@ -145,9 +107,20 @@ void Task_500ms(void)
     {
         pulseTimer--;
     }
+#if 0
+    {
+        static char c = '0';
+        UART1_TX(&c, 1);
+        //wait_us(15000);
+        c++;
+        if (c > 'z')
+            c = '0';
+    }
+#endif
 }
 
 uint8_t UART1_TxOverrun; // only for debugging
+t_LwSlcanDbg dbgLwSlcan;
 
 void Task_Bgrd(void)
 {

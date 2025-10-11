@@ -8,6 +8,10 @@
 
 #include "uart.h"
 
+typedef uint8_t t_UART1_idx;
+
+static t_UART1_idx UART1_RxDmaLastCnt = 0;
+
 static void UART1_RxDma_Update(void);
 
 void UART1_Init(uint32_t baudRate, uint8_t uartRemap)
@@ -41,17 +45,15 @@ void UART1_Init(uint32_t baudRate, uint8_t uartRemap)
   DMA1_Channel5->CPAR = (uint32_t)&(USART1->DR);
   DMA1_Channel5->CCR = DMA_CCR1_MINC | DMA_CCR1_CIRC; /* per2mem, circ, no-per-inc, mem-inc, psize=8, memsize=8, ch-prio=low, no-mem2mem */
   DMA1_Channel5->CMAR = (uint32_t)UART1_DMA_RX_BUFFER;
+  UART1_RxDmaLastCnt = sizeof(UART1_DMA_RX_BUFFER);
   DMA1_Channel5->CNDTR = sizeof(UART1_DMA_RX_BUFFER);
   DMA1_Channel5->CCR |= DMA_CCR1_EN;
   UART1_RxDma_Update();
-  NVIC_EnableIRQ(DMA1_Channel5_IRQn);
+  //NVIC_EnableIRQ(DMA1_Channel5_IRQn);
 #endif
   USART1->CR1 |= USART_CR1_UE; /* USART1 is enabled */
 }
 
-typedef uint8_t t_UART1_idx;
-
-static t_UART1_idx UART1_RxDmaLastCnt = 0;
 static t_UART1_idx UART1_RxIn = 0;
 static t_UART1_idx UART1_RxOut = 0;
 

@@ -23,6 +23,9 @@
 
 struct IO_ports
 {
+  USART_TypeDef *uart1;
+  DMA_Channel_TypeDef *dma1_5;
+  DMA_TypeDef *dma1;
   AFIO_TypeDef *afio;
   GPIO_TypeDef *gpioa;
   GPIO_TypeDef *gpiob;
@@ -33,7 +36,7 @@ struct IO_ports
   ADC_TypeDef *adc1;
   TIM_TypeDef *tim3;
   USART_TypeDef *uart2;
-  DMA_TypeDef *dma1;
+  //DMA_TypeDef *dma1;
   //DMA_Channel_TypeDef *dma1_4;
   SCB_Type *scb;
   NVIC_Type *nvic;
@@ -41,6 +44,9 @@ struct IO_ports
   SPI_TypeDef *spi2;
 } const registers =
 {
+  USART1,
+  DMA1_Channel5,
+  DMA1,
   AFIO,
   GPIOA,
   GPIOB,
@@ -51,7 +57,7 @@ struct IO_ports
   ADC1,
   TIM3,
   USART2,
-  DMA1,
+  //DMA1,
   //DMA1_Channel4,
   SCB,
   NVIC,
