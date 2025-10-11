@@ -25,7 +25,8 @@ void Task_Init(void)
     //UART2_Init();
     //SPI_Init();
     //DebugOut_Init();
-    UART1_Init(38400, 1);
+    UART1_Init(115200, 1);
+    //UART1_Init(38400, 1);
     //UART1_Init(1200, 1);
     GPIO_PortInit_In(   GPIOB,  8); /* CAN1-Rx */
     GPIO_PortInit_AFOut(GPIOB,  9); /* CAN1-Tx */
@@ -37,6 +38,7 @@ void Task_Init(void)
 void Task_1ms(void)
 {
     //if (ADC_values[ADC_IN5_Ub] > (uint32_t)(0.7 * 4095/3.3))
+    UART1_TX_Restart();
 }
 
 void Task_10ms(void)

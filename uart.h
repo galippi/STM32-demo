@@ -7,22 +7,46 @@
 void UART1_Init(uint32_t baudRate, uint8_t uartRemap);
 void UART1_Poll(void);
 
-static inline void UART1_TX(const void *data, uint32_t len)
-{
+#ifndef UART1_TX_QUEUE
+#define UART1_TX_QUEUE 0
+#endif
+
 #if UART1_DMA != 0
-  if (DMA1_Channel4->CNDTR != 0)
+
+#include "dma.h"
+
+static inline void UART1_TX_DMA(const void *data, uint32_t len)
+{
+  if (DMA_USART1_TX->CNDTR != 0)
   {
     UART1_OverrunCallback();
   }else
   { /* resetting Transfer Complete flag */
     //DMA1->IFCR = DMA_ISR_TCIF7;
   }
-  DMA1_Channel4->CCR &= ~DMA_CCR1_EN;
-  DMA1_Channel4->CMAR = (uint32_t)data;
-  DMA1_Channel4->CNDTR = len;
-  DMA1_Channel4->CCR |= DMA_CCR1_EN;
-#endif
+  DMA_USART1_TX->CCR &= ~DMA_CCR1_EN;
+  DMA_USART1_TX->CMAR = (uint32_t)data;
+  DMA_USART1_TX->CNDTR = len;
+  DMA_USART1_TX->CCR |= DMA_CCR1_EN;
 }
+#endif
+
+#if UART1_TX_QUEUE == 0
+static inline void UART1_TX(const void *data, uint32_t len)
+{
+    UART1_TX_DMA(data, len);
+}
+
+static inline void UART1_TX_Restart(void)
+{ /* do nothing */
+}
+
+#else
+
+void UART1_TX(const void *data, uint32_t len);
+void UART1_TX_Restart(void);
+
+#endif
 
 uint32_t UART1_RX(uint8_t *data, uint32_t len);
 

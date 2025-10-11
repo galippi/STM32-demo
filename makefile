@@ -1,6 +1,6 @@
 ##################################################################
 CFLAGS_DEBUG = -gdwarf-2
-SUBDIRS := . ST_lib LwSlcan
+SUBDIRS := . ST_lib LwSlcan queue
 
 WARNINGS = -Wall -Wextra
 WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
@@ -43,7 +43,7 @@ TARGET=demo1
 TARGET_DIR=bin
 DUMMY_DIR_FILE = $(TARGET_DIR)/dummy
 
-VPATH := $(TARGET_DIR) u32_to_hexstring LwSlcan
+VPATH := $(TARGET_DIR) u32_to_hexstring $(SUBDIRS)
 
 CPPFILES =
 #CPPFILES+=
@@ -70,7 +70,7 @@ CFILES  += vector.c
 CFILES  += u32_to_hexstring.c
 CFILES  += SysClock.c
 CFILES  += LwSlcan.c
-#CFILES  += 
+CFILES  += queue.c
 
 SFILES  =
 #SFILES += vectors.s

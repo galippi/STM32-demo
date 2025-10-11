@@ -37,9 +37,9 @@ void UART1_Init(uint32_t baudRate, uint8_t uartRemap)
   USART1->CR3 = 0xC0; /* DMA is enabled for the channel */
   /* configuring DMA for USART1-TX */
   DMA_Init(DMA1);
-  DMA1_Channel4->CCR &= ~DMA_CCR1_EN;
-  DMA1_Channel4->CPAR = (uint32_t)&(USART1->DR);
-  DMA1_Channel4->CCR = DMA_CCR1_DIR | DMA_CCR1_MINC; /* mem2per, no-circ, no-per-inc, mem-inc, psize=8, memsize=8,ch-prio=low, no-mem2mem */
+  DMA_USART1_TX->CCR &= ~DMA_CCR1_EN;
+  DMA_USART1_TX->CPAR = (uint32_t)&(USART1->DR);
+  DMA_USART1_TX->CCR = DMA_CCR1_DIR | DMA_CCR1_MINC; /* mem2per, no-circ, no-per-inc, mem-inc, psize=8, memsize=8,ch-prio=low, no-mem2mem */
   /* configuring DMA for USART1-RX */
   DMA1_Channel5->CCR &= ~DMA_CCR1_EN;
   DMA1_Channel5->CPAR = (uint32_t)&(USART1->DR);
@@ -53,6 +53,46 @@ void UART1_Init(uint32_t baudRate, uint8_t uartRemap)
 #endif
   USART1->CR1 |= USART_CR1_UE; /* USART1 is enabled */
 }
+
+#if UART1_TX_QUEUE != 0
+
+#include "queue.h"
+#include "scheduler_preemptive.h"
+
+QUEUE_CREATE(uart1TxQueue, UART1_TX_QUEUE);
+
+static void UART1_TxDma_Update(void)
+{
+    static tQueueIdx num = 0;
+    if (num != 0)
+        queueRemoveData(&uart1TxQueue, num);
+    num = UART1_TX_QUEUE;
+    tQueueData *buffer = queueGetDataBuffer(&uart1TxQueue, &num);
+    if (buffer != NULL) {
+        UART1_TX_DMA(buffer, num);
+    }
+}
+
+void UART1_TX_Restart()
+{
+    //SchedulerPre_AtomicBegin();
+    if (DMA_USART1_TX->CNDTR == 0)
+        UART1_TxDma_Update();
+    //SchedulerPre_AtomicEnd();
+}
+
+void UART1_TX(const void *data, uint32_t len)
+{
+    SchedulerPre_AtomicBegin();
+    uint32_t written = queueWrite(&uart1TxQueue, data, len);
+    if (written != len)
+        UART1_OverrunCallback();
+    SchedulerPre_AtomicEnd();
+    //UART1_TX_Restart();
+    //return written;
+}
+
+#endif
 
 static t_UART1_idx UART1_RxIn = 0;
 static t_UART1_idx UART1_RxOut = 0;
