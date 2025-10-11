@@ -39,9 +39,6 @@ void Task_1ms(void)
     //if (ADC_values[ADC_IN5_Ub] > (uint32_t)(0.7 * 4095/3.3))
 }
 
-uint8_t CAN_rxCtr;
-uint8_t CAN_txCtr;
-uint8_t CAN_txFull;
 void Task_10ms(void)
 {
     ADC_Handler_10ms();
