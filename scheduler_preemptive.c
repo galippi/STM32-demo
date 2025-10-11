@@ -6,9 +6,6 @@
 
 #include "scheduler_preemptive.h"
 
-volatile t_SchedPreTaskIdx SchedulerPre_CurrentTaskIdx = SCHEDULER_PRE_TASK_IDX_NA;
-volatile t_SchedPreTaskIdx SchedulerPre_AtomicTaskIdx = SCHEDULER_PRE_TASK_IDX_NA;
-
 #if (SchedPreTask_EnableCPULoadMeas)
 uint8_t CPU_load = 0xFF;
 static volatile uint8_t CPU_loadCntr = 0xFF;
@@ -69,6 +66,9 @@ const t_SchedPreTask_ROM SchedPreTask_ROM[SchedPreTaskNum] =
 #undef SCHED_PRE_TASK_DEF
 
 t_SchedPreTask_RAM SchedPreTask_RAM[SchedPreTaskNum];
+
+volatile t_SchedPreTaskIdx SchedulerPre_CurrentTaskIdx = SCHEDULER_PRE_TASK_IDX_BACKGROUND;
+volatile t_SchedPreTaskIdx SchedulerPre_AtomicTaskIdx = SCHEDULER_PRE_TASK_IDX_NA;
 
 void SchedulerPre_Init(void)
 {
@@ -164,7 +164,7 @@ void SchedulerPre_TaskManagement(void)
     }
   }
   if (i == SchedPreTaskNum)
-      SchedulerPre_CurrentTaskIdx = SCHEDULER_PRE_TASK_IDX_NA;
+      SchedulerPre_CurrentTaskIdx = SCHEDULER_PRE_TASK_IDX_BACKGROUND;
   }
   SchedPreTask_Disable(); /* disable IT */
   if (SchedPreTask_EnableCPULoadMeas)

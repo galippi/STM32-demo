@@ -16,16 +16,17 @@ uint8_t SchedPreTask_GetTaskLoad(t_SchedPreTaskIdx taskIdx);
 uint8_t SchedPreTask_GetTaskLoadMax(t_SchedPreTaskIdx taskIdx);
 
 #define SCHEDULER_PRE_TASK_IDX_NA 255
+#define SCHEDULER_PRE_TASK_IDX_BACKGROUND SchedPreTaskNum
 
 extern volatile t_SchedPreTaskIdx SchedulerPre_CurrentTaskIdx;
 
-static t_SchedPreTaskIdx SchedulerPre_GetCurrentTaskIdx(void) {
+static inline t_SchedPreTaskIdx SchedulerPre_GetCurrentTaskIdx(void) {
     return SchedulerPre_CurrentTaskIdx;
 }
 
 extern volatile t_SchedPreTaskIdx SchedulerPre_AtomicTaskIdx; /** Current index of the task which holds the lock */
 
-static void SchedulerPre_AtomicBegin(void)
+static inline void SchedulerPre_AtomicBegin(void)
 {
     if (SchedulerPre_AtomicTaskIdx != SCHEDULER_PRE_TASK_IDX_NA) {
         SchedulerPre_AtomicInvalidCallBack((SchedulerPre_GetCurrentTaskIdx() << 8) | 0);
@@ -34,7 +35,7 @@ static void SchedulerPre_AtomicBegin(void)
     SchedulerPre_AtomicTaskIdx = SchedulerPre_GetCurrentTaskIdx();
 }
 
-static void SchedulerPre_AtomicEnd(void)
+static inline void SchedulerPre_AtomicEnd(void)
 {
     if (SchedulerPre_AtomicTaskIdx != SchedulerPre_GetCurrentTaskIdx()) {
         SchedulerPre_AtomicInvalidCallBack((SchedulerPre_GetCurrentTaskIdx() << 8) | 1);
