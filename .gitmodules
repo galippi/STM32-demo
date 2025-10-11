@@ -4,3 +4,6 @@
 [submodule "u32_to_hexstring"]
 	path = u32_to_hexstring
 	url = S:\\git\\u32_to_hexstring.git
+[submodule "queue"]
+	path = queue
+	url = s:\\git\\Queue\\Queue.test
