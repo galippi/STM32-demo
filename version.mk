@@ -1,8 +1,22 @@
-VERSION_OLD = $(strip $(shell cat version.h))
+VERSION_OLD := $(strip $(shell cat version.h))
 GIT_COMMIT_ID := $(shell git rev-parse --short --verify HEAD 2>/dev/null)
+MODIFIED := $(shell git status --short 2> /dev/null)
+LAST_TAG := $(shell git describe --tags --abbrev=0 2> /dev/null)
 
 ifeq ($(GIT_COMMIT_ID),)
 GIT_COMMIT_ID := (git error)
+else
+  ifeq ($(MODIFIED),)
+    # not modified version
+    ifeq ($(LAST_TAG),)
+      # no tag - keep GIT_COMMIT_ID
+    else
+      GIT_COMMIT_ID := $(LAST_TAG)
+    endif
+  else
+    # modified content
+    GIT_COMMIT_ID := $(GIT_COMMIT_ID)-modified
+  endif
 endif
 
 VERSION_FILE = $(wildcard version.h)
