@@ -1,7 +1,7 @@
 VERSION_OLD := $(strip $(shell cat version.h))
 GIT_COMMIT_ID := $(shell git rev-parse --short --verify HEAD 2>/dev/null)
 MODIFIED := $(shell git status --short 2> /dev/null)
-LAST_TAG := $(shell git describe --tags --abbrev=0 2> /dev/null)
+LAST_TAG := $(shell git describe --tags --exact-match 2> /dev/null)
 
 ifeq ($(GIT_COMMIT_ID),)
 GIT_COMMIT_ID := (git error)
