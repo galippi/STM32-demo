@@ -132,6 +132,10 @@ $(DUMMY_DIR_FILE):
 targetdir:
 	-mkdir $(sort $(dir $(OBJECTS)))
 
+release: clean
+	git checkout -f
+	make all
+
 ##################################################################
 # cleaning rule
 ##################################################################

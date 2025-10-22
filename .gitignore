@@ -7,3 +7,4 @@ bin/*
 debug_log.txt
 build.bat
 version.h
+_git_config.bat
