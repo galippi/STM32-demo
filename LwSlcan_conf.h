@@ -1,6 +1,8 @@
 #ifndef _LWSLCAN_CONF_H_
 #define _LWSLCAN_CONF_H_
 
+#include "timer_app.h"
+
 typedef struct {
     uint8_t uart1_rxCtr;
     uint8_t CAN_txCtr;
@@ -17,5 +19,20 @@ extern t_LwSlcanDbg dbgLwSlcan;
 #else
 #define DBG_INC(var) do {}while(0) /* do nothing */
 #endif
+
+extern uint16_t LwSlcan_1us_ctr;
+extern uint16_t LwSlcan_1ms_ctr;
+
+static inline uint16_t get_1ms_ctr(void)
+{
+    uint16_t t = getTimer_us();
+    uint16_t dt = t - LwSlcan_1us_ctr;
+    if (dt >= 1000)
+    {
+        LwSlcan_1ms_ctr++;
+        LwSlcan_1us_ctr = LwSlcan_1us_ctr + 1000;
+    }
+    return LwSlcan_1ms_ctr;
+}
 
 #endif /* _LWSLCAN_CONF_H_ */

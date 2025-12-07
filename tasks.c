@@ -120,6 +120,8 @@ void Task_500ms(void)
 
 uint8_t UART1_TxOverrun; // only for debugging
 t_LwSlcanDbg dbgLwSlcan;
+uint16_t LwSlcan_1us_ctr;
+uint16_t LwSlcan_1ms_ctr;
 
 void Task_Bgrd(void)
 {

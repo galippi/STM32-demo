@@ -8,3 +8,5 @@ static inline void can1_init(uint32_t baud)
 }
 
 #define can1_deinit() CAN_STM32_deinit()
+
+#define can1_readErrorSate() CAN_STM32_readErrorSate()

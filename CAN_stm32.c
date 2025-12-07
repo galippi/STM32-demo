@@ -24,17 +24,21 @@
 void CAN_STM32_init(uint32_t baud)
 {
   RCC->APB1ENR |= RCC_APB1ENR_CAN1EN;
-  CAN1->MCR = (CAN_MCR_NART | CAN_MCR_INRQ);       /* init mode, disable auto. retransmission */
+  CAN1->MCR |= (CAN_MCR_INRQ);       /* init mode, disable auto. retransmission */
+  while ((CAN1->MSR & CAN_MSR_INAK) == 0)
+  {} // wait while the CAN init is accepted
+  CAN1->MCR &= (~CAN_MCR_NART);      /* enable  auto. retransmission */
+  CAN1->MCR |= (CAN_MCR_ABOM);       /* enable  auto. bus-off */
   /* set BTR register so that sample point is at about 72% bit time from bit start */
   uint16_t brp  = (f_APB1_Hz) / ((CAN_TSEG1 + CAN_TSEG2 + 1) * baud);
   CAN1->BTR &= ~(CAN_BTR_SILM | CAN_BTR_LBKM | CAN_BTR_BRP | CAN_BTR_TS1 | CAN_BTR_TS2 | CAN_BTR_SJW);
   CAN1->BTR |=  (CAN_BTR_INIT | ((CAN_SJW - 1)* CAN_BTR_SJW_0) | ((CAN_TSEG2 - 1) * CAN_BTR_TS2_0) | ((CAN_TSEG1 - 1) * CAN_BTR_TS1_0) | ((brp-1) * CAN_BTR_BRP_0));
-  CAN1->MCR &= ~CAN_MCR_INRQ;                      /* normal operating mode, reset INRQ */
+  CAN1->MCR &= ~CAN_MCR_INRQ;        /* normal operating mode, reset INRQ */
 }
 
 void CAN_STM32_deinit(void)
 {
-    CAN1->MCR &= ~(CAN_MCR_INRQ);       /* init mode - stop sending / receiving */
+    CAN1->MCR |= (CAN_MCR_INRQ);     /* init mode - stop sending / receiving */
 }
 
 void CAN_STM32_setFilter(CAN_TypeDef *can, uint8_t filterIdx, t_CAN_FilterMode mode, uint32_t id, uint32_t mask)
@@ -172,4 +176,34 @@ uint32_t CAN_STM32_rx(CAN_msg *msg)
   {
     return 0;
   }
+}
+
+e_CANerrorMask CAN_STM32_readErrorSate(void)
+{
+    e_CANerrorMask result = CANerrorMaskNoError;
+    if (CAN1->ESR & CAN_ESR_BOFF)
+        result |= CANerrorMaskBusOff;
+    uint8_t lec = (CAN1->ESR & CAN_ESR_LEC) >> 4;
+    switch (lec)
+    {
+        case 0x01:
+            result |= CANerrorMaskStuff;
+            break;
+        case 0x02:
+            result |= CANerrorMaskForm;
+            break;
+        case 0x03:
+            result |= CANerrorMaskAck;
+            break;
+        case 0x04:
+            result |= CANerrorMaskRecessive;
+            break;
+        case 0x05:
+            result |= CANerrorMaskDominant;
+            break;
+        case 0x06:
+            result |= CANerrorMaskCRC;
+            break;
+    }
+    return result;
 }
