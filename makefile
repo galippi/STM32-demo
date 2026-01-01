@@ -25,7 +25,6 @@ LDFLAGS = -L./lib -T $(MEMMAP_FILE) -Map $(TARGET_MAP)
 
 AS = $(ARMGNU)as
 CC = $(ARMGNU)gcc
-CC_DEP = gcc
 LL = $(ARMGNU)ld
 OBJCOPY = $(ARMGNU)objcopy
 OBJDUMP = $(ARMGNU)objdump
@@ -129,9 +128,13 @@ $(TARGET_LIST) : $(TARGET_ELF)
 #%.o: %.c $(MAKEFILE)
 %.o: %.c $(DUMMY_DIR_FILE)
 	@echo Building $(notdir $@)
-	-@rm -f $(@:.o=.d)
-	$(CC_DEP) -M $(CFLAGS_DEP) -c -o $(TARGET_DIR)/$(@:.o=.d) $<
-	$(CC) $(CFLAGS) -c -o $(TARGET_DIR)/$@ $<
+	-@rm -f $(TARGET_DIR)/$(@:.o=.d)
+	$(CC) $(CFLAGS) -c -o $(TARGET_DIR)/$@ -MMD -MF$(TARGET_DIR)/$(@:.o=.d) -MT"$@" $<
+
+
+#	$(CC) $(CFLAGS) -c -o $(TARGET_DIR)/$@ -MMD -MF$(TARGET_DIR)/$(@:.o=.dtmp) $<
+#	@cat $(TARGET_DIR)/$(@:.o=.dtmp)| sed 's|^bin/||' > $(TARGET_DIR)/$(@:.o=.d)
+#	-@rm -f $(TARGET_DIR)/$(@:.o=.dtmp)
 
 #	$(CC) -MD $(CFLAGS) -c -o $@ $<
 #	$(CC) -v -x c -E -
