@@ -5,6 +5,8 @@
 #include "tasks.h"
 #include "FaultHandler.h"
 
+typedef uint8_t t_SchedPreTaskIdx;
+
 #define t_SchedPreTask_Timer uint16_t
 
 #define SCHED_PRE_TASK_LIST \
@@ -53,12 +55,15 @@ inline static char atomic_check_and_set_u8(uint8_t *var, uint8_t val_old, uint8_
 #define SchedPreTask_TaskStart(func) { \
   func(); \
 }
-#define SchedPreTask_ErrorTaskOverrun(i) { \
-  CAT_Error(CAT_TaskOverrun_1ms + i, 0); \
+#define SchedPreTask_ErrorTaskOverrun(i, data) { \
+  CAT_Error((CAT_TaskOverrun_1ms + i), (data)); \
 }
 
 #define SchedulerPre_LostInterruptCallBack() \
   CAT_Error(CAT_SchedLostInterrupt, 0)
+
+#define SchedulerPre_AtomicInvalidCallBack(addData) \
+  CAT_Error(CAT_SchedAtomicInvalid, addData)
 
 #define SchedPreTask_EnableCPULoadMeas 1
 #define SchedPreTask_EnableTaskLoadMeas 1

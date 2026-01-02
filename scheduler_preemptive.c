@@ -6,6 +6,9 @@
 
 #include "scheduler_preemptive.h"
 
+volatile t_SchedPreTaskIdx SchedulerPre_CurrentTaskIdx = SCHEDULER_PRE_TASK_IDX_NA;
+volatile t_SchedPreTaskIdx SchedulerPre_AtomicTaskIdx = SCHEDULER_PRE_TASK_IDX_NA;
+
 #if (SchedPreTask_EnableCPULoadMeas)
 uint8_t CPU_load = 0xFF;
 static volatile uint8_t CPU_loadCntr = 0xFF;
@@ -90,7 +93,7 @@ void SchedulerPre_TaskTableUpdate(void)
         SchedPreTask_RAM[i].state = SCHED_PRE_TASK_STATE_READY;
       }else
       { /* task is started -> error management */
-        SchedPreTask_ErrorTaskOverrun(i);
+        SchedPreTask_ErrorTaskOverrun(i, (SchedulerPre_AtomicTaskIdx << 8));
       }
       /* reschedule the task */
       SchedPreTask_RAM[i].timer = SchedPreTask_ROM[i].T;
@@ -105,7 +108,7 @@ void SchedulerPre_TaskTableUpdate(void)
 
 void SchedulerPre_TaskManagement(void)
 {
-  uint32_t i;
+  t_SchedPreTaskIdx i;
   uint16_t t = getTimer_us();
   SchedPreTask_Disable(); /* disable IT */
   if (SchedPreTask_EnableCPULoadMeas)
@@ -131,6 +134,8 @@ void SchedulerPre_TaskManagement(void)
     CPU_loadCntr++;
   }
   SchedPreTask_Enable(); /* reenable IT */
+  if (SchedulerPre_AtomicTaskIdx == SCHEDULER_PRE_TASK_IDX_NA) {
+      // Atomic calculation is running - skip task change
   for(i = 0; i < SchedPreTaskNum; i++)
   {
     if (SchedPreTask_RAM[i].state == SCHED_PRE_TASK_STATE_RUNNING)
@@ -140,7 +145,8 @@ void SchedulerPre_TaskManagement(void)
     {
       if (atomic_check_and_set_u8(&SchedPreTask_RAM[i].state, SCHED_PRE_TASK_STATE_READY, SCHED_PRE_TASK_STATE_RUNNING))
       { /* task is ready to running -> start it */
-        SchedPreTask_TaskStart(SchedPreTask_ROM[i].func); /* start the task */
+          SchedulerPre_CurrentTaskIdx = i;
+          SchedPreTask_TaskStart(SchedPreTask_ROM[i].func); /* start the task */
         #if SchedPreTask_EnableTaskLoadMeas
         {
             uint16_t dt = getTimer_us() - t;
@@ -152,10 +158,13 @@ void SchedulerPre_TaskManagement(void)
         #endif
         SchedPreTask_RAM[i].state = SCHED_PRE_TASK_STATE_IDLE;
       }else
-      { /* if the lock was not succesful, then the lower prio scheduling is running -> it will start the rest of the tasks */
+      { /* if the lock was not successful, then the lower prio scheduling is running -> it will start the rest of the tasks */
         break;
       }
     }
+  }
+  if (i == SchedPreTaskNum)
+      SchedulerPre_CurrentTaskIdx = SCHEDULER_PRE_TASK_IDX_NA;
   }
   SchedPreTask_Disable(); /* disable IT */
   if (SchedPreTask_EnableCPULoadMeas)
@@ -184,7 +193,7 @@ void SchedulerPre_LostInterrupt(void)
   SchedulerPre_LostInterruptCallBack();
 }
 
-uint8_t SchedPreTask_GetTaskLoad(uint32_t taskIdx)
+uint8_t SchedPreTask_GetTaskLoad(t_SchedPreTaskIdx taskIdx)
 {
 #if SchedPreTask_EnableTaskLoadMeas
   return SchedPreTask_RAM[taskIdx].taskLoad;
@@ -193,7 +202,7 @@ uint8_t SchedPreTask_GetTaskLoad(uint32_t taskIdx)
 #endif
 }
 
-uint8_t SchedPreTask_GetTaskLoadMax(uint32_t taskIdx)
+uint8_t SchedPreTask_GetTaskLoadMax(t_SchedPreTaskIdx taskIdx)
 {
 #if SchedPreTask_EnableTaskLoadMeas
   return SchedPreTask_RAM[taskIdx].taskLoadMax;
