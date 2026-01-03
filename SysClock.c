@@ -67,12 +67,12 @@
   #endif
 #endif
 
-#if defined(f_PLL_Hz)
-#if f_VCO_CALC_Hz != f_PLL_Hz
-#error f_PLL_Hz is wrong!
+#if defined(f_VCO_Hz)
+#if f_VCO_CALC_Hz != f_VCO_Hz
+#error f_VCO_Hz is wrong!
 #endif
-#if ((f_PLL_Hz) < 64000000) || ((f_PLL_Hz) > 344000000)
-#error f_PLL_Hz is wrongly set!
+#if ((f_VCO_Hz) < 96000000) || ((f_VCO_Hz) > 344000000)
+#error f_VCO_Hz is wrongly set!
 #endif
 #endif
 

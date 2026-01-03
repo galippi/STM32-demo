@@ -39,7 +39,7 @@
 #endif
 
 #ifndef PLL_ON
-  #ifdef f_PLL_Hz
+  #ifdef f_VCO_Hz
     #define PLL_ON 1
   #else
     #define PLL_ON 0
@@ -59,12 +59,12 @@
   #if (HSE_ON == 0)
     #error HSE_ON is worngly set!
   #endif
-  #define f_PLL_INPUT_Hz (f_HSE_Hz / (PLLM_VAL))
+  #define f_VCO_INPUT_Hz (f_HSE_Hz / (PLLM_VAL))
 #elif (PLLSRC == PLLSRC_HSI16)
     #if HSI_ON != 1
     #error HSI_ON is worngly set!
     #endif
-    #define f_PLL_INPUT_Hz ((f_HSI_Hz) / (PLLM_VAL))
+    #define f_VCO_INPUT_Hz ((f_HSI_Hz) / (PLLM_VAL))
 #else
 #error The PLLSRC is wrongly set!
 #endif
@@ -77,7 +77,7 @@
 #error PLLN is wrongly set!
 #endif
 
-#define f_VCO_CALC_Hz ((f_PLL_INPUT_Hz) * (PLLN_VAL))
+#define f_VCO_CALC_Hz ((f_VCO_INPUT_Hz) * (PLLN_VAL))
 #define f_PLL_RCLK_Hz ((f_VCO_CALC_Hz) / (PLLR_VAL))
 
 #define RCC_CFGR_SW_HSISYS  0
@@ -103,6 +103,10 @@
 #endif
 
 #define f_HCLK_CALC_Hz (f_SYSCLK_Hz / AHB_PRESC_VAL)
+
+#if (f_HCLK_Hz) != (f_HCLK_CALC_Hz)
+#error HCLK config error!
+#endif
 
 #if PPRE_REG < 4
   #define APB_PRESC_VAL 1
@@ -144,10 +148,10 @@
 #define RCC_CCIPR2_USBSEL_HSE   1
 #define RCC_CCIPR2_USBSEL_PLL   2
 
-#define SysTick_CTRL_CLKSOURCE_HCLK  0
-#define SysTick_CTRL_CLKSOURCE_HCLK8 SysTick_CTRL_CLKSOURCE_Msk
+#define SysTick_CTRL_CLKSOURCE_HCLK  SysTick_CTRL_CLKSOURCE_Msk
+#define SysTick_CTRL_CLKSOURCE_HCLK8 0
 
-#if (((SYSTICK_CTRL_VAL) & SysTick_CTRL_CLKSOURCE_Msk) == 0)
+#if (((SYSTICK_CTRL_VAL) & SysTick_CTRL_CLKSOURCE_Msk) != 0)
 #define f_CortexSystemTimer_Hz (f_HCLK_Hz)
 #else
 #define f_CortexSystemTimer_Hz ((f_HCLK_Hz) / 8)
