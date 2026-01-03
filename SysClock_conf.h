@@ -5,7 +5,7 @@
 
 #define HSIDIV_REG 1 // div by 2
 
-//#define f_HSE_Hz 8000000
+#define f_HSE_Hz 4000000
 //#define f_LSE_Hz 32768
 #define f_PLL_Hz 64000000
 #define f_SYSCLK_Hz 8000000
@@ -21,7 +21,7 @@
 #define f_RTCCLK_Hz 32768
 
 #define HSI_ON 1
-//#define HSE_ON 1
+#define HSE_ON (defined(f_HSE_Hz) ? 1 : 0)
 #define HSE_BYP 0
 
 //#define PLL_ON 1
@@ -62,6 +62,11 @@
 #define HSI_STARTUP_ERROR() CAT_Error(CAT_HSI_Init, 0)
 /* If HSE fails to start-up, the application will have wrong clock
    configuration. User can add here some code to deal with this error */
+#if 0
 #define HSE_STARTUP_ERROR(data) CAT_Error(CAT_HSE_Init, data)
+#else
+#include "debug.h"
+#define HSE_STARTUP_ERROR(data) DBG_SET(clockHseInitError, 1)
+#endif
 
 #endif /* _SYSCLOCK_CONF_H_ */
