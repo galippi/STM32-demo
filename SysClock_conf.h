@@ -7,7 +7,7 @@
 
 #define f_HSE_Hz 4000000
 //#define f_LSE_Hz 32768
-#define f_PLL_Hz 64000000
+#define f_VCO_Hz 96000000
 #define f_SYSCLK_Hz 8000000
 //#define f_HCLK_Hz 8000000
 //#define f_PCLK_Hz 8000000
@@ -28,12 +28,9 @@
 //#define PLL_ON 1
 #define PLLM_VAL 4
 #define PLLSRC   PLLSRC_HSI16
-#define PLLN_VAL 16
+#define PLLN_VAL 24
 
-#define PLLR_VAL 8
-
-//#define AHB_PRESC 1
-//#define APB_PRESC 1
+#define PLLR_VAL 12
 
 #define SWS RCC_CFGR_SW_PLLRCLK
 
