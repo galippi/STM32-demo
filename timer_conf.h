@@ -2,8 +2,6 @@
 #define _TIMER_CONF_H_
 
 #include "SysClock_conf.h"
-#include "scheduler_preemptive.h"
-#include "dht11.h"
 
 #define TIM2_CR1_INIT 0x00 /* up counter mode */
 #define TIM2_CR2_INIT 0x0

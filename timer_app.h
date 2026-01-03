@@ -2,9 +2,13 @@
 #define _TIMER_APP_H_
 
 #include "gpio_app.h"
+#include "scheduler_preemptive.h"
 
 #include "timer.h"
 #include "timer_conf.h"
+
+#define TIM3_CC1IF_Callback() /* do nothing */
+#define TIM3_CC2IF_Callback() /* do nothing */
 
 static inline void TIM3_UIF_PollHandler(void)
 {
@@ -72,6 +76,15 @@ uint16_t tim14_uif_ctr;
 static inline void TIM14_UIF_Callback(void)
 {
   tim14_uif_ctr++;
+}
+
+static inline void TIM14_CC1IF_Callback(void)
+{ /* call back function of TIM3 UIF - counter underflow */
+  TIM14_CCR1_Set(TIM14_CCR1_Get() + TIM14_1ms); /* set next interrupt to the next 1ms slot */
+  if (((TIM14_CCR1_Get() - TIM14_Cnt_Get()) & 0xFFFF) > TIM14_1ms)
+    SchedulerPre_LostInterrupt();
+  SchedulerPre_TaskTableUpdate();
+  SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; /* activate PendSV handler */
 }
 
 #endif /* _TIMER_APP_H_ */

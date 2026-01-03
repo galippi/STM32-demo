@@ -19,14 +19,7 @@ typedef uint8_t t_SchedPreTaskIdx;
   SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; \
 }
 
-static inline void TIM14_CC1IF_Callback(void)
-{ /* call back function of TIM3 UIF - counter underflow */
-  TIM14_CCR1_Set(TIM14_CCR1_Get() + TIM14_1ms); /* set next interrupt to the next 1ms slot */
-  if (((TIM14_CCR1_Get() - TIM14_Cnt_Get()) & 0xFFFF) > TIM14_1ms)
-    SchedulerPre_LostInterrupt();
-  SchedulerPre_TaskTableUpdate();
-  SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; /* activate PendSV handler */
-}
+// static inline void TIM14_CC1IF_Callback(void); - it's implemented in timer.app.h - include order fix
 
 #define SchedPreTask_Disable() __disable_irq()
 
