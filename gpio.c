@@ -21,6 +21,10 @@ static inline void GPIO_PortEnable(GPIO_TypeDef * const gpio)
   { /* enable the GPIO-D */
       RCC->IOPENR |= RCC_IOPENR_GPIODEN;
   }else
+  if (gpio == GPIOF)
+  { /* enable the GPIO-F */
+      RCC->IOPENR |= RCC_IOPENR_GPIOFEN;
+  }else
     CAT_Error(CAT_InvalidParameter, 0);
 }
 
