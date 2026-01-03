@@ -21,11 +21,15 @@
 
 #define VDD 3.0 /* Volt */
 
+typedef uint32_t t_reg96Bits[3];
+
 #define DBG_PORTS \
     DBG_PORT(SYSCFG_TypeDef, syscfg, SYSCFG) \
 	DBG_PORT(GPIO_TypeDef, gpioa, GPIOA) \
 	DBG_PORT(GPIO_TypeDef, gpiob, GPIOB) \
 	DBG_PORT(GPIO_TypeDef, gpioc, GPIOC) \
+    DBG_PORT(GPIO_TypeDef, gpiod, GPIOD) \
+    DBG_PORT(GPIO_TypeDef, gpiof, GPIOF) \
 	DBG_PORT(RCC_TypeDef, rcc, RCC) \
 	DBG_PORT(SysTick_Type, systick, SysTick) \
 	DBG_PORT(ADC_TypeDef, adc1, ADC1) \
@@ -41,10 +45,15 @@
 	DBG_PORT(FLASH_TypeDef, flash, FLASH) \
     DBG_PORT(const uint16_t * const, ts_cal1, &TS_CAL1) \
     DBG_PORT(const uint16_t * const, vrefint_cal, &VREFINT_CAL) \
+    DBG_PORT(uint16_t, packageDataRegister, (uint16_t * const)PACKAGE_BASE) \
+    DBG_PORT(t_reg96Bits, uniqIdRegPtr1, (t_reg96Bits * const)UID_BASE) \
+    DBG_PORT(uint32_t, devId, (uint32_t * const)0x40015800) \
   /* no more peripheries */
 
 //    DBG_PORT(USB_DRD_TypeDef, usb_drd_fs, USB_DRD_FS)
 //    DBG_PORT(USB_DRD_PMABuffDescTypeDef, usb_drd_pma_buff, USB_DRD_PMA_BUFF)
+//    DBG_PORT(const uint16_t * const, packageDataRegister, &PACKAGE_DATA)
+//    DBG_PORT(const t_reg96Bits * const, uniqIdRegPtr, &uniqIdReg)
 
 #undef DBG_PORT
 #define DBG_PORT(type, field, val) type * const field;
@@ -116,6 +125,7 @@ void RAM_StartCheck(void)
 int main(void)
 {
   SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
+
   SysClock_Init();
   SysTick_Init();
 
