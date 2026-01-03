@@ -1,6 +1,6 @@
 ##################################################################
 CFLAGS_DEBUG = -gdwarf-2
-SUBDIRS := . ST_lib u32_to_hexstring dht11 hal_STM32G0 hal_STM32G0/ST_lib
+SUBDIRS := . ST_lib u32_to_hexstring hal_STM32G0 hal_STM32G0/ST_lib
 SUBDIRS += hal_STM32G0/ST_lib/usb
 SUBDIRS += queue
 SUBDIRS_LINKER := hal_STM32G0/lib
@@ -75,7 +75,6 @@ CFILES  += vector.c
 CFILES  += u32_to_hexstring.c
 CFILES  += SysClock.c
 #CFILES  += pwm.c
-CFILES  += dht11.c
 CFILES  += queue.c
 #CFILES  += battery.c
 CFILES  += stm32g0xx_hal_pcd.c

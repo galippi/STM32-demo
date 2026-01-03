@@ -1,9 +1,6 @@
 [submodule "u32_to_hexstring"]
 	path = u32_to_hexstring
 	url = s:\\git\\u32_to_hexstring.git
-[submodule "DHT11"]
-	path = DHT11
-	url = s:\\git\\DHT11
 [submodule "hal_STM32G0"]
 	path = hal_STM32G0
 	url = s:/git/STM32F103C8T6.git
