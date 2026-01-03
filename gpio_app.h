@@ -134,4 +134,21 @@ static inline void PB13_Set(uint32_t val)
   }
 }
 
+//#define PORT_TEST_PORT GPIOF, 0
+#ifdef PORT_TEST_PORT
+static inline void portTest(void)
+{
+    GPIO_PortInit_Out(PORT_TEST_PORT);
+    GPIO_Set(PORT_TEST_PORT, 0);
+    wait_us_rough(10);
+    GPIO_Set(PORT_TEST_PORT, 1);
+    wait_us_rough(10);
+    GPIO_Set(PORT_TEST_PORT, 0);
+    wait_us_rough(10);
+    GPIO_Set(PORT_TEST_PORT, 1);
+    wait_us_rough(10);
+    GPIO_PortInit_In(PORT_TEST_PORT); // restore back the port to init state
+}
+#endif /* PORT_TEST_PORT */
+
 #endif /* _GPIO_APP_H_ */

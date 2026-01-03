@@ -1,12 +1,13 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "util.h"
+
 #include "SysClock.h"
 #include "gpio_app.h"
 #include "adc.h"
 //#include "adc_app.h"
 #include "timer.h"
-#include "util.h"
 #include "system_conf.h"
 #include "timer_conf.h"
 #include "timer_app.h"
