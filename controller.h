@@ -51,6 +51,7 @@
 #define STM32G030xx
 #define USE_RTOS 0
 
+#include "stm32g0xx_hal.h"
 #include "stm32g030xx.h"
 #define CONTROLLER_BASE_NAME "stm32g030xx"
 //#define STM32_RCC_HEADER "stm32g030xx_rcc.h"
@@ -63,6 +64,7 @@
 #define STM32G0B1xx
 #define USE_RTOS 0
 
+#include "stm32g0xx_hal.h"
 #include "stm32g0b1xx.h"
 #define CONTROLLER_BASE_NAME "stm32g0b1xx"
 //#define STM32_RCC_HEADER "stm32g030xx_rcc.h"
