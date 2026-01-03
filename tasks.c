@@ -83,6 +83,8 @@ void Task_Bgnd(void)
 #endif
 }
 
+static uint32_t halTick_1ms;
+
 void Task_1ms(void)
 {
 #ifdef f_USBCLK_Hz
@@ -96,11 +98,12 @@ void Task_1ms(void)
         t_ug++;
     }
   }
+  halTick_1ms++;
 }
 
 uint32_t HAL_GetTick(void)
 {
-    return SysTick_Get();
+    return halTick_1ms;
 }
 
 void HAL_Delay(uint32_t delay)
@@ -116,8 +119,7 @@ void Task_10ms(void)
 {
     {
         static uint8_t db = 0; // TODO:
-        //GPIO_Set(DHT11_PORT_OUT, db);
-        GPIO_Set(GPIOA, 5, db);
+        LED4_Set( db);
         db = 1 - db;
     }
 }
