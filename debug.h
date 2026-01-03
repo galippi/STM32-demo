@@ -36,7 +36,10 @@ static inline void DebugOut_Set_u16(uint32_t block, uint32_t idx, uint16_t data)
 }
 
 typedef struct {
-    uint32_t uart1_rxCtr;
+    uint16_t uart1_rxCtr;
+    uint8_t uart1TxOverflowCtr;
+    uint8_t UART1_TxOverrun;
+    uint8_t clockHseInitError;
 }t_dbgBuffer;
 t_dbgBuffer dbgBuffer;
 

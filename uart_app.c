@@ -1,16 +1,27 @@
+#include <string.h>
+
 #include "queue.h"
+#include "FaultHandler.h"
+#include "debug.h"
 #include "uart.h"
 #include "uart_app.h"
 
-QUEUE_CREATE(uart1TxQueue, 128);
+QUEUE_CREATE(uart1TxQueue, 128); // Todo: to be corrected!!!
 
-uint8_t uart1TxOverflowCtr;
+void UART_appInit(USART_TypeDef *dev)
+{
+    if (dev == USART1) {
+        if (queueInit(&uart1TxQueue) != 0) {
+            CAT_Error(CAT_InvalidParameter, 0);
+        }
+    }
+}
 
 uint32_t UART1_TX_Queue(const void *data, uint32_t len)
 {
     uint32_t written = queueWrite(&uart1TxQueue, data, len);
     if (written != len)
-        uart1TxOverflowCtr++;
+        DBG_INC(uart1TxOverflowCtr);
     if (DMA1_Channel4->CNDTR == 0)
         UART1_TxDma_Update();
     return written;
