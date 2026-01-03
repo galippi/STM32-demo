@@ -80,6 +80,8 @@ void Task_Bgnd(void)
 #endif
 }
 
+static uint32_t halTick_1ms;
+
 void Task_1ms(void)
 {
 #ifdef f_USBCLK_Hz
@@ -93,6 +95,22 @@ void Task_1ms(void)
         t_ug++;
     }
   }
+  halTick_1ms++;
+}
+
+uint32_t HAL_GetTick(void)
+{
+    // Todo: if the scheduler is not yet started: implement HW solution
+    return halTick_1ms;
+}
+
+void HAL_Delay(uint32_t delay)
+{
+    const uint32_t tStart = HAL_GetTick();
+    const uint32_t tEnd = tStart + delay;
+    while (HAL_GetTick() < tEnd) {
+        // do nothing
+    }
 }
 
 void Task_10ms(void)
