@@ -26,6 +26,8 @@
 /* port definition for STM32G030 LQFP64 board */
 #define LED3_PORT GPIOC
 #define LED3_PIN_NUM 6
+#define LED4_PORT GPIOA
+#define LED4_PIN_NUM 2
 
 #elif TARGET_ECU == TARGET_ECU_STM32F4DISCOVERY
 /* port definition for STM32F4-discovery board */
