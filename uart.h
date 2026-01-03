@@ -114,4 +114,7 @@ static inline void UART2_TX(const uint8_t *data, uint32_t len)
 #endif
 }
 
+// User functions shall be implemented by the user application
+extern void UART_appInit(USART_TypeDef *dev);
+
 #endif /* _UART_H_ */

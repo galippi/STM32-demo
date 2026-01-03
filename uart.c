@@ -58,6 +58,9 @@ void UART1_Init(uint32_t baudRate, uint8_t uartRemap)
 
   //NVIC_EnableIRQ(DMA1_Channel5_IRQn);
 #endif
+
+  UART_appInit(USART1);
+
   USART1->CR1 |= USART_CR1_UE; /* USART1 is enabled */
 }
 
@@ -70,10 +73,8 @@ static inline t_UART1_idx idxUpdate(t_UART1_idx prev, t_UART1_idx increment, t_U
 }
 
 #if UART1_DMA != 0
-uint8_t UART1_TxDmaCtr;
 void UART1_TxDma_ISR(void)
 {
-    UART1_TxDmaCtr++;
     DMA1->IFCR = DMA_IFCR_CTCIF4;
 #if UART1_TX_QUEUE
     UART1_TxDma_Update();
@@ -82,10 +83,8 @@ void UART1_TxDma_ISR(void)
 #endif
 
 #if UART1_DMA != 0
-uint32_t UART1_RxDmaCtr;
 void UART1_RxDma_ISR(void)
 {
-    UART1_RxDmaCtr++;
     DMA1->IFCR = DMA_IFCR_CTCIF5;
     UART1_RxDma_Update();
 }
@@ -93,7 +92,6 @@ void UART1_RxDma_ISR(void)
 static t_UART1_idx UART1_RxDmaLastCnt = 0;
 static t_UART1_idx UART1_RxIn = 0;
 static t_UART1_idx UART1_RxOut = 0;
-static uint8_t UART1_RxOverrun;
 
 #if 1
 
@@ -104,7 +102,7 @@ static void UART1_RxDma_Update(void)
     uint32_t num = UART1_RxDmaLastCnt - DMA1_Channel_USART1_RX->CNDTR;
     if (USART1->ISR & USART_ISR_ORE)
     {
-        UART1_RxOverrun++;
+        UART1_RxDma_Update_Overrun();
         (void)USART1->RDR;
     }
     UART1_RxIn = idxUpdate(UART1_RxIn, (t_UART1_idx)num, sizeof(UART1_DMA_RX_BUFFER));
@@ -118,7 +116,7 @@ static void UART1_RxDma_Update(void)
     }
     if (num == 0)
     {
-        UART1_RxOverrun++;
+        UART1_RxDma_Update_Overrun();
         UART1_RxDmaLastCnt = 0;
         return;
     }
@@ -262,6 +260,9 @@ void UART2_Init(uint32_t BaudRate)
   DMA1_Channel6->CNDTR = sizeof(Rx_buffer);
   DMA1_Channel6->CCR |= DMA_CCR1_EN;
 #endif
+
+  UART_appInit(USART2);
+
   USART2->CR1 |= USART_CR1_UE; /* USART2 is enabled */
 #endif /* CPU_TYPE == CPU_TYPE_STM32F0 */
 }
