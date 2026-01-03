@@ -12,6 +12,14 @@
   #define HSI_ON 0
 #endif
 
+#ifndef HSI48_ON
+  #define HSI48_ON 0
+#endif
+
+#if HSI48_ON != 0
+  #define f_HSI48_Hz 48000000
+#endif
+
 #define HSIDIV_VAL (1 << HSIDIV_REG)
 #define F_HSISYS_Hz ((f_HSI_Hz) / (HSIDIV_VAL))
 
@@ -135,16 +143,6 @@
 #define RCC_CCIPR2_USBSEL_HSI48 0
 #define RCC_CCIPR2_USBSEL_HSE   1
 #define RCC_CCIPR2_USBSEL_PLL   2
-
-#if USBPRE_REG == 0
-  #define USBPRE_VAL 2 / 3
-#elif USBPRE_REG == 1
-  #define USBPRE_VAL 1
-#else
-#error USBPRE_REG is wrongly set!
-#endif
-
-#define f_USB_Hz (f_PLL_Hz * USBPRE_VAL)
 
 void SysClock_Init(void);
 

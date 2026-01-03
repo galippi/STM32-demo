@@ -39,6 +39,17 @@
 //#error f_APB_Hz is wrongly set!
 //#endif
 
+#if CLOCK_USBSEL == RCC_CCIPR2_USBSEL_HSI48
+#if HSI48_ON == 0
+#error HSI48 shall be enabled, if the USB is configured to use it!
+#endif
+#define f_USB_Hz f_HSI48_Hz
+#elif CLOCK_USBSEL == RCC_CCIPR2_USBSEL_HSE
+#define f_USB_Hz f_HSE_Hz
+#elif CLOCK_USBSEL == RCC_CCIPR2_USBSEL_PLL
+#define f_USB_Hz f_PLL_Hz
+#endif
+
 #if defined(f_USBCLK_Hz) && ((f_USBCLK_Hz != 48000000) || (f_USB_Hz != f_USBCLK_Hz))
 #error f_USBCLK_Hz is wrongly set!
 #endif
@@ -106,6 +117,18 @@
 
 #endif
 
+#ifndef HSI_STARTUP_DEBUG
+#define HSI_STARTUP_DEBUG(val) /* do nothing */
+#endif
+
+#ifndef HSI48_STARTUP_DEBUG
+#define HSI48_STARTUP_DEBUG(val) /* do nothing */
+#endif
+
+#ifndef HSE_STARTUP_DEBUG
+#define HSE_STARTUP_DEBUG(val) /* do nothing */
+#endif
+
 volatile char start_enable = 0;
 
 void SysClock_Init(void)
@@ -139,6 +162,21 @@ void SysClock_Init(void)
   }else{
       BitfieldSet(RCC->CR,RCC_CR_HSIDIV_Pos, 3,  HSIDIV_REG);
   }
+
+  #if HSI48_ON != 0
+  RCC->CR |= (uint32_t)(RCC_CR_HSI48ON); /* Enable HSE - high speed external oscillator */
+  /* Wait till HSI48 is ready and if Time out is reached exit */
+  StartUpCounter = 0;
+  while(((RCC->CR & RCC_CR_HSI48RDY) == 0) && (StartUpCounter != HSI48_STARTUP_TIMEOUT))
+  {
+    StartUpCounter++;
+  }
+  HSI48_STARTUP_DEBUG(StartUpCounter);
+  if (!(RCC->CR & RCC_CR_HSI48RDY))
+  {
+    HSI48_STARTUP_ERROR(StartUpCounter);
+  }
+  #endif
 
   #if HSE_ON != 0
   /* Enable HSE - high speed external oscillator */
@@ -268,7 +306,7 @@ void SysClock_Init(void)
 
   BitfieldSet(RCC->CFGR, RCC_CFGR_HPRE_Pos, 4, HPRE_REG);
 
-#if defined(f_USBCLK_Hz) && (0 == 0)
+#if defined(f_USBCLK_Hz)
   RCC->CCIPR2 = (RCC->CCIPR2 & ~(RCC_CCIPR2_USBSEL_Msk)) | (CLOCK_USBSEL << RCC_CCIPR2_USBSEL_Pos);
   RCC->PLLCFGR |= RCC_PLLCFGR_PLLQEN;
 #endif
