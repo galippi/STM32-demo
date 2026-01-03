@@ -127,8 +127,8 @@ int main(void)
 {
   SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
 
-  SysClock_Init();
   SysTick_Init();
+  SysClock_Init();
 
   TIM14_Init(); // scheduler timer init
 

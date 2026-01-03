@@ -1,5 +1,6 @@
 #include <string.h>
 
+#include "SysClock.h"
 #include "gpio_app.h"
 #include "debug.h"
 #include "FaultHandler.h"
@@ -20,6 +21,8 @@
 
 uint8_t uart1RxBuffer[128];
 //uint8_t uart1TxBuffer[128];
+
+#undef f_USBCLK_Hz /* the USB tasks are temporarily disabled */
 
 void Task_Init(void)
 {
@@ -80,8 +83,6 @@ void Task_Bgnd(void)
 #endif
 }
 
-static uint32_t halTick_1ms;
-
 void Task_1ms(void)
 {
 #ifdef f_USBCLK_Hz
@@ -95,13 +96,11 @@ void Task_1ms(void)
         t_ug++;
     }
   }
-  halTick_1ms++;
 }
 
 uint32_t HAL_GetTick(void)
 {
-    // Todo: if the scheduler is not yet started: implement HW solution
-    return halTick_1ms;
+    return SysTick_Get();
 }
 
 void HAL_Delay(uint32_t delay)

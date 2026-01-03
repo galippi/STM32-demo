@@ -72,7 +72,7 @@
 #define HSE_STARTUP_ERROR(data) DBG_SET(clockHseInitError, 1)
 #endif
 
-#define SYSTICK_RELOAD_VAL 65536
+#define SYSTICK_RELOAD_VAL 1000
 #define SYSTICK_CTRL_VAL   SysTick_CTRL_CLKSOURCE_HCLK8 | \
                          /*SysTick_CTRL_TICKINT_Msk   | */ \
                            SysTick_CTRL_ENABLE_Msk
