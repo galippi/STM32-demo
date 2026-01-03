@@ -6,13 +6,6 @@
 #include "controller.h"
 #include "bitfield_lib.h"
 
-void SysTick_Init(void);
-
-static inline uint16_t SysTick_Get(void)
-{
-  return (~SysTick->VAL) & 0xFFFF;
-}
-
 static inline void TIMx_CCRy_Set(TIM_TypeDef *tim, uint32_t chIdx, uint16_t val)
 {
     *((&(tim->CCR1)) + (chIdx * 2)) = val;

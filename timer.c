@@ -8,17 +8,6 @@
 
 #include "timer.h"
 
-void SysTick_Init(void)
-{
-  uint32_t ticks = 65536;
-  SysTick->LOAD  = (ticks & SysTick_LOAD_RELOAD_Msk) - 1;      /* set reload register */
-  //NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority for Cortex-M0 System Interrupts */
-  SysTick->VAL   = ticks - 1;                                    /* Load the SysTick Counter Value */
-  SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
-                   /*SysTick_CTRL_TICKINT_Msk   | */
-                   SysTick_CTRL_ENABLE_Msk;                    /* Enable SysTick IRQ and SysTick Timer */
-}
-
 #if 0
 void TIM2_Init(void)
 {

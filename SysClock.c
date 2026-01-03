@@ -311,3 +311,12 @@ void SysClock_Init(void)
   RCC->PLLCFGR |= RCC_PLLCFGR_PLLQEN;
 #endif
 }
+
+void SysTick_Init(void)
+{
+  const uint32_t ticks = SYSTICK_RELOAD_VAL;
+  SysTick->LOAD  = (ticks & SysTick_LOAD_RELOAD_Msk) - 1;      /* set reload register */
+  //NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority for Cortex-M0 System Interrupts */
+  SysTick->VAL   = ticks - 1;                                    /* Load the SysTick Counter Value */
+  SysTick->CTRL  = SYSTICK_CTRL_VAL;
+}

@@ -144,6 +144,21 @@
 #define RCC_CCIPR2_USBSEL_HSE   1
 #define RCC_CCIPR2_USBSEL_PLL   2
 
+#define SysTick_CTRL_CLKSOURCE_HCLK  0
+#define SysTick_CTRL_CLKSOURCE_HCLK8 SysTick_CTRL_CLKSOURCE_Msk
+
+#if (((SYSTICK_CTRL_VAL) & SysTick_CTRL_CLKSOURCE_Msk) == 0)
+#define f_CortexSystemTimer_Hz (f_HCLK_Hz)
+#else
+#define f_CortexSystemTimer_Hz ((f_HCLK_Hz) / 8)
+#endif
+
 void SysClock_Init(void);
+void SysTick_Init(void);
+
+static inline uint16_t SysTick_Get(void)
+{
+  return (~SysTick->VAL) & 0xFFFF;
+}
 
 #endif /* _SYSCLOCK_H_ */
