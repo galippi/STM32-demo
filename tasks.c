@@ -22,8 +22,6 @@
 uint8_t uart1RxBuffer[128];
 //uint8_t uart1TxBuffer[128];
 
-#undef f_USBCLK_Hz /* the USB tasks are temporarily disabled */
-
 void Task_Init(void)
 {
     DMA_Init(DMA1);

@@ -6,6 +6,7 @@
 #include "usbd_core.h"
 #include "usbd_cdc.h"
 #include "usbd_cdc_if.h"
+#include "stm32g0xx_hal_pcd.h"
 
 #include "usbd_conf.h"
 
@@ -71,7 +72,12 @@ static USBD_StatusTypeDef USBD_Get_USB_Status(HAL_StatusTypeDef hal_status)
 
 static uint32_t _USB_ReadInterrupts(void)
 {
-  return USB_ReadInterrupts(hpcd_USB_FS.Instance);
+  return USB_ReadInterrupts(hpcd_USB_FS.Instance) & hpcd_USB_FS.Instance->CNTR;
+}
+
+void USB_LP_IRQErrorCb(PCD_HandleTypeDef *hpcd)
+{
+    hpcd->Instance->CNTR &= ~USB_ISTR_ERR; // disable error IT
 }
 
 /** Descriptor for the Usb device. */
@@ -138,8 +144,10 @@ void USB_LP_IRQHandler(void)
 {
   /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 0 */
   usbItCtr++;
-  while(_USB_ReadInterrupts() != 0)
-    HAL_PCD_IRQHandler(&hpcd_USB_FS);
+  uint32_t itState;
+  while((itState = _USB_ReadInterrupts()) != 0) { // Todo: eliminate while
+      HAL_PCD_IRQHandler(&hpcd_USB_FS);
+  }
   /* USER CODE END USB_LP_CAN1_RX0_IRQn 0 */
   //HAL_PCD_IRQHandler(&hpcd_USB_FS);
   /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 1 */

@@ -51,5 +51,6 @@ void USB_task_init(void);
 void USB_task_1ms(void);
 
 void USB_LP_IRQHandler(void);
+void USB_LP_IRQErrorCb(PCD_HandleTypeDef *hpcd);
 
 #endif /* _USBD_CONF_H_ */

@@ -79,14 +79,14 @@ CFILES  += queue.c
 CFILES  += stm32g0xx_hal_pcd.c
 CFILES  += stm32g0xx_hal_pcd_ex.c
 
-#CFILES  += usbd_conf.c
+CFILES  += usbd_conf.c
 CFILES  += stm32g0xx_ll_usb.c
-#CFILES  += usbd_core.c
-#CFILES  += usbd_desc.c
-#CFILES  += usbd_cdc.c
-#CFILES  += usbd_ctlreq.c
-#CFILES  += usbd_ioreq.c
-#CFILES  += usbd_cdc_if.c
+CFILES  += usbd_core.c
+CFILES  += usbd_desc.c
+CFILES  += usbd_cdc.c
+CFILES  += usbd_ctlreq.c
+CFILES  += usbd_ioreq.c
+CFILES  += usbd_cdc_if.c
 
 SFILES  =
 #SFILES += vectors.s

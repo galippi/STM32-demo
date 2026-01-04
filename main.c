@@ -26,6 +26,7 @@ typedef uint32_t t_reg96Bits[3];
 
 #define DBG_PORTS \
     DBG_PORT(SYSCFG_TypeDef, syscfg, SYSCFG) \
+    DBG_PORT(USB_DRD_TypeDef, usbd, USB_DRD_FS) \
 	DBG_PORT(GPIO_TypeDef, gpioa, GPIOA) \
 	DBG_PORT(GPIO_TypeDef, gpiob, GPIOB) \
 	DBG_PORT(GPIO_TypeDef, gpioc, GPIOC) \
@@ -158,7 +159,7 @@ int main(void)
   //PB13_Init();
   GPIO_PortInit_Analog(GPIOA, 0);
   GPIO_PortInit_Analog(GPIOA, 1);
-  GPIO_PortInit_AFOut(GPIOA,  8, 0); /* PA8  MCO */
+  //GPIO_PortInit_AFOut(GPIOA,  8, 0); /* PA8  MCO */
   //BitfieldSet(RCC->CFGR, RCC_CFGR_MCOSEL_Pos, 4, RCC_MCO1SOURCE_SYSCLK);
   RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_MCOSEL_Msk)) | RCC_MCO1SOURCE_SYSCLK;
   BitfieldSet(RCC->CFGR, RCC_CFGR_MCOPRE_Pos, 4, 3); // division by 8

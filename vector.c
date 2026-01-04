@@ -17,6 +17,7 @@
 #include "main.h"
 //#include "uart.h"
 #include "util.h"
+#include "SysClock_conf.h"
 
 #ifdef f_USBCLK_Hz
 #include "usbd_conf.h"
