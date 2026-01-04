@@ -55,6 +55,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32g0xx_hal.h"
+#include "usbd_conf.h"
 
 /** @addtogroup STM32G0xx_HAL_Driver
   * @{
@@ -1047,6 +1048,7 @@ void HAL_PCD_IRQHandler(PCD_HandleTypeDef *hpcd)
 
   if ((wIstr & USB_ISTR_ERR) == USB_ISTR_ERR)
   {
+    USB_LP_IRQErrorCb(hpcd);
     __HAL_PCD_CLEAR_FLAG(hpcd, USB_ISTR_ERR);
 
     return;
