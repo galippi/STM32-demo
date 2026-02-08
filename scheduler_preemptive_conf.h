@@ -40,4 +40,8 @@ extern uint8_t taskOverrunCtr[5];
 
 //  CAT_Error(CAT_TaskOverrun_1ms + i, 0);
 
+#define SchedPreTask_ErrorStackError() do { \
+  CAT_Error(CAT_StackError, 0); \
+}while(0)
+
 #endif /* _SCHEDULER_PREEMPTIVE_CONF_H_ */
