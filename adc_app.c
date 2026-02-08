@@ -15,8 +15,8 @@ static uint8_t adc_idx;
 void ADC_HandlerInit(void)
 {
   adc_idx = 0;
-  GPIO_PortInit_Analog(GPIOB, 0);
-  GPIO_PortInit_Analog(GPIOB, 1);
+  //GPIO_PortInit_Analog(GPIOB, 0);
+  //GPIO_PortInit_Analog(GPIOB, 1);
   ADC_Init();
   ADC_Start();
 }

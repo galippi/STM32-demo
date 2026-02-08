@@ -17,9 +17,11 @@
 
 void Task_Init(void)
 {
-  SPI_Init();
+  //SPI_Init();
   //DebugOut_Init();
   MX_USB_DEVICE_Init();
+  GPIO_PortInit_In(GPIOB, 0);
+  GPIO_PortInit_In(GPIOB, 1);
 }
 
 void Task_1ms(void)
@@ -81,7 +83,7 @@ void Task_10ms(void)
     static const uint8_t spiData[] = { 0x00, 0x39, 0x00, 0x5A};
     static uint8_t spiBuf[sizeof(spiData)];
     memcpy(spiBuf, spiData, sizeof(spiBuf));
-    SPI2_Tx(spiBuf, sizeof(spiBuf));
+    //SPI2_Tx(spiBuf, sizeof(spiBuf));
   }
   {
 	  static uint8_t timer = 200;
@@ -109,6 +111,9 @@ void Task_10ms(void)
 
 uint16_t usbItCtr;
 uint8_t taskOverrunCtr[5];
+uint8_t tim3_cc3_ctr;
+uint8_t tim3_cc4_ctr;
+uint16_t encoder;
 
 typedef enum
 {
@@ -172,7 +177,7 @@ void Task_500ms(void)
 	}
     {
         static uint8_t msgCtr;
-        uint8_t usbDemoLine[] = "Periodic message ctr=xx xxxx xx xx xx xx xx\r\n";
+        uint8_t usbDemoLine[] = "Periodic message ctr=xx xxxx xx xx xx xx xx xx xx xxxx\r\n";
         U32_to_HexString((char*)usbDemoLine + 21, 2, msgCtr, '0');
         U32_to_HexString((char*)usbDemoLine + 24, 4, usbItCtr, '0');
         U32_to_HexString((char*)usbDemoLine + 29, 2, taskOverrunCtr[0], '0');
@@ -180,6 +185,12 @@ void Task_500ms(void)
         U32_to_HexString((char*)usbDemoLine + 35, 2, taskOverrunCtr[2], '0');
         U32_to_HexString((char*)usbDemoLine + 38, 2, taskOverrunCtr[3], '0');
         U32_to_HexString((char*)usbDemoLine + 41, 2, taskOverrunCtr[4], '0');
+
+        U32_to_HexString((char*)usbDemoLine + 44, 2, tim3_cc3_ctr, '0');
+        U32_to_HexString((char*)usbDemoLine + 47, 2, tim3_cc4_ctr, '0');
+
+        U32_to_HexString((char*)usbDemoLine + 50, 4, encoder, '0');
+
         CDC_Transmit_FS(usbDemoLine, sizeof(usbDemoLine) - 1);
         msgCtr++;
     }

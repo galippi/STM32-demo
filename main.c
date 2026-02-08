@@ -18,24 +18,64 @@
 #include "FaultHandler.h"
 #include "vector.h"
 #include "spi.h"
+#include "usb/stm32f103xb.h"
 
 #include "main.h"
 
 #define VDD 3.0 /* Volt */
 
-GPIO_TypeDef * const gpioa = GPIOA;
-GPIO_TypeDef * const gpiob = GPIOB;
-GPIO_TypeDef * const gpioc = GPIOC;
-RCC_TypeDef * const rcc = RCC;
-SysTick_Type * const systick = SysTick;
-ADC_TypeDef * const adc1 = ADC1;
-TIM_TypeDef * const tim3 = TIM3;
-USART_TypeDef * const uart2 = USART2;
-DMA_TypeDef * const dma1 = DMA1;
-//DMA_Channel_TypeDef * const dma1_4 = DMA1_Channel4;
-SCB_Type * const scb = SCB;
-NVIC_Type * const nvic = NVIC;
-SPI_TypeDef * const spi2 = SPI2;
+#define DBG_PORTS \
+    DBG_PORT(USB_TypeDef, usb, USB) \
+    DBG_PORT(GPIO_TypeDef, gpioa, GPIOA) \
+    DBG_PORT(GPIO_TypeDef, gpiob, GPIOB) \
+    DBG_PORT(GPIO_TypeDef, gpioc, GPIOC) \
+    DBG_PORT(GPIO_TypeDef, gpiod, GPIOD) \
+    DBG_PORT(RCC_TypeDef, rcc, RCC) \
+    DBG_PORT(SysTick_Type, systick, SysTick) \
+    DBG_PORT(ADC_TypeDef, adc1, ADC1) \
+    DBG_PORT(TIM_TypeDef, tim3, TIM3) \
+    DBG_PORT(SCB_Type, scb, SCB) \
+    DBG_PORT(NVIC_Type, nvic, NVIC) \
+    DBG_PORT(DMA_TypeDef, dma1, DMA1) \
+    DBG_PORT(DMA_Channel_TypeDef, dma1_1, DMA1_Channel1) \
+    DBG_PORT(DMA_Channel_TypeDef, dma1_4, DMA1_Channel4) \
+    DBG_PORT(DMA_Channel_TypeDef, dma1_5, DMA1_Channel5) \
+    DBG_PORT(USART_TypeDef, uart2, USART2) \
+    DBG_PORT(FLASH_TypeDef, flash, FLASH) \
+    DBG_PORT(SPI_TypeDef, spi2, SPI2) \
+    DBG_PORT(t_PacketBuffer, packetBuffer, (t_PacketBuffer * const)0x40006000) \
+    DBG_PORT(uint16_t, f_size, (uint16_t * const)0x1FFFF7E0) \
+    DBG_PORT(t_reg96Bits, uniqIdRegPtr1, (t_reg96Bits * const)UID_BASE) \
+  /* no more peripheries */
+
+typedef uint16_t t_PacketBuffer[0x200];
+typedef uint32_t t_reg96Bits[3];
+
+#undef DBG_PORT
+#define DBG_PORT(type, field, val) type * const field;
+
+typedef struct {
+    DBG_PORTS
+}t_DBG_Ports;
+
+#undef DBG_PORT
+#define DBG_PORT(type, field, val) val,
+
+const t_DBG_Ports dbg_ports = {
+    DBG_PORTS
+};
+
+#if !defined  (HSE_STARTUP_TIMEOUT)
+  #define HSE_STARTUP_TIMEOUT    ((uint16_t)0x0500)   /*!< Time out for HSE start up */
+#endif /* HSE_STARTUP_TIMEOUT */
+
+#ifndef RCC_CFGR_PLLSRC_HSI_Div2
+#define  RCC_CFGR_PLLSRC_HSI_Div2           ((uint32_t)0x00000000)        /*!< HSI clock divided by 2 selected as PLL entry clock source */
+#define  RCC_CFGR_PLLSRC_HSE                ((uint32_t)0x00010000)        /*!< HSE clock selected as PLL entry clock source */
+
+//#define  RCC_CFGR_PLLXTPRE_HSE              ((uint32_t)0x00000000)        /*!< HSE clock not divided for PLL entry */
+#define  RCC_CFGR_PLLXTPRE_HSE_Div2         ((uint32_t)0x00020000)        /*!< HSE clock divided by 2 for PLL entry */
+#endif
 
 uint32_t StartUpCounter;
 
@@ -383,6 +423,16 @@ uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
   {
     TIM3_SR_CC1IF_Reset();
     TIM3_CC1IF_Callback();
+  }else
+  if (TIM3_SR_CC3IF_Get())
+  {
+    TIM3_SR_CC3IF_Reset();
+    TIM3_CC3IF_Callback();
+  }else
+   if (TIM3_SR_CC4IF_Get())
+  {
+    TIM3_SR_CC4IF_Reset();
+    TIM3_CC4IF_Callback();
   }else
   {
     CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF));

@@ -13,11 +13,21 @@ static inline void TIM2_CC3IF_Callback(void)
 #define TIM3_CR2_INIT 0x0
 #define TIM3_FREQ 1000 /* kHz */
 #define TIM3_PSC_INIT  ((F_SYSTEM / TIM3_FREQ) - 1) /* prescaler of TIM3 -> 1MHz */
-#define TIM3_ARR_INIT 65535 /* 1MHz / 1000 -> 1ms timebase */
-#define TIM3_CCER_INIT 0x01 /* enable CC1 out high */
+#define TIM3_ARR_INIT 65535 /* continuous counter */
+#define TIM3_CCER_INIT 0x1101 /* enable CC1 out high, CC3/CC4 input */
 #define TIM3_CCMR1_INIT 0x0000
-#define TIM3_CCMR2_INIT 0x0000
-#define TIM3_DIER_INIT 0x0003 /* enable update interrupt */
+#define TIM3_CCMR2_INIT 0x0101 /* enable CC3/CC4 as input capture */
+#define TIM3_DIER_INIT 0x001B /* enable update interrupt */
+
+#define TIM4_CR1_INIT 0x00 /* up counter mode */
+#define TIM4_CR2_INIT 0x0
+#define TIM4_FREQ 1000 /* kHz */
+#define TIM4_PSC_INIT  ((F_SYSTEM / TIM4_FREQ) - 1) /* prescaler of TIM3 -> 1MHz */
+#define TIM4_ARR_INIT 65535 /* continuous counter */
+#define TIM4_CCER_INIT 0x00 /* enable CC1 out high */
+#define TIM4_CCMR1_INIT 0x0000
+#define TIM4_CCMR2_INIT 0x0000
+#define TIM4_DIER_INIT 0x0003 /* enable update interrupt */
 
 static inline void TIM3_UIF_Callback(void)
 { /* call back function of TIM3 UIF - counter underflow */

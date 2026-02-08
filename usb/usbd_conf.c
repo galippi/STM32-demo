@@ -31,7 +31,9 @@
 
 /* USER CODE BEGIN Includes */
 #include "usb_if.h"
-
+#include "util.h"
+#include "gpio.h"
+#include "timer_app.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -84,6 +86,33 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef* pcdHandle)
     /* Peripheral interrupt init */
     NVIC_SetPriority(USB_LP_CAN1_RX0_IRQn, 15);
     NVIC_EnableIRQ(USB_LP_CAN1_RX0_IRQn);
+
+#if 0
+    GPIO_PortInit_Out(GPIOA, 11);
+    GPIO_Set(GPIOA, 11, 0);
+    GPIO_Set(GPIOA, 11, 1);
+    GPIO_Set(GPIOA, 11, 0);
+    GPIO_Set(GPIOA, 11, 1);
+    GPIO_Set(GPIOA, 11, 0);
+    GPIO_PortInit_In(GPIOA, 11);
+
+    GPIO_PortInit_Out(GPIOA, 12);
+    GPIO_Set(GPIOA, 12, 0);
+    GPIO_Set(GPIOA, 12, 1);
+    GPIO_Set(GPIOA, 12, 0);
+    GPIO_Set(GPIOA, 12, 1);
+    GPIO_Set(GPIOA, 12, 0);
+    GPIO_PortInit_In(GPIOA, 12);
+
+    GPIO_PortInit_Out(GPIOA, 15); // USB-DP-pull-up to high
+    GPIO_Set(GPIOA, 15, 0);
+    GPIO_Set(GPIOA, 15, 1);
+    GPIO_Set(GPIOA, 15, 0);
+    GPIO_Set(GPIOA, 15, 1);
+#else
+    GPIO_PortInit_Out(GPIOA, 15); // USB-DP-pull-up to high
+    GPIO_Set(GPIOA, 15, 1);
+#endif
   /* USER CODE BEGIN USB_MspInit 1 */
 
   /* USER CODE END USB_MspInit 1 */
@@ -668,7 +697,18 @@ USBD_StatusTypeDef USBD_Get_USB_Status(HAL_StatusTypeDef hal_status)
   return usb_status;
 }
 
-extern uint16_t usbItCtr;
+#define DBG_STORE_SIZE 16
+struct {
+    struct {
+        uint16_t it;
+        uint16_t itm;
+        uint16_t t;
+    }it[DBG_STORE_SIZE];
+    uint16_t usbItCtr;
+    uint16_t epnr;
+}dbg_usb;
+
+COMPILE_TIME_CHECK(((DBG_STORE_SIZE) & ((DBG_STORE_SIZE) - 1)), 0)
 
 /**
   * @brief This function handles USB low priority or CAN RX0 interrupts.
@@ -676,9 +716,16 @@ extern uint16_t usbItCtr;
 void USB_LP_CAN1_RX0_IRQHandler(void)
 {
   /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 0 */
-  usbItCtr++;
-  while(_USB_ReadInterrupts() != 0)
-    HAL_PCD_IRQHandler(&hpcd_USB_FS);
+  const USB_TypeDef *USBx = hpcd_USB_FS.Instance;
+  const uint8_t dbgIdx = dbg_usb.usbItCtr & ((DBG_STORE_SIZE) - 1);
+  dbg_usb.usbItCtr++;
+  dbg_usb.it[dbgIdx].it = USBx->ISTR;
+  dbg_usb.it[dbgIdx].itm = USBx->ISTR & USBx->CNTR;
+  dbg_usb.it[dbgIdx].t = getTimer_us();
+  if ((dbg_usb.it[dbgIdx].itm & 0xFF00) == 0) {
+      dbg_usb.epnr = *(&USBx->EP0R + (dbg_usb.it[dbgIdx].itm & 0x07));
+  }
+  HAL_PCD_IRQHandler(&hpcd_USB_FS);
   /* USER CODE END USB_LP_CAN1_RX0_IRQn 0 */
   //HAL_PCD_IRQHandler(&hpcd_USB_FS);
   /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 1 */
@@ -696,9 +743,11 @@ void USBWakeUp_IRQHandler(void)
   CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF));
 }
 
-uint32_t _USB_ReadInterrupts(void)
+#if 0
+static uint32_t _USB_ReadInterrupts(void)
 {
   return USB_ReadInterrupts(hpcd_USB_FS.Instance);
 }
+#endif
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

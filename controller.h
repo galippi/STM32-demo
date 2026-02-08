@@ -37,7 +37,8 @@
 
 #define STM32F10X_MD 1 /* Medium-density devices */
 
-#include "stm32f10x.h"
+//#include "stm32f10x.h"
+#include "stm32f103xb.h"
 #define CONTROLLER_BASE_NAME "stm32f10x"
 #define STM32_RCC_HEADER "stm32f10x_rcc.h"
 #define STM32_ADC_HEADER "stm32f10x_adc.h"

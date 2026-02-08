@@ -1776,9 +1776,9 @@ HAL_StatusTypeDef USB_EnableGlobalInt(USB_TypeDef *USBx)
   uint16_t winterruptmask;
 
   /* Set winterruptmask variable */
-  winterruptmask = USB_CNTR_CTRM  | USB_CNTR_WKUPM |
+  winterruptmask = /* USB_CNTR_CTRM | */ USB_CNTR_WKUPM |
                    USB_CNTR_SUSPM | USB_CNTR_ERRM |
-                   USB_CNTR_SOFM | USB_CNTR_ESOFM |
+                   /* USB_CNTR_SOFM | */ USB_CNTR_ESOFM |
                    USB_CNTR_RESETM;
 
   /* Set interrupt mask */
@@ -2353,6 +2353,7 @@ uint32_t  USB_ReadInterrupts(USB_TypeDef *USBx)
 {
   uint32_t tmpreg;
 
+  //tmpreg = USBx->ISTR & USBx->CNTR;
   tmpreg = USBx->ISTR;
   return tmpreg;
 }
