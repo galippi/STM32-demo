@@ -14,6 +14,10 @@
 #include "timer_app.h"
 #include "version.h"
 #include "battery.h"
+#include "usb_device.h"
+#define __STM32F103xB_H
+#define __STM32F1XX_H
+#include "usbd_cdc_if.h"
 
 #include "tasks.h"
 
@@ -35,6 +39,9 @@ void Task_Init(void)
   TIM4_Init();
   dht11_init();
   battery_init();
+
+  MX_USB_DEVICE_Init();
+
 }
 
 void Task_1ms(void)
@@ -103,6 +110,8 @@ void Task_10ms(void)
   }
 }
 
+uint16_t usbItCtr;
+uint8_t taskOverrunCtr[5];
 uint8_t UART1_TxOverrun;
 uint8_t tim3_cc3_ctr;
 uint8_t tim3_cc4_ctr;
@@ -214,5 +223,26 @@ void Task_500ms(void)
         UART1_TX_Queue((uint8_t*)uart2Buffer, sizeof(uart2Buffer) - 1);
     }
 #endif
+
+    {
+        static uint8_t msgCtr;
+        uint8_t usbDemoLine[] = "Periodic message ctr=xx xxxx xx xx xx xx xx xx xx xxxx\r\n";
+        U32_to_HexString((char*)usbDemoLine + 21, 2, msgCtr, '0');
+        U32_to_HexString((char*)usbDemoLine + 24, 4, usbItCtr, '0');
+        U32_to_HexString((char*)usbDemoLine + 29, 2, taskOverrunCtr[0], '0');
+        U32_to_HexString((char*)usbDemoLine + 32, 2, taskOverrunCtr[1], '0');
+        U32_to_HexString((char*)usbDemoLine + 35, 2, taskOverrunCtr[2], '0');
+        U32_to_HexString((char*)usbDemoLine + 38, 2, taskOverrunCtr[3], '0');
+        U32_to_HexString((char*)usbDemoLine + 41, 2, taskOverrunCtr[4], '0');
+
+        U32_to_HexString((char*)usbDemoLine + 44, 2, tim3_cc3_ctr, '0');
+        U32_to_HexString((char*)usbDemoLine + 47, 2, tim3_cc4_ctr, '0');
+
+        //U32_to_HexString((char*)usbDemoLine + 50, 4, encoder, '0');
+
+        CDC_Transmit_FS(usbDemoLine, sizeof(usbDemoLine) - 1);
+        msgCtr++;
+    }
+
     //while(1);
 }

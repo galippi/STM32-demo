@@ -17,6 +17,9 @@
 #include "main.h"
 #include "uart.h"
 #include "adc_app.h"
+#define __STM32F103xB_H
+#define __STM32F1XX_H
+#include "usbd_conf.h"
 
 #include "vector.h"
 
@@ -58,7 +61,11 @@ t_func_ptr const ISR_VectorTable[] =
   ISR_Invalid,       /*  DMA1 Ch7 */
   ISR_Invalid,       /*  ADC */
   ISR_Invalid,       /*  CAN1 Tx */
+#if 0
   ISR_Invalid,       /*  CAN1 Rx0 */
+#else
+  USB_LP_CAN1_RX0_IRQHandler, /*  USB RX */
+#endif
   ISR_Invalid,       /*  CAN1 Rx1 */
   ISR_Invalid,       /*  CAN1 SCE   */
   ISR_Invalid,       /*  EXTI9_5 */

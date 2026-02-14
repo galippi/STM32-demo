@@ -1,6 +1,7 @@
 ##################################################################
 CFLAGS_DEBUG = -gdwarf-2
 SUBDIRS := . ST_lib u32_to_hexstring dht11 hal_STM32F1 hal_STM32F1/ST_lib
+SUBDIRS += hal_STM32F1/usb
 SUBDIRS += queue
 SUBDIRS_LINKER := hal_STM32F1/lib
 
@@ -75,7 +76,23 @@ CFILES  += pwm.c
 CFILES  += dht11.c
 CFILES  += queue.c
 CFILES  += battery.c
+CFILES  += usb_device.c
+CFILES  += usbd_core.c
+CFILES  += usbd_cdc.c
+CFILES  += usbd_cdc_if.c
+CFILES  += usbd_conf.c
+CFILES  += usbd_desc.c
+CFILES  += usbd_ctlreq.c
+CFILES  += usbd_ioreq.c
+CFILES  += stm32f1xx_hal_pcd.c
+CFILES  += stm32f1xx_hal_pcd_ex.c
+CFILES  += stm32f1xx_ll_usb.c
 #CFILES  += 
+#CFILES  += 
+#CFILES  += 
+#CFILES  += 
+#CFILES  += 
+
 
 SFILES  =
 #SFILES += vectors.s
