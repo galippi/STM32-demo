@@ -13,6 +13,9 @@ static uint16_t CPU_loadStart;
 static uint16_t CPU_loadBusy, CPU_loadFree;
 #endif
 
+#define STACK_END_VAL_0 0xAA55A55A
+#define STACK_END_VAL_1 0xA55AAA55
+
 typedef enum {
   SCHED_PRE_TASK_STATE_IDLE,
   SCHED_PRE_TASK_STATE_READY,
@@ -67,6 +70,9 @@ const t_SchedPreTask_ROM SchedPreTask_ROM[SchedPreTaskNum] =
 
 t_SchedPreTask_RAM SchedPreTask_RAM[SchedPreTaskNum];
 
+extern uint32_t __bss_end;
+uint32_t * const stackEnd = &__bss_end + 32;
+
 void SchedulerPre_Init(void)
 {
   uint32_t i;
@@ -75,12 +81,22 @@ void SchedulerPre_Init(void)
     SchedPreTask_RAM[i].timer = SchedPreTask_ROM[i].T;
     SchedPreTask_RAM[i].state = SCHED_PRE_TASK_STATE_IDLE;
   }
+#if 1
+  stackEnd[0] = STACK_END_VAL_0;
+  stackEnd[1] = STACK_END_VAL_1;
+#endif
 }
 
 void SchedulerPre_TaskTableUpdate(void)
 {
   uint32_t i;
   SchedPreTask_Disable(); /* disable IT */
+
+  if ((stackEnd[0] != STACK_END_VAL_0) ||
+      (stackEnd[1] != STACK_END_VAL_1)) { /* Stack end mark is overwritten -> error management */
+    SchedPreTask_ErrorStackError();
+  }
+
   for(i = 0; i < SchedPreTaskNum; i++)
   {
     if (SchedPreTask_RAM[i].timer == 0)

@@ -39,4 +39,8 @@
 #define SchedPreTask_EnableTaskLoadMeas 1
 #define SchedPreTask_LoadMeasResolution TIM3_FREQ
 
+#define SchedPreTask_ErrorStackError() do { \
+  CAT_Error(CAT_StackError, 0); \
+}while(0)
+
 #endif /* _SCHEDULER_PREEMPTIVE_CONF_H_ */
