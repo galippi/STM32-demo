@@ -61,6 +61,7 @@ for j in range(0, len(ranges)):
     r = used[str(j)]
     perc = (r[1] - r[0]) * 100 / ranges[j][1]
     #print("Section " + hex(ranges[j][0]) + f": {perc:.2f}")
-    print("  Section " + ranges[j][2] + f": {perc:.1f}%")
+    #print("  Section " + ranges[j][2] + f": {perc:.1f}%")
+    print("  Section " + ranges[j][2] + ": {0:.1f}%".format(perc))
 
 #end
