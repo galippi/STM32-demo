@@ -96,7 +96,7 @@ void ADC_Handler(void)
 void ADC_Handler_10ms(void)
 {
   static uint8_t ctr = 0;
-  static char uart2Buffer[32];
+  char uart2Buffer[32];
   int8_t U32_to_HexString(char *string, int len, uint32_t val, char leadingChar);
   (void)U32_to_HexString(uart2Buffer, 2, ctr, '0');
   uart2Buffer[2] = ' ';
@@ -114,7 +114,7 @@ void ADC_Handler_10ms(void)
   uart2Buffer[26] = ' ';
   memset(uart2Buffer + 27, ' ', sizeof(uart2Buffer) - 27 - 1);
   uart2Buffer[sizeof(uart2Buffer) - 1] = '\r';
-  UART1_TX((uint8_t*)uart2Buffer, sizeof(uart2Buffer));
+  hostTx((uint8_t*)uart2Buffer, sizeof(uart2Buffer));
   ctr++;
 }
 

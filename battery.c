@@ -3,8 +3,8 @@
 #include "gpio.h"
 #include "pwm.h"
 #include "adc_app.h"
-#include "uart.h"
 #include "u32_to_hexstring/u32_to_hexstring.h"
+#include "host_comm.h"
 
 #include "battery.h"
 
@@ -179,7 +179,7 @@ static void battery_cmdRx(void)
     uint8_t buf[32];
     static uint8_t rxCmdBuffer[32];
     static uint8_t bufIdx = 0;
-    uint32_t num = UART1_RX(buf, sizeof(buf));
+    uint32_t num = hostRx(buf, sizeof(buf));
     for(uint32_t i = 0; i < num; i++)
     {
         DBG_INC(uart1_rxCtr);
@@ -206,6 +206,7 @@ void battery_init(void)
     batteryData.cmd = e_BatteryCmd_default;
     batteryData.timeoutCtr = 0;
     batteryData.timeoutVal = 2000;
+    hostInit();
     PWM_Init(BatteryLoadTimer, BatteryLoadChannel);
     GPIO_PortInit_AFOut(GPIOA, 3); /* PA3 PWM2/4 */
 }
@@ -253,10 +254,23 @@ void battery_10ms(void)
 
 void battery_100ms(void)
 {
-    static char uartBuffer[] = "DBG00xxyyzz\r";
-    static uint8_t ctr;
-    (void)U32_to_HexString(uartBuffer +  5, 2, ctr++, '0');
-    (void)U32_to_HexString(uartBuffer +  7, 2, PWM_Get(BatteryLoadTimer, BatteryLoadChannel), '0');
-    (void)U32_to_HexString(uartBuffer +  9, 2, (unsigned)batteryData.errInt, '0');
-    UART1_TX_Queue(uartBuffer, sizeof(uartBuffer) - 1);
+    {
+        char uart2Buffer[] = "U0xxxx\rU1xxxx\rIxxxx\r";
+        (void)U32_to_HexString(uart2Buffer +  2, 4, ADC_values[ADC_IN0], '0');
+        (void)U32_to_HexString(uart2Buffer +  9, 4, ADC_values[ADC_IN1], '0');
+        {
+            int32_t du = ADC_values[ADC_IN0] - ADC_values[ADC_IN1];
+            int32_t i = (du * (3300 * 10)) / (27 * 4096); // 2.7 Ohm
+            (void)U32_to_HexString(uart2Buffer +  15, 4, ((uint32_t)i) & 0xFFFF, '0');
+        }
+        hostTx((uint8_t*)uart2Buffer, sizeof(uart2Buffer) - 1);
+    }
+    {
+        char uartBuffer[] = "DBG00xxyyzz\r";
+        static uint8_t ctr;
+        (void)U32_to_HexString(uartBuffer +  5, 2, ctr++, '0');
+        (void)U32_to_HexString(uartBuffer +  7, 2, PWM_Get(BatteryLoadTimer, BatteryLoadChannel), '0');
+        (void)U32_to_HexString(uartBuffer +  9, 2, (unsigned)batteryData.errInt, '0');
+        hostTx(uartBuffer, sizeof(uartBuffer) - 1);
+    }
 }

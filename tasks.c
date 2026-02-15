@@ -5,8 +5,9 @@
 #include "adc_app.h"
 //#include "spi.h"
 #include "FaultHandler.h"
-#include "uart.h"
-#include "uart_app.h"
+//#include "uart.h"
+//#include "uart_app.h"
+#include "host_comm.h"
 #include "u32_to_hexstring/u32_to_hexstring.h"
 #include "scheduler_preemptive.h"
 #include "pwm.h"
@@ -14,6 +15,7 @@
 #include "timer_app.h"
 #include "version.h"
 #include "battery.h"
+
 #include "usb_device.h"
 #define __STM32F103xB_H
 #define __STM32F1XX_H
@@ -26,9 +28,6 @@ uint8_t uart1RxBuffer[128];
 
 void Task_Init(void)
 {
-  //UART1_Init(115200, 1);
-  UART1_Init(9600, 1);
-  //ESP8266_open();
   TIM2_Init();
   PWM_Init(TIM2, 1);
   //GPIO_PortInit_AFOut(GPIOA, 1); /* PA1 PWM2/2 */
@@ -41,7 +40,6 @@ void Task_Init(void)
   battery_init();
 
   MX_USB_DEVICE_Init();
-
 }
 
 void Task_1ms(void)
@@ -64,7 +62,7 @@ void DHT_ResultDebug(uint16_t resultCtr, uint16_t resultChecksumCtr)
     U32_to_HexString(dhtData + 7, 4, dhtResult.humidity, '0');
     U32_to_HexString(dhtData + 11, 2, resultCtr, '0');
     U32_to_HexString(dhtData + 13, 2, resultChecksumCtr, '0');
-    UART1_TX_Queue(dhtData, sizeof(dhtData)-1);
+    hostTx(dhtData, sizeof(dhtData)-1);
 }
 
 void Task_10ms(void)
@@ -211,17 +209,6 @@ void Task_500ms(void)
 #if 0
     ADC_Handler_10ms();
 #else
-    {
-        static char uart2Buffer[] = "U0xxxx\rU1xxxx\rIxxxx\r";
-        (void)U32_to_HexString(uart2Buffer +  2, 4, ADC_values[ADC_IN0], '0');
-        (void)U32_to_HexString(uart2Buffer +  9, 4, ADC_values[ADC_IN1], '0');
-        {
-            int32_t du = ADC_values[ADC_IN0] - ADC_values[ADC_IN1];
-            int32_t i = (du * (3300 * 10)) / (27 * 4096); // 2.7 Ohm
-            (void)U32_to_HexString(uart2Buffer +  15, 4, ((uint32_t)i) & 0xFFFF, '0');
-        }
-        UART1_TX_Queue((uint8_t*)uart2Buffer, sizeof(uart2Buffer) - 1);
-    }
 #endif
 
     {
