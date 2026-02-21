@@ -166,6 +166,12 @@ void USBD_static_free(void *p);
 /* Exported functions -------------------------------------------------------*/
 void USB_LP_CAN1_RX0_IRQHandler(void);
 
+void usbInit(void);
+uint16_t usbTx(const void *dataPtr, uint16_t len);
+uint16_t usbRx(void *dataPtr, uint16_t bufLen);
+uint16_t usbRxCopyToQueue(const void *dataPtr, uint16_t bufLen);
+void usb_10ms(void);
+
 /**
   * @}
   */

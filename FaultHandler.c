@@ -84,6 +84,9 @@ void CAT_Error(t_CAT_ErrorCode Code, uint32_t SubCode)
   CAT_StackReinit();
 
   CAT_SystemInit();
+
+  UART1_Init(9600, 1);
+
   while(1) { /* endless loop */
       CAT_SendDebugData();
       systemSleepMs(1000);

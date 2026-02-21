@@ -290,32 +290,7 @@ static void bin2Hex32(char *data, uint32_t bin)
   */
 static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
-  UNUSED(Len);
-  /* USER CODE BEGIN 6 */
-  static uint8_t ctr;
-  uint8_t data[] = "Rec ? CTR=xx ADC=xxx Err=xxxxxxxx St=xxxxxxxx\n\r";
-  if (Buf[0] == '1')
-  {
-    data[4] = '1';
-  }else if (Buf[0] == '0')
-  {
-    data[4] = '0';
-  }else
-  {
-    data[4] = 'X';
-  }
-  data[10] = bin2HexDigit((ctr >> 4) & 0x0F);
-  data[11] = bin2HexDigit((ctr     ) & 0x0F);
-  ctr++;
-
-  //data[17] = bin2HexDigit((ADCValue >> 8) & 0x0F);
-  //data[18] = bin2HexDigit((ADCValue >> 4) & 0x0F);
-  //data[19] = bin2HexDigit((ADCValue     ) & 0x0F);
-
-  //bin2Hex32(&data[25], HAL_ADC_GetError(&hadc1));
-  //bin2Hex32(&data[38], HAL_ADC_GetState(&hadc1));
-
-  CDC_Transmit_FS(data, sizeof(data) - 1);
+  usbRxCopyToQueue(Buf, *Len);
 
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);

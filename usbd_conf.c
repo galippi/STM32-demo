@@ -28,6 +28,7 @@
 #include "usbd_def.h"
 #include "usbd_core.h"
 #include "usbd_cdc.h"
+#include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN Includes */
 #define __STM32F10x_H
@@ -750,5 +751,49 @@ static uint32_t _USB_ReadInterrupts(void)
   return USB_ReadInterrupts(hpcd_USB_FS.Instance);
 }
 #endif
+
+#include "queue.h"
+
+QUEUE_CREATE(usbTxQueue, 128);
+QUEUE_CREATE(usbRxQueue, 64);
+
+void usbInit(void)
+{
+    queueInit(&usbTxQueue);
+    queueInit(&usbRxQueue);
+}
+
+uint16_t usbTx(const void *dataPtr, uint16_t len)
+{
+    queueWrite(&usbTxQueue, dataPtr, len);
+    return len;
+}
+
+void usb_10ms(void)
+{
+    static tQueueIdx txNum;
+    if (txNum != 0) {
+        queueRemoveData(&usbTxQueue, txNum);
+        txNum = 0;
+    }
+    if (!queueIsEmpty(&usbTxQueue)) {
+        txNum = 64; // max chunk of data
+        void *ptr = queueGetDataBuffer(&usbTxQueue, &txNum);
+        if (txNum != 0)
+            if (CDC_Transmit_FS(ptr, txNum) != USBD_OK) {
+                txNum = 0;
+            }
+    }
+}
+
+uint16_t usbRxCopyToQueue(const void *dataPtr, uint16_t len)
+{
+    return queueWrite(&usbRxQueue, dataPtr, len);
+}
+
+uint16_t usbRx(void *dataPtr, uint16_t bufLen)
+{
+    return queueRead(&usbRxQueue, dataPtr, bufLen);
+}
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
