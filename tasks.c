@@ -35,7 +35,7 @@ void Task_Init(void)
   battery_init();
 }
 
-void Task_1ms(void)
+void Task_2ms(void)
 {
   /*PB13_Set(!PB13_Get());*/ /* toggling debug port */
   {

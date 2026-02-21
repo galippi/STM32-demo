@@ -8,7 +8,7 @@
 #define t_SchedPreTask_Timer uint16_t
 
 #define SCHED_PRE_TASK_LIST \
-  SCHED_PRE_TASK_DEF(Task_1ms,     2) \
+  SCHED_PRE_TASK_DEF(Task_2ms,     2) \
   SCHED_PRE_TASK_DEF(Task_10ms,   10) \
   SCHED_PRE_TASK_DEF(Task_500ms, 100)
 
