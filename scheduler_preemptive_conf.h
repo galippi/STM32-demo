@@ -8,7 +8,7 @@
 #define t_SchedPreTask_Timer uint16_t
 
 #define SCHED_PRE_TASK_LIST \
-  SCHED_PRE_TASK_DEF(Task_1ms,     1) \
+  SCHED_PRE_TASK_DEF(Task_1ms,     2) \
   SCHED_PRE_TASK_DEF(Task_10ms,   10) \
   SCHED_PRE_TASK_DEF(Task_500ms, 100)
 
@@ -28,9 +28,16 @@
 #define SchedPreTask_TaskStart(func) { \
   func(); \
 }
+#if 0
 #define SchedPreTask_ErrorTaskOverrun(i) { \
-  CAT_Error(CAT_TaskOverrun_1ms + i, 0); \
+  if (i != 99) \
+    CAT_Error(CAT_TaskOverrun_1ms + i, 0); \
 }
+#else
+#define SchedPreTask_ErrorTaskOverrun(i) { \
+    CAT_Error(CAT_TaskOverrun_1ms + i, 0); \
+}
+#endif
 
 #define SchedulerPre_LostInterruptCallBack() \
   CAT_Error(CAT_SchedLostInterrupt, 0)
