@@ -266,11 +266,18 @@ void battery_100ms(void)
         hostTx((uint8_t*)uart2Buffer, sizeof(uart2Buffer) - 1);
     }
     {
-        char uartBuffer[] = "DBG00xxyyzz\r";
+        char uartBuffer[] = "DBG00xxyyzzaaabbbccc\r";
         static uint8_t ctr;
         (void)U32_to_HexString(uartBuffer +  5, 2, ctr++, '0');
         (void)U32_to_HexString(uartBuffer +  7, 2, PWM_Get(BatteryLoadTimer, BatteryLoadChannel), '0');
         (void)U32_to_HexString(uartBuffer +  9, 2, (unsigned)batteryData.errInt, '0');
+        (void)U32_to_HexString(uartBuffer + 11, 3, ADC_values[ADC_TemperatureSensor], '0');
+        uint16_t vrefDig = ADC_values[ADC_Vref];
+        (void)U32_to_HexString(uartBuffer + 14, 3, vrefDig, '0');
+        if (vrefDig != 0) {
+            uint16_t vref = (120 * 4095) / vrefDig;
+            (void)U32_to_DecString(uartBuffer + 17, 3, vref, ' ');
+        }
         hostTx(uartBuffer, sizeof(uartBuffer) - 1);
     }
 }

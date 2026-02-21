@@ -3,66 +3,83 @@
 #include "SysClock_conf.h"
 #include "util.h"
 
-uint32_t DivU32_U32U32(uint32_t dividend, uint32_t divisor)
+t_DivU32 udiv(uint32_t dividend, uint32_t divisor)
 {
-  if (divisor == 0)
-  { /* error case -> overflow */
-    return 0xFFFFFFFF;
-  }
-  if (dividend < divisor)
-  {
-    return 0;
-  }
-  if ((divisor & (divisor - 1)) == 0)
-  { /* the divisor is power of 2 */
-    while (divisor != 1)
-    {
-      if ((divisor & 0xFF) == 0)
-      {
-        divisor = divisor >> 8;
-        dividend = dividend >> 8;
-      }else
-      {
-        divisor = divisor >> 1;
-        dividend = dividend >> 1;
-      }
+    t_DivU32 result;
+    if (divisor == 0)
+    { /* error case -> overflow */
+        result.result = 0xFFFFFFFF;
+        result.remainder = dividend;
+        return result;
     }
-    return dividend;
-  }else
-  {
-    uint32_t result = 0;
-    int32_t shift = 0;
-    if (dividend & 0x80000000)
-    { /* the upper bit of the value is set -> take care of it */
-      while ((divisor & 0x80000000) == 0)
-      {
-        divisor = divisor << 1;
-        shift++;
-      }
-    }else
+    if (dividend < divisor)
     {
-      while (dividend > divisor)
-      {
-        divisor = divisor << 1;
-        shift++;
-      }
+        result.result = 0;
+        result.remainder = dividend;
+        return result;
     }
-    while (shift >= 0)
-    {
-      if (dividend >= divisor)
+    if ((divisor & (divisor - 1)) == 0)
+    { /* the divisor is power of 2 */
+      result.remainder = dividend & (divisor - 1);
+      while (divisor != 1)
       {
-        result = result + (1 << shift);
-        dividend = dividend - divisor;
-        if (dividend == 0)
-        { /* no remainder -> return immediately */
-          return result;
+        if ((divisor & 0xFF) == 0)
+        {
+          divisor = divisor >> 8;
+          dividend = dividend >> 8;
+        }else
+        {
+          divisor = divisor >> 1;
+          dividend = dividend >> 1;
         }
       }
-      shift--;
-      divisor = divisor >> 1;
+      result.result = dividend;
+      return result;
+    }else
+    {
+      uint32_t resultU32 = 0;
+      int32_t shift = 0;
+      if (dividend & 0x80000000)
+      { /* the upper bit of the value is set -> take care of it */
+        while ((divisor & 0x80000000) == 0)
+        {
+          divisor = divisor << 1;
+          shift++;
+        }
+      }else
+      {
+        while (dividend > divisor)
+        {
+          divisor = divisor << 1;
+          shift++;
+        }
+      }
+      while (shift >= 0)
+      {
+        if (dividend >= divisor)
+        {
+          resultU32 = resultU32 + (1 << shift);
+          dividend = dividend - divisor;
+          if (dividend == 0)
+          { /* no remainder -> return immediately */
+            result.remainder = 0;
+            result.result = resultU32;
+            return result;
+          }
+        }
+        shift--;
+        divisor = divisor >> 1;
+      }
+      result.remainder = dividend;
+      result.result = resultU32;
+      return result;
     }
-    return result;
-  }
+}
+
+uint32_t DivU32_U32U32(uint32_t dividend, uint32_t divisor)
+{
+    t_DivU32 result = udiv(dividend, divisor);
+    return result.result;
 }
 
 int32_t DivI32_I32I32(int32_t dividend, int32_t divisor)

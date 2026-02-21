@@ -13,6 +13,12 @@
 
 #define COMP_CHECK_ARRAY(array, length) COMP_CHECK_VAL(NUMOF(array), length)
 
+typedef struct {
+    uint32_t result;
+    uint32_t remainder;
+}t_DivU32;
+
+t_DivU32 udiv(uint32_t dividend, uint32_t divisor);
 uint32_t DivU32_U32U32(uint32_t dividend, uint32_t divisor);
 int32_t DivI32_I32I32(int32_t dividend, int32_t divisor);
 
