@@ -30,11 +30,12 @@ OBJCOPY = $(ARMGNU)objcopy
 OBJDUMP = $(ARMGNU)objdump
 
 CFLAGS_TARGET := -mthumb
-CFLAGS_TARGET += -mcpu=cortex-m0
+#CFLAGS_TARGET += -mcpu=cortex-m0
 #CFLAGS_TARGET += -mcpu=cortex-m0plus
 #CFLAGS_TARGET += -mcpu=cortex-m3
 #CFLAGS_TARGET += -mcpu=cortex-m4
 #CFLAGS_TARGET += -march=armv7-m
+CFLAGS_TARGET += -march=armv8-m.main -mfpu=fpv5-sp-d16 -mfloat-abi=hard
 #CFLAGS_TARGET += --short-enums
 
 #LDFLAGS_STRIP_DEBUG_INFO = -s
