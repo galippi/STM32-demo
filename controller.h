@@ -8,6 +8,7 @@
 #define CPU_TYPE_STM32F4 2
 #define CPU_TYPE_STM32G0 3
 #define CPU_TYPE_STM32G0B1 4
+#define CPU_TYPE_STM32C542 5
 
 #if !defined(TARGET_ECU)
 #error "Error: TARGET ECU is not defined!"
@@ -70,6 +71,19 @@
 //#define STM32_RCC_HEADER "stm32g030xx_rcc.h"
 #define STM32_ADC_HEADER "stm32g0b1xx_adc.h"
 #define STM32_GPIO_HEADER "stm32g0b1xx_gpio.h"
+
+#elif TARGET_ECU == TARGET_ECU_STM32C542
+
+#define CPU_TYPE CPU_TYPE_STM32C542
+#define STM32C542xx
+#define USE_RTOS 0
+
+#include "stm32c5xx_hal.h"
+//#include "stm32c5xx.h"
+#define CONTROLLER_BASE_NAME "stm32c542"
+//#define STM32_RCC_HEADER "stm32g030xx_rcc.h"
+//#define STM32_ADC_HEADER "stm32g0b1xx_adc.h"
+//#define STM32_GPIO_HEADER "stm32g0b1xx_gpio.h"
 
 #else
 #error Not defined TARGET_ECU!
