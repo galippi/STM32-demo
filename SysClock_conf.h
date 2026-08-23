@@ -38,7 +38,7 @@
 #define PPRE_REG  0 /* APB prescaler */
 #define ADCPRE_REG 2
 
-#define f_USBCLK_Hz 48000000
+//#define f_USBCLK_Hz 48000000
 #define USBPRE_REG 1
 #define CLOCK_USBSEL RCC_CCIPR2_USBSEL_HSI48
 

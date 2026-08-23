@@ -1,9 +1,9 @@
 ##################################################################
 CFLAGS_DEBUG = -gdwarf-2
-SUBDIRS := . ST_lib u32_to_hexstring hal_STM32G0 hal_STM32G0/ST_lib
-SUBDIRS += hal_STM32G0/ST_lib/usb
+SUBDIRS := . ST_lib u32_to_hexstring hal_STM32C5 hal_STM32C5/ST_lib
+SUBDIRS += hal_STM32C5/ST_lib/usb
 SUBDIRS += queue
-SUBDIRS_LINKER := hal_STM32G0/lib
+SUBDIRS_LINKER := hal_STM32C5/lib
 
 WARNINGS = -Wall -Wextra
 WARNINGS += -Wwrite-strings -Wcast-qual -Wpointer-arith -Wsign-compare
@@ -57,37 +57,14 @@ CPPFILES =
 
 CFILES   = reset.c
 CFILES  += main.c
-CFILES  += adc.c
-CFILES  += adc_app.c
-#CFILES  += dac.c
-#CFILES  += spi.c
 CFILES  += debug.c
-CFILES  += gpio.c
-CFILES  += scheduler_preemptive.c
-CFILES  += uart.c
-CFILES  += uart_app.c
-CFILES  += tasks.c
-CFILES  += timer.c
 CFILES  += util.c
 CFILES  += FaultHandler.c
 CFILES  += ram_init.c
 CFILES  += vector.c
 CFILES  += u32_to_hexstring.c
-CFILES  += SysClock.c
-#CFILES  += pwm.c
+#CFILES  += SysClock.c
 CFILES  += queue.c
-#CFILES  += battery.c
-CFILES  += stm32g0xx_hal_pcd.c
-CFILES  += stm32g0xx_hal_pcd_ex.c
-
-CFILES  += usbd_conf.c
-CFILES  += stm32g0xx_ll_usb.c
-CFILES  += usbd_core.c
-CFILES  += usbd_desc.c
-CFILES  += usbd_cdc.c
-CFILES  += usbd_ctlreq.c
-CFILES  += usbd_ioreq.c
-CFILES  += usbd_cdc_if.c
 
 SFILES  =
 #SFILES += vectors.s

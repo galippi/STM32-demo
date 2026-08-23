@@ -4,24 +4,25 @@
 #include "util.h"
 
 #include "SysClock.h"
-#include "gpio_app.h"
-#include "adc.h"
+//#include "gpio_app.h"
+//#include "adc.h"
 //#include "adc_app.h"
-#include "timer.h"
+//#include "timer.h"
 #include "system_conf.h"
-#include "timer_conf.h"
-#include "timer_app.h"
-#include "scheduler_preemptive_conf.h"
+//#include "timer_conf.h"
+//#include "timer_app.h"
+//#include "scheduler_preemptive_conf.h"
 #include "tasks.h"
 #include "FaultHandler.h"
 #include "vector.h"
 
-#include "stm32g0xx_hal_rcc.h"
+//#include "stm32c5xx_hal_rcc.h"
 
 #include "main.h"
 
 #define VDD 3.0 /* Volt */
 
+#if 0
 typedef uint32_t t_reg96Bits[3];
 
 #define DBG_PORTS \
@@ -70,6 +71,7 @@ typedef struct {
 const t_DBG_Ports dbg_ports = {
 	DBG_PORTS
 };
+#endif
 
 /** \brief  Set Stack Pointer
 
@@ -124,19 +126,26 @@ void RAM_StartCheck(void)
   }
 }
 
+void Task_Bgnd(void)
+{
+
+}
+
 int main(void)
 {
   SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
 
-  SysTick_Init();
-  SysClock_Init();
+//  SysTick_Init();
+//  SysClock_Init();
 
+#if 0
   TIM14_Init(); // scheduler timer init
 
   DBG->APBFZ1 |= DBG_APB_FZ1_DBG_TIM3_STOP;
   DBG->APBFZ2 |= DBG_APB_FZ2_DBG_TIM14_STOP; /* stop scheduler timer */
 
   RCC->APBENR2 |= RCC_APBENR2_SYSCFGEN;
+#endif
 
 #if 0
   // MCO out is turned on
@@ -146,6 +155,8 @@ int main(void)
 #endif
   //RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
   //AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE; /* disable JTAG, enable SWD - PA15, PB3, PB4: free; PA13, PA14: in use */
+
+#if 0
   LED3_Init();
   LED3_Set(0);
   LED3_Set(1);
@@ -163,19 +174,20 @@ int main(void)
   //BitfieldSet(RCC->CFGR, RCC_CFGR_MCOSEL_Pos, 4, RCC_MCO1SOURCE_SYSCLK);
   RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_MCOSEL_Msk)) | RCC_MCO1SOURCE_SYSCLK;
   BitfieldSet(RCC->CFGR, RCC_CFGR_MCOPRE_Pos, 4, 3); // division by 8
+#endif
 
   //ADC_HandlerInit();
   //UART2_Init();
-  Task_Init();
+  //Task_Init();
   //TIM14_Init();
-  SchedulerPre_Init();
-  TIM14_CCR1_Set(TIM14_Cnt_Get() + TIM14_1ms); /* set the first scheduler interrupt to 1ms */
-  NVIC_EnableIRQ(TIM14_IRQn); /* enable TIM14 interrupt */
-  NVIC->IP[TIM14_IRQn] = 0x80; /* set TIM14 interrupt priority to medium */
+  //SchedulerPre_Init();
+  //TIM14_CCR1_Set(TIM14_Cnt_Get() + TIM14_1ms); /* set the first scheduler interrupt to 1ms */
+  //NVIC_EnableIRQ(TIM14_IRQn); /* enable TIM14 interrupt */
+  //NVIC->IP[TIM14_IRQn] = 0x80; /* set TIM14 interrupt priority to medium */
   /* set PENDSV prio to 0xFF */
-  SCB->SHP[14-4] = 0xFF; /* it shall be lower than the prio of the scheduler-timer interrupt */
+  //SCB->SHP[14-4] = 0xFF; /* it shall be lower than the prio of the scheduler-timer interrupt */
   /* set SVC prio to 0x00 */
-  SCB->SHP[11-4] = 0x10;
+  //SCB->SHP[11-4] = 0x10;
 
   while (1)
   {
@@ -214,6 +226,7 @@ void ExceptionHandler_4(void)
 uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
 /* INTERRUPT */ void TIM14_ISR(void)
 {
+#if 0
     if (TIM14_SR_UIF_Get())
     {
       TIM14_SR_UIF_Reset();
@@ -224,13 +237,15 @@ uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
       TIM14_SR_CC1IF_Reset();
       TIM14_CC1IF_Callback();
     }else
+#endif
     {
-      CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) | ((TIM14->SR) << 16));
+      CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) /*| ((TIM14->SR) << 16)*/);
     }
 }
 
 /* INTERRUPT */ void TIM3_ISR(void)
 {
+#if 0
   uint32_t tim3_sr = TIM3->SR & TIM3->DIER;
   if (tim3_sr & TIM_SR_UIF) // (TIM3_SR_UIF_Get())
   {
@@ -259,8 +274,9 @@ uint32_t tcnt0,tcnt1,tcnt2, ccr3_old, ccr3_new;
     TIM3_SR_CC4OF_Reset();
     //TIM3_CC4IF_Callback();
   }else
+#endif
   {
-    CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) | ((TIM3->SR) << 16));
+    CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) /* | ((TIM3->SR) << 16)*/ );
   }
 }
 
@@ -329,6 +345,13 @@ void svc_ret(void)
    * FPU handling
    */
   __ASM("SVC #0");
+}
+
+extern void SchedulerPre_TaskManagement(void);
+
+void SchedulerPre_TaskManagement(void)
+{
+
 }
 
 /* INTERRUPT */ void PendSV_Handler(void)
