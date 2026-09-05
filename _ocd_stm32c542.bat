@@ -1,11 +1,16 @@
 @cls
 @set OCD_PATH=C:\Programok\OpenOCD-0.12.0-3
+::@set DEBUG=-d
+::@set DEBUG=-d4
 ::@set OCD_PATH=C:\Programok\openocd-0.9.0
 @set START=start
+
+@set OPENOCD_SCRIPTS=%OCD_PATH%\openocd\scripts
+
 ::start %OCD_PATH%\bin-x64\openocd.exe -f scripts\board\st_nucleo_f103rb.cfg
 ::start %OCD_PATH%\bin-x64\openocd.exe -f %OCD_PATH%\scripts\board\st_nucleo_f103rb.cfg
 ::start %OCD_PATH%\bin-x64\openocd.exe -f %OCD_PATH%\scripts\board\st_nucleo_f103c8.cfg
-%START% %OCD_PATH%\bin\openocd.exe -f %CD%\OpenOCD\st_nucleo_c5.cfg
+%START% %OCD_PATH%\bin\openocd.linux.exe -f %CD%\OpenOCD\st_nucleo_c5.cfg %DEBUG%
 ::%START% %OCD_PATH%\bin-x64\openocd.exe -f %CD%\OpenOCD\st_nucleo_g0.cfg
 ::%START% %OCD_PATH%\bin\openocd.exe -f %CD%\OpenOCD\st_nucleo_g0.cfg -d3
 ::%START% %OCD_PATH%\bin\openocd.exe -f %CD%\OpenOCD\st_nucleo_g0.cfg  -c "init; reset halt"
