@@ -5,6 +5,7 @@
 
 #include "SysClock.h"
 //#include "gpio_app.h"
+#include "gpio.h"
 //#include "adc.h"
 //#include "adc_app.h"
 //#include "timer.h"
@@ -22,41 +23,43 @@
 
 #define VDD 3.0 /* Volt */
 
-#if 0
-typedef uint32_t t_reg96Bits[3];
+#if 1
+//typedef uint32_t t_reg96Bits[3];
 
 #define DBG_PORTS \
-    DBG_PORT(SYSCFG_TypeDef, syscfg, SYSCFG) \
-    DBG_PORT(USB_DRD_TypeDef, usbd, USB_DRD_FS) \
 	DBG_PORT(GPIO_TypeDef, gpioa, GPIOA) \
 	DBG_PORT(GPIO_TypeDef, gpiob, GPIOB) \
 	DBG_PORT(GPIO_TypeDef, gpioc, GPIOC) \
     DBG_PORT(GPIO_TypeDef, gpiod, GPIOD) \
-    DBG_PORT(GPIO_TypeDef, gpiof, GPIOF) \
 	DBG_PORT(RCC_TypeDef, rcc, RCC) \
 	DBG_PORT(SysTick_Type, systick, SysTick) \
 	DBG_PORT(ADC_TypeDef, adc1, ADC1) \
-    DBG_PORT(TIM_TypeDef, tim3, TIM3) \
-    DBG_PORT(TIM_TypeDef, tim14, TIM14) \
 	DBG_PORT(SCB_Type, scb, SCB) \
 	DBG_PORT(NVIC_Type, nvic, NVIC) \
-	DBG_PORT(DMA_TypeDef, dma1, DMA1) \
+	DBG_PORT(USART_TypeDef, uart1, USART1) \
+	DBG_PORT(FLASH_TypeDef, flash, FLASH) \
+    DBG_PORT(uint16_t, packageDataRegister, (uint16_t * const)PACKAGE_BASE) \
+  /* no more peripheries */
+
+#if 0
+    DBG_PORT(uint32_t, devId, (uint32_t * const)0x40015800) \
+    DBG_PORT(const uint16_t * const, ts_cal1, &TS_CAL1) \
+    DBG_PORT(const uint16_t * const, vrefint_cal, &VREFINT_CAL) \
+    DBG_PORT(GPIO_TypeDef, gpiof, GPIOF) \
+    DBG_PORT(TIM_TypeDef, tim3, TIM3) \
+    DBG_PORT(TIM_TypeDef, tim14, TIM14) \
+    DBG_PORT(DMA_TypeDef, dma1, DMA1) \
     DBG_PORT(DMA_Channel_TypeDef, dma1_1, DMA1_Channel1) \
     DBG_PORT(DMA_Channel_TypeDef, dma1_4, DMA1_Channel4) \
     DBG_PORT(DMA_Channel_TypeDef, dma1_5, DMA1_Channel5) \
-	DBG_PORT(USART_TypeDef, uart1, USART1) \
-	DBG_PORT(FLASH_TypeDef, flash, FLASH) \
-    DBG_PORT(const uint16_t * const, ts_cal1, &TS_CAL1) \
-    DBG_PORT(const uint16_t * const, vrefint_cal, &VREFINT_CAL) \
-    DBG_PORT(uint16_t, packageDataRegister, (uint16_t * const)PACKAGE_BASE) \
     DBG_PORT(t_reg96Bits, uniqIdRegPtr1, (t_reg96Bits * const)UID_BASE) \
-    DBG_PORT(uint32_t, devId, (uint32_t * const)0x40015800) \
-  /* no more peripheries */
-
-//    DBG_PORT(USB_DRD_TypeDef, usb_drd_fs, USB_DRD_FS)
-//    DBG_PORT(USB_DRD_PMABuffDescTypeDef, usb_drd_pma_buff, USB_DRD_PMA_BUFF)
-//    DBG_PORT(const uint16_t * const, packageDataRegister, &PACKAGE_DATA)
-//    DBG_PORT(const t_reg96Bits * const, uniqIdRegPtr, &uniqIdReg)
+    DBG_PORT(SYSCFG_TypeDef, syscfg, SYSCFG) \
+    DBG_PORT(USB_DRD_TypeDef, usbd, USB_DRD_FS) \
+    //    DBG_PORT(USB_DRD_TypeDef, usb_drd_fs, USB_DRD_FS)
+    //    DBG_PORT(USB_DRD_PMABuffDescTypeDef, usb_drd_pma_buff, USB_DRD_PMA_BUFF)
+    //    DBG_PORT(const uint16_t * const, packageDataRegister, &PACKAGE_DATA)
+    //    DBG_PORT(const t_reg96Bits * const, uniqIdRegPtr, &uniqIdReg)
+#endif
 
 #undef DBG_PORT
 #define DBG_PORT(type, field, val) type * const field;
@@ -135,8 +138,13 @@ int main(void)
 {
   SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
 
-//  SysTick_Init();
-//  SysClock_Init();
+  SysClock_Init();
+  SysTick_Init();
+  NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority lowest / highest for SysTick Interrupts */
+  GPIO_PortInit_Out(GPIOA, 9); /* debug data port */
+  GPIO_Set(GPIOA, 9, 0);
+  GPIO_Set(GPIOA, 9, 1);
+  GPIO_Set(GPIOA, 9, 0);
 
 #if 0
   TIM14_Init(); // scheduler timer init
@@ -193,6 +201,11 @@ int main(void)
   {
     //ADC_Handler();
     Task_Bgnd();
+    if (SysTick_GetCountFlag()) {
+        static uint8_t led_val;
+        GPIO_Set(GPIOA, 9, led_val);
+        led_val = 1 - led_val;
+    }
   }
 
   return 0;

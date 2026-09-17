@@ -1,7 +1,7 @@
 ##################################################################
 CFLAGS_DEBUG = -gdwarf-2
-SUBDIRS := . ST_lib u32_to_hexstring hal_STM32C5 hal_STM32C5/ST_lib
-SUBDIRS += hal_STM32C5/ST_lib/usb
+SUBDIRS := . u32_to_hexstring hal_STM32C5 hal_STM32C5/ST_lib
+SUBDIRS += hal_STM32C5/ST_lib/ll
 SUBDIRS += queue
 SUBDIRS_LINKER := hal_STM32C5/lib
 
@@ -63,8 +63,9 @@ CFILES  += FaultHandler.c
 CFILES  += ram_init.c
 CFILES  += vector.c
 CFILES  += u32_to_hexstring.c
-#CFILES  += SysClock.c
+CFILES  += SysClock.c
 CFILES  += queue.c
+CFILES  += gpio.c
 
 SFILES  =
 #SFILES += vectors.s
