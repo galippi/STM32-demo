@@ -202,9 +202,14 @@ int main(void)
     //ADC_Handler();
     Task_Bgnd();
     if (SysTick_GetCountFlag()) {
-        static uint8_t led_val;
-        GPIO_Set(GPIOA, 9, led_val);
-        led_val = 1 - led_val;
+        static uint32_t ctr;
+        if (ctr == 0) {
+            static uint8_t led_val;
+            GPIO_Set(GPIOA, 9, led_val);
+            led_val = 1 - led_val;
+            ctr = 1000;
+        }
+        ctr--;
     }
   }
 
