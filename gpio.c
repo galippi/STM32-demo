@@ -7,25 +7,27 @@ static inline void GPIO_PortEnable(GPIO_TypeDef * const gpio)
 {
   if (gpio == GPIOA)
   { /* enable the GPIO-A */
-      RCC->IOPENR |= RCC_IOPENR_GPIOAEN;
+      RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
   }else
   if (gpio == GPIOB)
   { /* enable the GPIO-B */
-      RCC->IOPENR |= RCC_IOPENR_GPIOBEN;
+      RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
   }else
   if (gpio == GPIOC)
   { /* enable the GPIO-C */
-      RCC->IOPENR |= RCC_IOPENR_GPIOCEN;
+      RCC->AHB2ENR |= RCC_AHB2ENR_GPIOCEN;
   }else
   if (gpio == GPIOD)
   { /* enable the GPIO-D */
-      RCC->IOPENR |= RCC_IOPENR_GPIODEN;
+      RCC->AHB2ENR |= RCC_AHB2ENR_GPIODEN;
   }else
+#if 0
   if (gpio == GPIOF)
   { /* enable the GPIO-F */
-      RCC->IOPENR |= RCC_IOPENR_GPIOFEN;
+      RCC->AHB2ENR |= RCC_AHB2ENR_GPIOFEN;
   }else
-    CAT_Error(CAT_InvalidParameter, 0);
+#endif
+      CAT_Error(CAT_InvalidParameter, 0);
 }
 
 /**

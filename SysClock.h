@@ -3,25 +3,16 @@
 
 #include "controller.h"
 
-#define f_LSI_Hz 40000
-#define f_HSI_Hz 16000000
+#include "stm32c5xx_ll_rcc.h"
+
+#define f_LSI_Hz 32000
+#define f_HSI_Hz 144000000
 
 #include "SysClock_conf.h"
 
 #ifndef HSI_ON
   #define HSI_ON 0
 #endif
-
-#ifndef HSI48_ON
-  #define HSI48_ON 0
-#endif
-
-#if HSI48_ON != 0
-  #define f_HSI48_Hz 48000000
-#endif
-
-#define HSIDIV_VAL (1 << HSIDIV_REG)
-#define F_HSISYS_Hz ((f_HSI_Hz) / (HSIDIV_VAL))
 
 #ifndef HSE_ON
   #define HSE_ON 0
@@ -30,7 +21,7 @@
   #error HSE config error!
 #endif
 
-#if (defined(f_HSE_Hz) && ((f_HSE_Hz < 4000000) || (f_HSE_Hz > 48000000)))
+#if (defined(f_HSE_Hz) && ((f_HSE_Hz < 4000000) || (f_HSE_Hz > 50000000)))
   #error HSE value config error!
 #endif
 
@@ -38,23 +29,21 @@
   #define HSE_BYP 0
 #endif
 
-#ifndef PLL_ON
-  #ifdef f_VCO_Hz
-    #define PLL_ON 1
+#ifndef PSI_ON
+  #ifdef f_PSI_Hz
+    #define PSI_ON 1
   #else
-    #define PLL_ON 0
+    #define PSI_ON 0
   #endif
 #endif
 
-#define PLLSRC_NONE 0
-//#define PLLSRC_RESERVED 1
-#define PLLSRC_HSI16 2
-#define PLLSRC_HSE 3
+#define PSISRC_NONE 0
 
-#ifndef PLLSRC
-#define PLLSRC PLLSRC_NONE
+#ifndef PSISRC
+#define PSISRC PSISRC_NONE
 #endif
 
+#if 0
 #if (PLLSRC == PLLSRC_HSE)
   #if (HSE_ON == 0)
     #error HSE_ON is worngly set!
@@ -80,15 +69,17 @@
 #define f_VCO_CALC_Hz ((f_VCO_INPUT_Hz) * (PLLN_VAL))
 #define f_PLL_RCLK_Hz ((f_VCO_CALC_Hz) / (PLLR_VAL))
 
-#define RCC_CFGR_SW_HSISYS  0
-#define RCC_CFGR_SW_HSE     1
-#define RCC_CFGR_SW_PLLRCLK 2
+#endif
 
-#if SWS == RCC_CFGR_SW_HSISYS
+#if (RCC_CFGR2_SW_VAL == LL_RCC_SYS_CLKSOURCE_HSIDIV3)
+  #define f_SYSCLK_CALC_Hz ((f_HSI_Hz) / 3)
+#elif (RCC_CFGR2_SW_VAL == LL_RCC_SYS_CLKSOURCE_HSIS)
   #define f_SYSCLK_CALC_Hz F_HSISYS_Hz
-#elif SWS == RCC_CFGR_SW_HSE && (HSE_ON != 0)
+#elif RCC_CFGR2_SW_VAL == RCC_CFGR_SW_HSE && (HSE_ON != 0)
+#error Not yet implemented!
   #define f_SYSCLK_CALC_Hz f_HSE_Hz
-#elif SWS == RCC_CFGR_SW_PLLRCLK && (PLL_ON != 0)
+#elif RCC_CFGR2_SW_VAL == RCC_CFGR_SW_PLLRCLK && (PLL_ON != 0)
+#error Not yet implemented!
   #define f_SYSCLK_CALC_Hz f_PLL_RCLK_Hz
 #else
 #error SWS is wrongly set!
@@ -96,11 +87,16 @@
 
 #if HPRE_REG < 0x08
   #define AHB_PRESC_VAL 1
+#elif HPRE_REG < 12
+  #define AHB_PRESC_VAL (1 << ((HPRE_REG) - 7))
 #elif HPRE_REG <= 15
-  #define AHB_PRESC_VAL (2 << (HPRE_REG - 8))
+  #define AHB_PRESC_VAL (64 << (HPRE_REG - 12))
 #else
 #error HPRE_REG is wrongly set!
 #endif
+
+#if 0
+
 
 #define f_HCLK_CALC_Hz (f_SYSCLK_Hz / AHB_PRESC_VAL)
 
@@ -148,6 +144,8 @@
 #define RCC_CCIPR2_USBSEL_HSE   1
 #define RCC_CCIPR2_USBSEL_PLL   2
 
+#endif
+
 #define SysTick_CTRL_CLKSOURCE_HCLK  SysTick_CTRL_CLKSOURCE_Msk
 #define SysTick_CTRL_CLKSOURCE_HCLK8 0
 
@@ -163,6 +161,11 @@ void SysTick_Init(void);
 static inline uint16_t SysTick_Get(void)
 {
   return (~SysTick->VAL) & 0xFFFF;
+}
+
+static inline uint32_t SysTick_GetCountFlag(void)
+{
+  return SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk;
 }
 
 #endif /* _SYSCLOCK_H_ */

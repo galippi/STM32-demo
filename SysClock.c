@@ -2,11 +2,11 @@
 
 #include "SysClock.h"
 
-#if defined(f_PLL_INPUT_Hz) && (((f_PLL_INPUT_Hz) < 2600000) || ((f_PLL_INPUT_Hz) > 16000000))
-#error PLL input is wrongly configured!
+#if defined(f_PSI_INPUT_Hz) && (((f_PSI_INPUT_Hz) < 2600000) || ((f_PLL_PSI_Hz) > 16000000))
+#error PSI input is wrongly configured!
 #endif
 
-#if f_SYSCLK_Hz > 64000000
+#if f_SYSCLK_Hz > 150000000
 #error f_SYSCLK_Hz is wrongly set!
 #endif
 
@@ -18,7 +18,7 @@
 //#error f_HCLK_Hz is wrongly set!
 //#endif
 
-//#define f_HCLK_CALC_Hz ((f_SYSCLK_Hz) / AHB_PRESC)
+#define f_HCLK_CALC_Hz ((f_SYSCLK_Hz) / (AHB_PRESC_VAL))
 #if (f_HCLK_CALC_Hz) != (f_HCLK_Hz)
 #error f_HCLK_Hz config error!
 #endif
@@ -27,6 +27,7 @@
 //#error f_PCLK_Hz is wrongly set!
 //#endif
 
+#if 0
 #if (f_PCLK_CALC_Hz) != (f_PCLK_Hz)
 #error f_PCLK_Hz config error!
 #endif
@@ -117,6 +118,8 @@
 
 #endif
 
+#endif
+
 #ifndef HSI_STARTUP_DEBUG
 #define HSI_STARTUP_DEBUG(val) /* do nothing */
 #endif
@@ -135,48 +138,34 @@ void SysClock_Init(void)
 {
   volatile uint32_t StartUpCounter;
 
-  if ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (RCC_CFGR_SWS_HSISYS))
+  if (((RCC->CFGR1 & (uint32_t)RCC_CFGR1_SWS) != LL_RCC_SYS_CLKSOURCE_STATUS_HSIDIV3) &&
+      ((RCC->CFGR1 & (uint32_t)RCC_CFGR1_SWS) != LL_RCC_SYS_CLKSOURCE_STATUS_HSIS))
   {
     /* Enable HSI temporarly - high speed internal oscillator */
-    RCC->CR |= (uint32_t)(RCC_CR_HSION);
+    RCC->CR1 |= (uint32_t)(RCC_CR1_HSISON);
     StartUpCounter = 0;
-    while(((RCC->CR & RCC_CR_HSIRDY) == 0) && (StartUpCounter != HSI_STARTUP_TIMEOUT))
+    while(((RCC->CR1 & RCC_CR1_HSISRDY) == 0) && (StartUpCounter != HSI_STARTUP_TIMEOUT))
     {
       StartUpCounter++;
     }
     HSI_STARTUP_DEBUG(StartUpCounter);
-    if (!(RCC->CR & RCC_CR_HSIRDY))
+    if (!(RCC->CR1 & RCC_CR1_HSISRDY))
     {
       HSI_STARTUP_ERROR();
     }
-    BitfieldSet(RCC->CR,RCC_CR_HSIDIV_Pos, 3,  HSIDIV_REG);
+    RCC->CR1 = RCC->CR1 | RCC_CR1_HSIDIV3ON_Msk;
     /* Select HSI as system clock source */
-    RCC->CFGR = (RCC->CFGR & (uint32_t)((uint32_t)~(RCC_CFGR_SW))) | (RCC_CFGR_SWS_HSISYS);
+    RCC->CFGR1 = (RCC->CFGR1 & (uint32_t)((uint32_t)~(RCC_CFGR1_SW))) | (LL_RCC_SYS_CLKSOURCE_STATUS_HSIDIV3);
     /* Wait till HSI is used as system clock source */
     StartUpCounter = 0;
-    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (RCC_CFGR_SWS_HSISYS))
+    while ((RCC->CFGR1 & (uint32_t)RCC_CFGR1_SWS) != (LL_RCC_SYS_CLKSOURCE_STATUS_HSIDIV3))
     {
       StartUpCounter++;
     }
     SYSCLK_SET_DEBUG(StartUpCounter);
   }else{
-      BitfieldSet(RCC->CR,RCC_CR_HSIDIV_Pos, 3,  HSIDIV_REG);
+      //BitfieldSet(RCC->CR,RCC_CR_HSIDIV_Pos, 3,  HSIDIV_REG);
   }
-
-  #if HSI48_ON != 0
-  RCC->CR |= (uint32_t)(RCC_CR_HSI48ON); /* Enable HSE - high speed external oscillator */
-  /* Wait till HSI48 is ready and if Time out is reached exit */
-  StartUpCounter = 0;
-  while(((RCC->CR & RCC_CR_HSI48RDY) == 0) && (StartUpCounter != HSI48_STARTUP_TIMEOUT))
-  {
-    StartUpCounter++;
-  }
-  HSI48_STARTUP_DEBUG(StartUpCounter);
-  if (!(RCC->CR & RCC_CR_HSI48RDY))
-  {
-    HSI48_STARTUP_ERROR(StartUpCounter);
-  }
-  #endif
 
   #if HSE_ON != 0
   /* Enable HSE - high speed external oscillator */
@@ -195,7 +184,7 @@ void SysClock_Init(void)
   }
   #else /* HSE_ON == 0 */
   /* Stop HSE - high speed external oscillator */
-  RCC->CR &= (uint32_t)(~RCC_CR_HSEON);
+  RCC->CR1 &= (uint32_t)(~RCC_CR1_HSEON);
   #endif /* HSE_ON != 0 */
   {
 #if 0
@@ -209,6 +198,7 @@ void SysClock_Init(void)
                            | (RCC_CFGR_PPRE1_0 * PPRE1_REG) /* set PCLK1 */;
 #endif
 
+#if 0
     /* Stop PLL */
     RCC->CR &= ~RCC_CR_PLLON;
     StartUpCounter = 0;
@@ -261,15 +251,21 @@ void SysClock_Init(void)
 
     #endif /* PLL_ON != 0 */
 
-#if (SWS == RCC_CFGR_SWS_HSISYS) && (HSI_ON == 0)
-#error HSI / SWS config error!
 #endif
 
-#if (SWS == RCC_CFGR_SWS_HSE)
-#if !defined(HSE_EXTERNAL_OSC)
-    #error HSE / SWS config error!
+#if ((RCC_CFGR2_SW_VAL == LL_RCC_SYS_CLKSOURCE_STATUS_HSIDIV3) || \
+     (RCC_CFGR2_SW_VAL == LL_RCC_SYS_CLKSOURCE_STATUS_HSIDIV3)) && \
+    (HSI_ON == 0)
+#error HSI / SW config error!
 #endif
-    if (!(RCC->CR & RCC_CR_HSERDY))
+
+#if 0
+
+#if (RCC_CFGR2_SW_VAL == RCC_CFGR_SWS_HSE)
+#if !defined(HSE_EXTERNAL_OSC)
+    #error HSE / RCC_CFGR2_SW_VAL config error!
+#endif
+    if (!(RCC->CR1 & RCC_CR1_HSERDY))
     {
       HSE_STARTUP_ERROR(1);
     }
@@ -283,12 +279,14 @@ void SysClock_Init(void)
 #error SWS config error!
 #endif
 
+#endif
+
     /* Select system clock source */
-    RCC->CFGR = (RCC->CFGR & (uint32_t)((uint32_t)~(RCC_CFGR_SW))) | ((SWS) << RCC_CFGR_SW_Pos);
+    RCC->CFGR1 = (RCC->CFGR1 & (uint32_t)((uint32_t)~(RCC_CFGR1_SW))) | ((RCC_CFGR2_SW_VAL) << RCC_CFGR1_SW_Pos);
 
     /* Wait till system clock source is set */
     StartUpCounter = 0;
-    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != ((SWS) << RCC_CFGR_SWS_Pos))
+    while ((RCC->CFGR1 & (uint32_t)RCC_CFGR1_SWS) != ((RCC_CFGR2_SW_VAL) << RCC_CFGR1_SWS_Pos))
     {
       StartUpCounter++;
     }
@@ -298,13 +296,13 @@ void SysClock_Init(void)
     RCC->CR &= (uint32_t)(~RCC_CR_HSION);
     #endif
     #ifdef f_LSE_Hz
-      RCC->BDCR |= RCC_BDCR_LSEON;
+      RCC->RTCCR |= RCC_RTCCR_LSEON;
     #else
-      RCC->BDCR &= ~RCC_BDCR_LSEON;
+      RCC->RTCCR &= ~RCC_RTCCR_LSEON;
     #endif
   }
 
-  BitfieldSet(RCC->CFGR, RCC_CFGR_HPRE_Pos, 4, HPRE_REG);
+  //BitfieldSet(RCC->CFGR, RCC_CFGR_HPRE_Pos, 4, HPRE_REG);
 
 #if defined(f_USBCLK_Hz)
   RCC->CCIPR2 = (RCC->CCIPR2 & ~(RCC_CCIPR2_USBSEL_Msk)) | (CLOCK_USBSEL << RCC_CCIPR2_USBSEL_Pos);
