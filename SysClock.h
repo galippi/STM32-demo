@@ -146,21 +146,29 @@
 
 #endif
 
-#define SysTick_CTRL_CLKSOURCE_HCLK  SysTick_CTRL_CLKSOURCE_Msk
-#define SysTick_CTRL_CLKSOURCE_HCLK8 0
+#define SysTick_CTRL_CLKSOURCE_INTERNAL SysTick_CTRL_CLKSOURCE_Msk /* clock source is unknown */
+#define SysTick_CTRL_CLKSOURCE_EXTERNAL 0 /* clock source is selected by RCC_CCIPR2_SYSTICKSEL */
 
 #if (((SYSTICK_CTRL_VAL) & SysTick_CTRL_CLKSOURCE_Msk) != 0)
-#define f_CortexSystemTimer_Hz (f_HCLK_Hz)
+#define f_CortexSystemTimer_Hz (f_HSI_Hz)
 #else
-#define f_CortexSystemTimer_Hz ((f_HCLK_Hz) / 8)
+#if RCC_CCIPR2_SYSTICKSEL_INIT == LL_RCC_SYSTICK_CLKSOURCE_HCLKDIV8
+#define f_CortexSystemTimer_Hz ((f_HSI_Hz) / 8)
+#elif RCC_CCIPR2_SYSTICKSEL_INIT == LL_RCC_SYSTICK_CLKSOURCE_LSE
+#define f_CortexSystemTimer_Hz (f_LSE_Hz)
+#elif RCC_CCIPR2_SYSTICKSEL_INIT == LL_RCC_SYSTICK_CLKSOURCE_LSI
+#define f_CortexSystemTimer_Hz (f_LSI_Hz)
+#else
+#error Wrong System timer source config!
+#endif
 #endif
 
 void SysClock_Init(void);
 void SysTick_Init(void);
 
-static inline uint16_t SysTick_Get(void)
+static inline uint32_t SysTick_Get(void)
 {
-  return (~SysTick->VAL) & 0xFFFF;
+  return (~SysTick->VAL) & 0xFFFFFF;
 }
 
 static inline uint32_t SysTick_GetCountFlag(void)
