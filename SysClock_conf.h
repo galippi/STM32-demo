@@ -59,9 +59,10 @@
 #define HSE_STARTUP_ERROR(data) DBG_SET(clockHseInitError, 1)
 #endif
 
-#define SYSTICK_RELOAD_VAL 8000
-#define SYSTICK_CTRL_VAL   SysTick_CTRL_CLKSOURCE_HCLK8 | \
-                         /*SysTick_CTRL_TICKINT_Msk   | */ \
+#define SYSTICK_RELOAD_VAL ((f_SYSCLK_Hz) / 8 / 1000) /* 1 ms */
+#define RCC_CCIPR2_SYSTICKSEL_INIT LL_RCC_SYSTICK_CLKSOURCE_HCLKDIV8
+#define SYSTICK_CTRL_VAL   SysTick_CTRL_CLKSOURCE_EXTERNAL | \
+                           SysTick_CTRL_TICKINT_Msk     |  \
                            SysTick_CTRL_ENABLE_Msk
 
 #endif /* _SYSCLOCK_CONF_H_ */

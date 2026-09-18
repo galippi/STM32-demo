@@ -17,6 +17,9 @@
 
 void RAM_StartCheck(void);
 int main(void);
+
+void SysTick_Isr(void);
+
 void TIM1_ISR(void);
 void TIM3_ISR(void);
 void TIM14_ISR(void);

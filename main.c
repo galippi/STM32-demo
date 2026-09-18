@@ -140,7 +140,6 @@ int main(void)
 
   SysClock_Init();
   SysTick_Init();
-  NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority lowest / highest for SysTick Interrupts */
   GPIO_PortInit_Out(GPIOA, 9); /* debug data port */
   GPIO_Set(GPIOA, 9, 0);
   GPIO_Set(GPIOA, 9, 1);
@@ -196,11 +195,13 @@ int main(void)
   //SCB->SHP[14-4] = 0xFF; /* it shall be lower than the prio of the scheduler-timer interrupt */
   /* set SVC prio to 0x00 */
   //SCB->SHP[11-4] = 0x10;
+  NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority lowest / highest for SysTick Interrupts */
 
   while (1)
   {
     //ADC_Handler();
     Task_Bgnd();
+#if 0
     if (SysTick_GetCountFlag()) {
         static uint32_t ctr;
         if (ctr == 0) {
@@ -211,9 +212,25 @@ int main(void)
         }
         ctr--;
     }
+#endif
   }
 
   return 0;
+}
+
+void SysTick_Isr(void)
+{
+    if (SysTick_GetCountFlag()) {
+        static uint32_t ctr;
+        if (ctr == 0) {
+            static uint8_t led_val;
+            GPIO_Set(GPIOA, 9, led_val);
+            led_val = 1 - led_val;
+            ctr = 1000;
+        }
+        ctr--;
+    }else
+        CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) );
 }
 
 void ExceptionHandler_0(void)

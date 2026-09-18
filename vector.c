@@ -44,7 +44,7 @@ t_func_ptr const ISR_VectorTable[] =
   ISR_Invalid,       /* 12 Debug Monitor */
   ISR_Invalid,       /* 13 RESERVED */
   PendSV_Handler,    /* 14 PendSV */
-  ISR_Invalid,       /* 15 SysTick */
+  SysTick_Isr,       /* 15 SysTick */
   ISR_Invalid,       /* 16 WWDG */
   ISR_Invalid,       /* 17 PVD / PVM */
   ISR_Invalid,       /* 18 RTC / TAMP */
