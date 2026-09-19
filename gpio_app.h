@@ -17,6 +17,11 @@
 #define LED3_PORT GPIOC
 #define LED3_PIN_NUM 13
 
+#elif TARGET_ECU == TARGET_ECU_STM32C542
+/* port definition for STM32G030 LQFP64 board */
+#define LED3_PORT GPIOA
+#define LED3_PIN_NUM 9
+
 #elif TARGET_ECU == TARGET_ECU_STM32G030
 /* port definition for STM32G030 TSSOP20 board */
 #define LED3_PORT GPIOA

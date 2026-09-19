@@ -1,9 +1,10 @@
 #include <string.h>
+#include <stdint.h>
+
+#if 0
 
 #include "SysClock.h"
-#include "gpio_app.h"
 #include "debug.h"
-#include "FaultHandler.h"
 #include "scheduler_preemptive.h"
 #include "version.h"
 #include "timer.h"
@@ -17,6 +18,11 @@
 #include "usbd_conf.h"
 #endif
 
+#endif
+
+#include "gpio_app.h"
+#include "FaultHandler.h"
+
 #include "tasks.h"
 
 uint8_t uart1RxBuffer[128];
@@ -24,6 +30,7 @@ uint8_t uart1RxBuffer[128];
 
 void Task_Init(void)
 {
+#if 0
     DMA_Init(DMA1);
 
     UART1_Init(9600, 0);
@@ -35,10 +42,12 @@ void Task_Init(void)
     #ifdef f_USBCLK_Hz
     USB_task_init();
     #endif
+#endif
 }
 
 //QUEUE_CREATE(uart1TxQueue, 128);
 char uart1TxOverflowCtr1;
+#if 0
 
 static void UART_TX(const void *ptr, uint8_t len)
 {
@@ -66,6 +75,7 @@ static void UART_TX(const void *ptr, uint8_t len)
     }
 #endif
 }
+#endif
 
 uint8_t UART1_TxOverrun;
 
@@ -99,10 +109,14 @@ void Task_1ms(void)
   halTick_1ms++;
 }
 
+extern uint32_t HAL_GetTick(void);
+
 uint32_t HAL_GetTick(void)
 {
     return halTick_1ms;
 }
+
+extern void HAL_Delay(uint32_t delay);
 
 void HAL_Delay(uint32_t delay)
 {
@@ -115,11 +129,6 @@ void HAL_Delay(uint32_t delay)
 
 void Task_10ms(void)
 {
-    {
-        static uint8_t db = 0; // TODO:
-        LED4_Set( db);
-        db = 1 - db;
-    }
 }
 
 typedef enum
@@ -182,6 +191,7 @@ void Task_500ms(void)
 	{
 		pulseTimer--;
 	}
+#if 0
     {
         static uint8_t rxIdx = 0;
         uint8_t len = UART1_RX(uart1RxBuffer + rxIdx, sizeof(uart1RxBuffer) - rxIdx);
@@ -199,4 +209,5 @@ void Task_500ms(void)
         U32_to_HexString(adcData + 15, 4, ADC_values_raw[3], '0');
         UART_TX(adcData, sizeof(adcData) - 1);
     }
+#endif
 }

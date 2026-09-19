@@ -12,7 +12,7 @@
 #include "system_conf.h"
 //#include "timer_conf.h"
 //#include "timer_app.h"
-//#include "scheduler_preemptive_conf.h"
+#include "scheduler_preemptive.h"
 #include "tasks.h"
 #include "FaultHandler.h"
 #include "vector.h"
@@ -129,11 +129,6 @@ void RAM_StartCheck(void)
   }
 }
 
-void Task_Bgnd(void)
-{
-
-}
-
 int main(void)
 {
   SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
@@ -191,11 +186,9 @@ int main(void)
   //TIM14_CCR1_Set(TIM14_Cnt_Get() + TIM14_1ms); /* set the first scheduler interrupt to 1ms */
   //NVIC_EnableIRQ(TIM14_IRQn); /* enable TIM14 interrupt */
   //NVIC->IP[TIM14_IRQn] = 0x80; /* set TIM14 interrupt priority to medium */
-  /* set PENDSV prio to 0xFF */
-  //SCB->SHP[14-4] = 0xFF; /* it shall be lower than the prio of the scheduler-timer interrupt */
-  /* set SVC prio to 0x00 */
-  //SCB->SHP[11-4] = 0x10;
-  NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority lowest / highest for SysTick Interrupts */
+  NVIC_SetPriority(SysTick_IRQn, 8);  /* set Priority to middle for SysTick Interrupts */
+  NVIC_SetPriority(SVCall_IRQn,  0); // set priority to lowest one
+  NVIC_SetPriority(PendSV_IRQn,  (1<<__NVIC_PRIO_BITS) - 1); /* it shall be lower than the prio of the scheduler-timer interrupt */
 
   while (1)
   {
@@ -221,6 +214,23 @@ int main(void)
 void SysTick_Isr(void)
 {
     if (SysTick_GetCountFlag()) {
+#if 1
+#if 0
+        static uint16_t t_last;
+        uint16_t t = getTimer_us();
+        if (t_last == 0) {
+            t_last  = t;
+        }else {
+            if (((t - t_last) & 0xFFFF) > (2 * TIM6_1ms))
+              SchedulerPre_LostInterrupt();
+            t_last = t_last + TIM6_1ms;
+        }
+        if (t_last == 0)
+            t_last = 1;
+#endif
+        SchedulerPre_TaskTableUpdate();
+        SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; /* activate PendSV handler */
+#else
         static uint32_t ctr;
         if (ctr == 0) {
             static uint8_t led_val;
@@ -229,6 +239,7 @@ void SysTick_Isr(void)
             ctr = 1000;
         }
         ctr--;
+#endif
     }else
         CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) );
 }
@@ -380,13 +391,6 @@ void svc_ret(void)
    * FPU handling
    */
   __ASM("SVC #0");
-}
-
-extern void SchedulerPre_TaskManagement(void);
-
-void SchedulerPre_TaskManagement(void)
-{
-
 }
 
 /* INTERRUPT */ void PendSV_Handler(void)

@@ -66,6 +66,8 @@ CFILES  += u32_to_hexstring.c
 CFILES  += SysClock.c
 CFILES  += queue.c
 CFILES  += gpio.c
+CFILES  += scheduler_preemptive.c
+CFILES  += tasks.c
 
 SFILES  =
 #SFILES += vectors.s
