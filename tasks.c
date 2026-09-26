@@ -8,9 +8,7 @@
 #include "scheduler_preemptive.h"
 #include "version.h"
 #include "timer.h"
-#include "uart.h"
 #include "u32_to_hexstring.h"
-#include "queue.h"
 #include "adc_app.h"
 #include "dma.h"
 
@@ -22,6 +20,8 @@
 
 #include "gpio_app.h"
 #include "FaultHandler.h"
+#include "uart.h"
+#include "queue.h"
 
 #include "tasks.h"
 
@@ -30,10 +30,11 @@ uint8_t uart1RxBuffer[128];
 
 void Task_Init(void)
 {
+    UART1_Init(9600, 0);
+
 #if 0
     DMA_Init(DMA1);
 
-    UART1_Init(9600, 0);
 
     TIM3_Init();
 
@@ -45,9 +46,8 @@ void Task_Init(void)
 #endif
 }
 
-//QUEUE_CREATE(uart1TxQueue, 128);
+QUEUE_CREATE(uart1TxQueue, 128);
 char uart1TxOverflowCtr1;
-#if 0
 
 static void UART_TX(const void *ptr, uint8_t len)
 {
@@ -75,13 +75,12 @@ static void UART_TX(const void *ptr, uint8_t len)
     }
 #endif
 }
-#endif
 
 uint8_t UART1_TxOverrun;
 
 void Task_Bgnd(void)
 {
-#if 0
+#if UART1_DMA == 0
     uint8_t data;
     char len = queueRead(&uart1TxQueue, &data, 1);
     if (len)

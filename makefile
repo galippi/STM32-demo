@@ -68,6 +68,8 @@ CFILES  += queue.c
 CFILES  += gpio.c
 CFILES  += scheduler_preemptive.c
 CFILES  += tasks.c
+CFILES  += uart.c
+CFILES  += uart_app.c
 
 SFILES  =
 #SFILES += vectors.s
