@@ -5,7 +5,7 @@
 
 #define HSIDIV_REG 1 // div by 2
 
-//#define f_HSE_Hz 4000000
+#define f_HSE_Hz 16000000
 //#define f_LSE_Hz 32768
 //#define f_PSI_Hz 100000000 or 144000000 or 160000000
 #define f_SYSCLK_Hz 48000000
