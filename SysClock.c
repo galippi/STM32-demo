@@ -169,16 +169,16 @@ void SysClock_Init(void)
 
   #if HSE_ON != 0
   /* Enable HSE - high speed external oscillator */
-  RCC->CR |= (uint32_t)(RCC_CR_HSEON);
+  RCC->CR1 |= (uint32_t)(RCC_CR1_HSEON);
 
   /* Wait till HSE is ready and if Time out is reached exit */
   StartUpCounter = 0;
-  while(((RCC->CR & RCC_CR_HSERDY) == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT))
+  while(((RCC->CR1 & RCC_CR1_HSERDY) == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT))
   {
     StartUpCounter++;
   }
   HSE_STARTUP_DEBUG(StartUpCounter);
-  if (!(RCC->CR & RCC_CR_HSERDY))
+  if (!(RCC->CR1 & RCC_CR1_HSERDY))
   {
     HSE_STARTUP_ERROR(0);
   }
