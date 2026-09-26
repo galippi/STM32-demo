@@ -120,7 +120,13 @@
   #define f_TIMPCLK_CALC_Hz (f_HCLK_Hz * 2)
 #endif
 
-#define f_APB2_CALC_Hz (f_AHB_Hz / PPRE2_VAL)
+#endif
+
+#define PPRE2_VAL 1 /* to be calculated */
+
+#define f_APB2_CALC_Hz ((f_HCLK_Hz() / (PPRE2_VAL))
+
+#if 0
 
 #if (ADCPRE_REG >= 0) && (ADCPRE_REG <= 3)
 #define ADCPRE_VAL (2 + (ADCPRE_REG * 2))
@@ -136,9 +142,17 @@
 #define f_LSE_USART_Hz f_LSE_Hz
 #endif
 
-#define f_USART1_Hz (((USART1SEL) == RCC_CCIPR_USART1SEL_PCLK)   ? (f_PCLK_Hz)   : \
-                    (((USART1SEL) == RCC_CCIPR_USART1SEL_SYSCLK) ? (f_SYSCLK_Hz) : \
-                    (((USART1SEL) == RCC_CCIPR_USART1SEL_HSI16)  ? (f_HSI_Hz)    : (f_LSE_USART_Hz))))
+#endif
+
+#ifndef f_LSE_USART_Hz
+#define f_LSE_USART_Hz 0
+#endif
+
+#define f_USART1_Hz (((USART1SEL) == LL_RCC_USART1_CLKSOURCE_PCLK2) ? (f_PCLK2_Hz)  : \
+                    (((USART1SEL) == LL_RCC_USART1_CLKSOURCE_PSIK)  ? (f_SYSCLK_Hz) : \
+                    (((USART1SEL) == LL_RCC_USART1_CLKSOURCE_HSIK)  ? (f_HSI_Hz)    : (f_LSE_USART_Hz))))
+
+#if 0
 
 #define RCC_CCIPR2_USBSEL_HSI48 0
 #define RCC_CCIPR2_USBSEL_HSE   1
