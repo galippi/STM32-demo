@@ -75,8 +75,7 @@
   #define f_SYSCLK_CALC_Hz ((f_HSI_Hz) / 3)
 #elif (RCC_CFGR2_SW_VAL == LL_RCC_SYS_CLKSOURCE_HSIS)
   #define f_SYSCLK_CALC_Hz F_HSISYS_Hz
-#elif RCC_CFGR2_SW_VAL == RCC_CFGR_SW_HSE && (HSE_ON != 0)
-#error Not yet implemented!
+#elif RCC_CFGR2_SW_VAL == LL_RCC_SYS_CLKSOURCE_HSE && (HSE_ON != 0)
   #define f_SYSCLK_CALC_Hz f_HSE_Hz
 #elif RCC_CFGR2_SW_VAL == RCC_CFGR_SW_PLLRCLK && (PLL_ON != 0)
 #error Not yet implemented!
