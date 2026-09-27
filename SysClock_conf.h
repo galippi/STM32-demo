@@ -8,8 +8,9 @@
 #define f_HSE_Hz 16000000
 //#define f_LSE_Hz 32768
 //#define f_PSI_Hz 100000000 or 144000000 or 160000000
-#define f_SYSCLK_Hz 16000000
-#define f_HCLK_Hz 48000000 // AHB
+#define f_PSI_Hz 100000000
+#define f_SYSCLK_Hz 100000000
+#define f_HCLK_Hz 25000000 // AHB
 #define f_PCLK1_Hz 48000000 // APB1 - rcc_pclk1
 #define f_PCLK2_Hz 48000000 // APB2 - rcc_pclk2
 #define f_PCLK3_Hz 48000000 // APB3 - rcc_pclk3
@@ -23,11 +24,14 @@
 #define HSE_ON (defined(f_HSE_Hz) ? 1 : 0)
 #define HSE_BYP 0
 
-#define PSISRC   PSISRC_LSE or PSISRC_HSE or PSISRC_HSIDIV18_CK
+//#define PSIREFSRC 0 // LL_RCC_PSISOURCE_HSE or LL_RCC_PSISOURCE_LSE or LL_RCC_PSISOURCE_HSIDIV18
+#define PSIREFSRC LL_RCC_PSISOURCE_HSE
+#define PSISRC LL_RCC_PSIREF_16MHZ
+#define PISFREQ LL_RCC_PSIFREQ_100MHZ
 
-#define RCC_CFGR2_SW_VAL LL_RCC_SYS_CLKSOURCE_HSE
+#define RCC_CFGR2_SW_VAL LL_RCC_SYS_CLKSOURCE_PSIS
 
-#define HPRE_REG  0 // AHB prescaler
+#define HPRE_REG  0b1001 // AHB prescaler
 //#define PPRE_REG  0 /* APB prescaler */
 //#define ADCPRE_REG 2
 
@@ -44,8 +48,8 @@
 
 #define HSI_STARTUP_DEBUG(x) /* do nothing */
 #define HSE_STARTUP_DEBUG(x) /* do nothing */
-#define PLL_STOP_DEBUG(x) /* do nothing */
-#define PLL_STARTUP_DEBUG(x) /* do nothing */
+#define PSI_STOP_DEBUG(x) /* do nothing */
+#define PSI_STARTUP_DEBUG(x) /* do nothing */
 #define SYSCLK_SET_DEBUG(x) /* do nothing */
 
 
@@ -59,7 +63,7 @@
 #define HSE_STARTUP_ERROR(data) DBG_SET(clockHseInitError, 1)
 #endif
 
-#define SYSTICK_RELOAD_VAL ((f_SYSCLK_Hz) / 8 / 1000) /* 1 ms */
+#define SYSTICK_RELOAD_VAL ((f_CortexSystemTimer_Hz) / 1000) /* 1 ms */
 #define RCC_CCIPR2_SYSTICKSEL_INIT LL_RCC_SYSTICK_CLKSOURCE_HCLKDIV8
 #define SYSTICK_CTRL_VAL   SysTick_CTRL_CLKSOURCE_EXTERNAL | \
                            SysTick_CTRL_TICKINT_Msk     |  \

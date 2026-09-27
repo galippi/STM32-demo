@@ -25,12 +25,52 @@
 
 #include "tasks.h"
 
+#define LEDR_PORT    GPIOB
+#define LEDR_PIN_NUM 14
+
+#define LEDY_PORT    GPIOB
+#define LEDY_PIN_NUM 13
+
+#define LEDG_PORT    GPIOB
+#define LEDG_PIN_NUM 12
+
+LEDx_Init(R)
+LEDx_Set(R)
+//LEDx_Get(R)
+
+LEDx_Init(Y)
+LEDx_Set(Y)
+//LEDx_Get(Y)
+
+LEDx_Init(G)
+LEDx_Set(G)
+//LEDx_Get(G)
+
 uint8_t uart1RxBuffer[128];
 //uint8_t uart1TxBuffer[128];
 
 void Task_Init(void)
 {
     UART1_Init(9600, 0);
+
+    LEDR_Init();
+    LEDY_Init();
+    LEDG_Init();
+
+    LEDR_Set(0);
+    LEDR_Set(1);
+    LEDR_Set(0);
+    LEDR_Set(1);
+
+    LEDY_Set(0);
+    LEDY_Set(1);
+    LEDY_Set(0);
+    LEDY_Set(1);
+
+    LEDG_Set(0);
+    LEDG_Set(1);
+    LEDG_Set(0);
+    LEDG_Set(1);
 
 #if 0
     DMA_Init(DMA1);
@@ -209,4 +249,15 @@ void Task_500ms(void)
         UART_TX(adcData, sizeof(adcData) - 1);
     }
 #endif
+
+    {
+        static uint8_t ctr;
+        LEDR_Set(ctr & 0x01);
+        LEDY_Set(ctr & 0x02);
+        LEDG_Set(ctr & 0x04);
+        if (ctr < 7)
+            ctr++;
+        else
+            ctr = 0;
+    }
 }

@@ -180,7 +180,7 @@ int main(void)
 
   //ADC_HandlerInit();
   //UART2_Init();
-  //Task_Init();
+  Task_Init();
   //TIM14_Init();
   //SchedulerPre_Init();
   //TIM14_CCR1_Set(TIM14_Cnt_Get() + TIM14_1ms); /* set the first scheduler interrupt to 1ms */
