@@ -8,7 +8,7 @@
 #define f_HSE_Hz 16000000
 //#define f_LSE_Hz 32768
 //#define f_PSI_Hz 100000000 or 144000000 or 160000000
-#define f_SYSCLK_Hz 48000000
+#define f_SYSCLK_Hz 16000000
 #define f_HCLK_Hz 48000000 // AHB
 #define f_PCLK1_Hz 48000000 // APB1 - rcc_pclk1
 #define f_PCLK2_Hz 48000000 // APB2 - rcc_pclk2
@@ -25,7 +25,7 @@
 
 #define PSISRC   PSISRC_LSE or PSISRC_HSE or PSISRC_HSIDIV18_CK
 
-#define RCC_CFGR2_SW_VAL LL_RCC_SYS_CLKSOURCE_HSIDIV3
+#define RCC_CFGR2_SW_VAL LL_RCC_SYS_CLKSOURCE_HSE
 
 #define HPRE_REG  0 // AHB prescaler
 //#define PPRE_REG  0 /* APB prescaler */
