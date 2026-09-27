@@ -14,9 +14,9 @@
 #error System clock config error!
 #endif
 
-//#if f_HCLK_Hz > 64000000
-//#error f_HCLK_Hz is wrongly set!
-//#endif
+#if f_HCLK_Hz > 160000000
+#error f_HCLK_Hz is wrongly set!
+#endif
 
 #define f_HCLK_CALC_Hz ((f_SYSCLK_Hz) / (AHB_PRESC_VAL))
 #if (f_HCLK_CALC_Hz) != (f_HCLK_Hz)
@@ -198,25 +198,34 @@ void SysClock_Init(void)
                            | (RCC_CFGR_PPRE1_0 * PPRE1_REG) /* set PCLK1 */;
 #endif
 
-#if 0
-    /* Stop PLL */
-    RCC->CR &= ~RCC_CR_PLLON;
+    /* Stop PSI */
+    RCC->CR1 &= ~RCC_CR1_PSISON;
     StartUpCounter = 0;
-    while((RCC->CR & RCC_CR_PLLRDY) != 0)
+    while((RCC->CR1 & RCC_CR1_PSISON) != 0)
     {
       StartUpCounter++;
     }
-    PLL_STOP_DEBUG(StartUpCounter);
+    PSI_STOP_DEBUG(StartUpCounter);
 
+#if PSI_ON != 0
+
+    /* PSI configuration */
+    RCC->CR2 = (RCC->CR2 & ~(RCC_CR2_PSIFREQ_Msk | RCC_CR2_PSIREFSRC_Msk | RCC_CR2_PSIREFSRC_Msk)) |
+            (PSIREFSRC | PSISRC | PISFREQ);
+
+    /* Start PSI */
+    RCC->CR1 |= RCC_CR1_PSISON;
+    StartUpCounter = 0;
+    while((RCC->CR1 & RCC_CR1_PSISON) == 0)
     {
-        //while(start_enable == 0)
-            ;
+      StartUpCounter++;
     }
-    #if PLL_ON != 0
-    /* PLL configuration */
-    RCC->PLLCFGR = ((PLLM_VAL) - 1) << (RCC_PLLCFGR_PLLM_Pos) |
-                   (((PLLSRC) << RCC_PLLCFGR_PLLSRC_Pos) | \
-                   ((PLLN_VAL) << RCC_PLLCFGR_PLLN_Pos));
+    PSI_STARTUP_DEBUG(StartUpCounter);
+
+#endif
+
+#if 0
+#if PLL_ON != 0
 
     #if (SWS == 2) // RCC_CFGR_SWS_PLLRCLK
       #if ((f_PLL_RCLK_Hz) > 64000000)
@@ -280,6 +289,9 @@ void SysClock_Init(void)
 #endif
 
 #endif
+
+    // set AHB prescaller
+    RCC->CFGR2 = (RCC->CFGR2 & ~RCC_CFGR2_HPRE_Msk) | (HPRE_REG << RCC_CFGR2_HPRE_Pos);
 
     /* Select system clock source */
     RCC->CFGR1 = (RCC->CFGR1 & (uint32_t)((uint32_t)~(RCC_CFGR1_SW))) | ((RCC_CFGR2_SW_VAL) << RCC_CFGR1_SW_Pos);

@@ -32,43 +32,43 @@
 #ifndef PSI_ON
   #ifdef f_PSI_Hz
     #define PSI_ON 1
+    #ifndef PSIREFSRC
+    #error PSI is on, but the PSIREFSRC is not defined!
+    #endif
+    #if PSIREFSRC == LL_RCC_PSISOURCE_HSE
+    #define f_PSI_INPUT_CALC_Hz f_HSE_Hz
+    #elif PSIREFSRC == LL_RCC_PSISOURCE_LSE
+    #define f_PSI_INPUT_CALC_Hz f_LSE_Hz
+    #elif PSIREFSRC == LL_RCC_PSISOURCE_HSIDIV18
+    #define f_PSI_INPUT_CALC_Hz (f_HSI_Hz / 18)
+    #else
+    #error PSIREFSRC is wrong!
+    #endif
+    #if PSISRC == LL_RCC_PSIREF_32768HZ
+      #define f_PSI_INPUT_REQ_Hz    32768
+    #elif PSISRC == LL_RCC_PSIREF_16MHZ
+      #define f_PSI_INPUT_REQ_Hz 16000000
+    #else
+      #error PSISRC is wrong!
+    #endif
+    #if (f_PSI_INPUT_CALC_Hz) != (f_PSI_INPUT_REQ_Hz)
+    #error PSI configuration error!
+    #endif
+    #if PISFREQ == LL_RCC_PSIFREQ_100MHZ
+    #define f_PSI_OUTPUT_CALC_Hz 100000000
+    #elif PISFREQ == LL_RCC_PSIFREQ_144MHZ
+    #define f_PSI_OUTPUT_CALC_Hz 144000000
+    #elif PISFREQ == LL_RCC_PSIFREQ_166MHZ
+    #define f_PSI_OUTPUT_CALC_Hz 160000000
+    #else
+    #error PSIFREQ is wrongly set!
+    #endif
+    #if f_PSI_OUTPUT_CALC_Hz != f_PSI_Hz
+    #error PSI configuration is wrong!
+    #endif
   #else
     #define PSI_ON 0
   #endif
-#endif
-
-#define PSISRC_NONE 0
-
-#ifndef PSISRC
-#define PSISRC PSISRC_NONE
-#endif
-
-#if 0
-#if (PLLSRC == PLLSRC_HSE)
-  #if (HSE_ON == 0)
-    #error HSE_ON is worngly set!
-  #endif
-  #define f_VCO_INPUT_Hz (f_HSE_Hz / (PLLM_VAL))
-#elif (PLLSRC == PLLSRC_HSI16)
-    #if HSI_ON != 1
-    #error HSI_ON is worngly set!
-    #endif
-    #define f_VCO_INPUT_Hz ((f_HSI_Hz) / (PLLM_VAL))
-#else
-#error The PLLSRC is wrongly set!
-#endif
-
-#if ((PLLM_VAL) < 1) || ((PLLM_VAL) > 8)
-#error PLLM_VAL is wrongly set!
-#endif
-
-#if ((PLLN_VAL) < 8) || ((PLLN_VAL) > 86)
-#error PLLN is wrongly set!
-#endif
-
-#define f_VCO_CALC_Hz ((f_VCO_INPUT_Hz) * (PLLN_VAL))
-#define f_PLL_RCLK_Hz ((f_VCO_CALC_Hz) / (PLLR_VAL))
-
 #endif
 
 #if (RCC_CFGR2_SW_VAL == LL_RCC_SYS_CLKSOURCE_HSIDIV3)
@@ -77,31 +77,25 @@
   #define f_SYSCLK_CALC_Hz F_HSISYS_Hz
 #elif RCC_CFGR2_SW_VAL == LL_RCC_SYS_CLKSOURCE_HSE && (HSE_ON != 0)
   #define f_SYSCLK_CALC_Hz f_HSE_Hz
-#elif RCC_CFGR2_SW_VAL == RCC_CFGR_SW_PLLRCLK && (PLL_ON != 0)
-#error Not yet implemented!
-  #define f_SYSCLK_CALC_Hz f_PLL_RCLK_Hz
+#elif RCC_CFGR2_SW_VAL == LL_RCC_SYS_CLKSOURCE_PSIS && (PSI_ON != 0)
+  #define f_SYSCLK_CALC_Hz f_PSI_Hz
 #else
-#error SWS is wrongly set!
+#error RCC_CFGR2_SW_VAL is wrongly set!
+#endif
+
+#if f_SYSCLK_Hz != f_SYSCLK_CALC_Hz
+#error f_SYSCLK_Hz setting error!
 #endif
 
 #if HPRE_REG < 0x08
   #define AHB_PRESC_VAL 1
-#elif HPRE_REG < 12
-  #define AHB_PRESC_VAL (1 << ((HPRE_REG) - 7))
 #elif HPRE_REG <= 15
-  #define AHB_PRESC_VAL (64 << (HPRE_REG - 12))
+  #define AHB_PRESC_VAL (1 << ((HPRE_REG) - 7))
 #else
 #error HPRE_REG is wrongly set!
 #endif
 
 #if 0
-
-
-#define f_HCLK_CALC_Hz (f_SYSCLK_Hz / AHB_PRESC_VAL)
-
-#if (f_HCLK_Hz) != (f_HCLK_CALC_Hz)
-#error HCLK config error!
-#endif
 
 #if PPRE_REG < 4
   #define APB_PRESC_VAL 1
