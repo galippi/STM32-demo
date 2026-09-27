@@ -160,7 +160,7 @@
 #define f_CortexSystemTimer_Hz (f_HSI_Hz)
 #else
 #if RCC_CCIPR2_SYSTICKSEL_INIT == LL_RCC_SYSTICK_CLKSOURCE_HCLKDIV8
-#define f_CortexSystemTimer_Hz ((f_HSI_Hz) / 8)
+#define f_CortexSystemTimer_Hz ((f_HCLK_Hz) / 8)
 #elif RCC_CCIPR2_SYSTICKSEL_INIT == LL_RCC_SYSTICK_CLKSOURCE_LSE
 #define f_CortexSystemTimer_Hz (f_LSE_Hz)
 #elif RCC_CCIPR2_SYSTICKSEL_INIT == LL_RCC_SYSTICK_CLKSOURCE_LSI
