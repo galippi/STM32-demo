@@ -23,6 +23,21 @@
 #error f_HCLK_Hz config error!
 #endif
 
+#define f_PCLK1_CALC_Hz ((f_HCLK_CALC_Hz) / (APB1_PRESC_VAL))
+#if f_PCLK1_CALC_Hz != f_PCLK1_Hz
+#error f_PCLK1_CALC_Hz is wrong!
+#endif
+
+#define f_PCLK2_CALC_Hz ((f_HCLK_CALC_Hz) / (APB2_PRESC_VAL))
+#if f_PCLK2_CALC_Hz != f_PCLK2_Hz
+#error f_PCLK2_CALC_Hz is wrong!
+#endif
+
+#define f_PCLK3_CALC_Hz ((f_HCLK_CALC_Hz) / (APB3_PRESC_VAL))
+#if f_PCLK3_CALC_Hz != f_PCLK3_Hz
+#error f_PCLK3_CALC_Hz is wrong!
+#endif
+
 //#if f_PCLK_Hz > 64000000
 //#error f_PCLK_Hz is wrongly set!
 //#endif
@@ -80,10 +95,6 @@
 #if 0
 #if f_AHB_CALC_Hz != f_AHB_Hz
 #error f_AHB_CALC_Hz is wrong!
-#endif
-
-#if f_APB1_CALC_Hz != f_APB1_Hz
-#error f_APB1_CALC_Hz is wrong!
 #endif
 
 #if f_TIMXCLK_CALC_Hz != f_TIMXCLK_Hz
@@ -313,6 +324,11 @@ void SysClock_Init(void)
       RCC->RTCCR &= ~RCC_RTCCR_LSEON;
     #endif
   }
+
+  RCC->CFGR2 = (RCC->CFGR2 & ~(RCC_CFGR2_PPRE1_Msk | RCC_CFGR2_PPRE2_Msk | RCC_CFGR2_PPRE3_Msk)) |
+               ((PPRE1_REG << RCC_CFGR2_PPRE1_Pos) |
+                (PPRE2_REG << RCC_CFGR2_PPRE2_Pos) |
+                (PPRE3_REG << RCC_CFGR2_PPRE3_Pos));
 
   //BitfieldSet(RCC->CFGR, RCC_CFGR_HPRE_Pos, 4, HPRE_REG);
 

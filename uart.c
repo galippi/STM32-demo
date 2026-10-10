@@ -190,84 +190,68 @@ uint32_t UART1_RX(uint8_t *data, uint32_t len)
 #endif
 #endif
 
-void UART2_Init(uint32_t BaudRate)
+void UART2_Init(uint32_t baudRate, uint8_t uartRemap)
 {
-#if (CPU_TYPE == CPU_TYPE_STM32F0)
-  GPIO_PortInit_AFOut(GPIOA, 2, 1); /* GPIOA_AFRL.2 = 0001 -> PA2 USART2_TX */
-  GPIO_PortInit_AFOut(GPIOA, 3, 1); /* GPIOA_AFRL.3 = 0001 -> PA3 USART2_RX */
-  /* enable the USART2, if it was not enabled */
-  if (!(RCC->APB1ENR & RCC_APB1ENR_USART2EN))
-  {
-    RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
-  }
-  USART2->CR1 = USART_CR1_TE | USART_CR1_RE; /* TX/RX are enabled */
-#if F_SYSTEM == 48000
-  USART2->BRR = 192; /* 48MHz / 250kBaud */
-#else
-#error "USART2_BRR must be adapted for system frequency!"
-#endif
-  USART2->CR2 = 0; /* 1 stop bit */
-  USART2->CR3 = 0x80; /* DMA is enabled for the channel */
-  /* configuring DMA for USART2-TX */
-  DMA_Init();
-  DMA1_Channel4->CPAR = (uint32_t)&(USART2->TDR);
-  DMA1_Channel4->CCR = DMA_CCR_DIR | DMA_CCR_MINC; /* mem2per, no-circ, no-per-inc, mem-inc, psize=8, memsize=8,ch-prio=low, no-mem2mem */
-  USART2->CR1 |= USART_CR1_UE; /* USART2 is enabled */
-#endif /* CPU_TYPE == CPU_TYPE_STM32F0 */
-#if (CPU_TYPE == CPU_TYPE_STM32F1)
-  GPIO_PortInit_AFOut(GPIOA, 2); /* GPIOA_AFRL.2 = 0001 -> PA2 USART2_TX */
-  GPIO_PortInit_In(GPIOA, 3); /* GPIOA_AFRL.3 = 0001 -> PA3 USART2_RX */
-  BitfieldSet(AFIO->MAPR, 3, 1, 0); /* AFIO_MAPR_USART2_REMAP */
-  /* enable the USART2, if it was not enabled */
-  if (!(RCC->APB1ENR & RCC_APB1ENR_USART2EN))
-  {
-    RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
-  }
-  USART2->CR1 = USART_CR1_TE | USART_CR1_RE; /* TX/RX are enabled */
-  if (BaudRate == 9600)
-  {
-    USART2->BRR = USART2_BRR_9600;
-  }else
-  if (BaudRate == 19200)
-  {
-    USART2->BRR = USART2_BRR_19200;
-  }else
-  if (BaudRate == 38400)
-  {
-    USART2->BRR = USART2_BRR_38400;
-  }else
-  if (BaudRate == 115200)
-  {
-    USART2->BRR = USART2_BRR_115200;
-  }
-  else
-  { /* wrong baud rate is specified -> error */
-    USART2->BRR = USART2_BRR_9600;
-  }
-  USART2->CR2 = 0; /* 1 stop bit */
-#if UART2_DMA == 0
-  USART2->CR3 = 0x00; /* DMA is disabled (???) for the channel */
-#else
-  USART2->CR3 = 0xC0; /* DMA is enabled for the channel */
-  /* configuring DMA for USART2-TX */
-  DMA_Init(DMA1);
-  DMA1_Channel7->CPAR = (uint32_t)&(USART2->DR);
-  DMA1_Channel7->CCR = DMA_CCR1_DIR | DMA_CCR1_MINC; /* mem2per, no-circ, no-per-inc, mem-inc, psize=8, memsize=8,ch-prio=low, no-mem2mem */
-  /* configuring DMA for USART2-RX */
-  DMA1_Channel6->CCR &= ~DMA_CCR1_EN;
-  DMA1_Channel6->CPAR = (uint32_t)&(USART2->DR);
-  DMA1_Channel6->CCR = DMA_CCR1_MINC | DMA_CCR1_CIRC; /* per2mem, circ, no-per-inc, mem-inc, psize=8, memsize=8, ch-prio=low, no-mem2mem */
-  DMA1_Channel6->CMAR = (uint32_t)Rx_buffer;
-  DMA1_Channel6->CNDTR = sizeof(Rx_buffer);
-  DMA1_Channel6->CCR |= DMA_CCR1_EN;
-#endif
+    if (uartRemap == 0)
+    {
+      GPIO_PortInit_AFOut(GPIOA, 2, 7); /* PA2 USART2_TX */
+      GPIO_PortInit_AFOut(GPIOA, 3, 7); /* PA3 USART2_RX */
+      //SYSCFG->CFGR1 |= (SYSCFG_CFGR1_PA11_RMP | SYSCFG_CFGR1_PA12_RMP); // TSSOP20 package pin remap
+    }else if (uartRemap == 1)
+    {
+      GPIO_PortInit_AFOut(GPIOA, 11, 4); /* PA11 USART2_TX */
+      GPIO_PortInit_AFOut(GPIOA, 12, 4); /* PA12 USART2_RX */
+    }else if (uartRemap == 2)
+    {
+      GPIO_PortInit_AFOut(GPIOB,  0, 7); /* PB0 USART2_TX */
+      GPIO_PortInit_AFOut(GPIOB,  1, 7); /* PB1 USART2_RX */
+    }else if (uartRemap == 3)
+    {
+      GPIO_PortInit_AFOut(GPIOB, 10, 7); /* PB10 USART2_TX */
+      GPIO_PortInit_AFOut(GPIOC,  4, 7); /* PC4  USART2_RX */
+    }else
+    {
+      GPIO_PortInit_AFOut(GPIOC, 10, 7); /* PC10 USART2_TX */
+      GPIO_PortInit_AFOut(GPIOC, 11, 7); /* PC11 USART2_RX */
+    }
+    BitfieldSetMask(RCC->CCIPR1, RCC_CCIPR1_USART2SEL_Pos, RCC_CCIPR1_USART2SEL_Msk, USART2SEL);
+    //RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_USART1SEL_Msk) | ((USART1SEL) << RCC_CCIPR1_USART1SEL_Pos);
+    RCC->APB1LENR |= RCC_APB1LENR_USART2EN ; /* enable the USART2 */
+    USART2->CR1 = USART_CR1_TE | USART_CR1_RE; /* TX/RX are enabled */
+    USART2->BRR = ((((f_USART2_Hz) / 1) + (baudRate / 2)) / baudRate);
+    USART2->CR2 = 0 | USART_CR2_ABREN | USART_CR2_ABRMOD; /* 1 stop bit, auto baud rate mode to 0x55 - 'U' */
+  #if UART2_DMA == 0
+    USART2->CR3 = 0x00; /* DMA is disabled (???) for the channel */
+  #else
+    USART2->CR3 = 0xC0; /* DMA is enabled for the channel */
+    /* configuring DMA for USART1-TX */
+    DMA_Init(DMA1);
+    DMA1_Channel_USART1_TX->CCR &= ~DMA_CCR_EN;
+    DMA1_Channel_USART1_TX->CPAR = (uint32_t)&(USART1->TDR);
+    DMA1_Channel_USART1_TX->CCR = DMA_CCR_DIR | DMA_CCR_MINC | DMA_CCR_TCIE; /* mem2per, no-circ, no-per-inc, mem-inc, psize=8, memsize=8,ch-prio=low, no-mem2mem */
+    DMAMUX1[DMA1_ChIdx_USART1_TX].CCR = 51;
+  #if UART1_TX_QUEUE
+    //DMA1_Channel_USART1_TX->CCR |= DMA_CCR_TCIE; /* enable DMA interrupt */
+  #endif // UART1_TX_QUEUE
 
-  UART_appInit(USART2);
+  #if 0
+    /* configuring DMA for USART1-RX */
+    DMA1_Channel_USART1_RX->CCR &= ~DMA_CCR1_EN;
+    DMA1_Channel_USART1_RX->CPAR = (uint32_t)&(USART1->DR);
+    DMA1_Channel_USART1_RX->CCR = DMA_CCR1_MINC | DMA_CCR1_TCIE; /* per2mem, circ, no-per-inc, mem-inc, psize=8, memsize=8, ch-prio=low, no-mem2mem */
+    DMAMUX1[DMA1_ChIdx_USART1_RX].CCR = 51;
+    UART1_RxDma_Update();
+  #endif
 
-  USART2->CR1 |= USART_CR1_UE; /* USART2 is enabled */
-#endif /* CPU_TYPE == CPU_TYPE_STM32F0 */
+    //NVIC_EnableIRQ(DMA1_Channel5_IRQn);
+  #endif
+
+    UART_appInit(USART2);
+
+    USART2->CR1 |= USART_CR1_UE; /* USART2 is enabled */
 }
 
+#if 0
 #if UART2_DMA == 0
 const uint8_t *UART2_TxData = 0;
 uint8_t UART2_TxLen = 0;
@@ -291,5 +275,7 @@ void UART2_Poll(void)
   rxIdx = sizeof(Rx_buffer) - DMA1_Channel6->CNDTR;
 #endif
 }
+
+#endif
 
 #endif /* UART2_IS_ENABLED */

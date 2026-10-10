@@ -95,6 +95,30 @@
 #error HPRE_REG is wrongly set!
 #endif
 
+#if PPRE1_REG < 0x04
+  #define APB1_PRESC_VAL 1
+#elif PPRE1_REG <= 7
+  #define APB1_PRESC_VAL (2 << ((PPRE1_REG) - 4))
+#else
+#error PPRE1_REG is wrongly set!
+#endif
+
+#if PPRE2_REG < 0x04
+  #define APB2_PRESC_VAL 1
+#elif PPRE2_REG <= 7
+  #define APB2_PRESC_VAL (2 << ((PPRE2_REG) - 4))
+#else
+#error PPRE2_REG is wrongly set!
+#endif
+
+#if PPRE3_REG < 0x04
+  #define APB3_PRESC_VAL 1
+#elif PPRE3_REG <= 7
+  #define APB3_PRESC_VAL (2 << ((PPRE3_REG) - 4))
+#else
+#error PPRE3_REG is wrongly set!
+#endif
+
 #if 0
 
 #if PPRE_REG < 4
@@ -144,6 +168,10 @@
 #define f_USART1_Hz (((USART1SEL) == LL_RCC_USART1_CLKSOURCE_PCLK2) ? (f_PCLK2_Hz)  : \
                     (((USART1SEL) == LL_RCC_USART1_CLKSOURCE_PSIK)  ? (f_SYSCLK_Hz) : \
                     (((USART1SEL) == LL_RCC_USART1_CLKSOURCE_HSIK)  ? (f_HSI_Hz)    : (f_LSE_USART_Hz))))
+
+#define f_USART2_Hz (((USART2SEL) == LL_RCC_USART2_CLKSOURCE_PCLK1) ? (f_PCLK1_Hz)  : \
+                    (((USART2SEL) == LL_RCC_USART1_CLKSOURCE_PSIK)  ? (f_SYSCLK_Hz) : \
+                    (((USART2SEL) == LL_RCC_USART1_CLKSOURCE_HSIK)  ? (f_HSI_Hz)    : (f_LSE_USART_Hz))))
 
 #if 0
 

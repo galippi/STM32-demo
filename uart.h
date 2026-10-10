@@ -45,18 +45,12 @@ void UART1_RxDma_ISR(void);
 
 uint32_t UART1_RX(uint8_t *data, uint32_t len);
 
-void UART2_Init(uint32_t BaudRate);
+void UART2_Init(uint32_t BaudRate, uint8_t uartRemap);
 void UART2_Poll(void);
 
 static inline uint32_t UART2_TXE_Get(void)
 {
-#if CPU_TYPE == CPU_TYPE_STM32F0
   return USART2->ISR & USART_ISR_TXE;
-#elif CPU_TYPE == CPU_TYPE_STM32F1
-  return USART2->SR & USART_SR_TXE;
-#else
-  return 0;
-#endif
 }
 
 static inline uint32_t UART2_RXNE_Get(void)
@@ -112,6 +106,15 @@ static inline void UART2_TX(const uint8_t *data, uint32_t len)
   (void)data;
   (void)len;
 #endif
+}
+
+static inline char UART2_TX_Char(char d) {
+    if (UART2_TXE_Get() != 0)
+    {
+        USART2->TDR = d;
+        return 0;
+    }else
+        return 1;
 }
 
 // User functions shall be implemented by the user application
