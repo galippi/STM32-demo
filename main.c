@@ -135,10 +135,6 @@ int main(void)
 
   SysClock_Init();
   SysTick_Init();
-  GPIO_PortInit_Out(GPIOA, 9); /* debug data port */
-  GPIO_Set(GPIOA, 9, 0);
-  GPIO_Set(GPIOA, 9, 1);
-  GPIO_Set(GPIOA, 9, 0);
 
 #if 0
   TIM14_Init(); // scheduler timer init

@@ -53,19 +53,6 @@ void Task_Init(void)
 {
     UART1_Init(9600, 0);
 
-    GPIO_PortInit_Out(GPIOA, 2);
-    GPIO_PortInit_Out(GPIOA, 3);
-
-    GPIO_Set(GPIOA, 2, 0);
-    GPIO_Set(GPIOA, 2, 1);
-    GPIO_Set(GPIOA, 2, 0);
-    GPIO_Set(GPIOA, 2, 1);
-
-    GPIO_Set(GPIOA, 3, 0);
-    GPIO_Set(GPIOA, 3, 1);
-    GPIO_Set(GPIOA, 3, 0);
-    GPIO_Set(GPIOA, 3, 1);
-
     UART2_Init(1200, 0);
 
     LEDR_Init();
@@ -275,5 +262,12 @@ void Task_500ms(void)
         else
             ctr = 0;
     }
-    UART2_TX_Char('U');
+#if 1
+    UART2_TX_Char(UART2_RX_Char());
+#else
+    if (UART2_RXNE_Get())
+        UART2_TX_Char(UART2_RX_Char());
+    else
+        UART2_TX_Char('U');
+#endif
 }
