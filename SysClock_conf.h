@@ -11,9 +11,9 @@
 #define f_PSI_Hz 100000000
 #define f_SYSCLK_Hz 100000000
 #define f_HCLK_Hz 25000000 // AHB
-#define f_PCLK1_Hz 48000000 // APB1 - rcc_pclk1
-#define f_PCLK2_Hz 48000000 // APB2 - rcc_pclk2
-#define f_PCLK3_Hz 48000000 // APB3 - rcc_pclk3
+#define f_PCLK1_Hz 25000000 // APB1 - rcc_pclk1
+#define f_PCLK2_Hz 25000000 // APB2 - rcc_pclk2
+#define f_PCLK3_Hz 25000000 // APB3 - rcc_pclk3
 //#define f_TIMPCLK_Hz 8000000
 //#define f_TIMXCLK_Hz 72000000
 //#define f_TIM1CLK_Hz 72000000
@@ -32,7 +32,9 @@
 #define RCC_CFGR2_SW_VAL LL_RCC_SYS_CLKSOURCE_PSIS
 
 #define HPRE_REG  0b1001 // AHB prescaler
-//#define PPRE_REG  0 /* APB prescaler */
+#define PPRE1_REG 0b000
+#define PPRE2_REG 0b000
+#define PPRE3_REG 0b000
 //#define ADCPRE_REG 2
 
 //#define f_USBCLK_Hz 48000000

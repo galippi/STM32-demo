@@ -18,9 +18,10 @@
 #include "debug.h"
 #include "uart_app.h"
 
-#define UART_MODE_POLLED 0
-#define UART_MODE_IRQ    1
-#define UART_MODE_DMA    2
+#define UART_MODE_NONE   0
+#define UART_MODE_POLLED 1
+#define UART_MODE_IRQ    2
+#define UART_MODE_DMA    3
 
 #define USART1SEL LL_RCC_USART1_CLKSOURCE_PCLK2
 #define UART1_MODE UART_MODE_POLLED
@@ -32,7 +33,10 @@
 
 typedef uint8_t t_UART1_idx;
 
-#define UART2_IS_ENABLED 0
+#define USART2SEL LL_RCC_USART2_CLKSOURCE_PCLK1
+#define UART2_IS_ENABLED 1
+#define UART2_TX_MODE UART_MODE_POLLED
+#define UART2_RX_MODE UART_MODE_POLLED
 #define UART2_DMA 0
 #define UART2_TX_QUEUE 0
 
