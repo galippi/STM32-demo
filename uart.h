@@ -10,6 +10,33 @@
 #define RCC_CCIPR_USART1SEL_HSI16  2
 #define RCC_CCIPR_USART1SEL_LSE    3
 
+static inline uint32_t UART_RXNE_Get(USART_TypeDef *uart)
+{
+  return uart->ISR & USART_ISR_RXNE;
+}
+
+static inline char UART_RX_Char(USART_TypeDef *uart)
+{
+    if (UART_RXNE_Get(uart))
+        return uart->RDR & 0xFF;
+    else
+        return '?';
+}
+
+static inline uint32_t UART_TXE_Get(USART_TypeDef *uart)
+{
+  return uart->ISR & USART_ISR_TXE;
+}
+
+static inline char UART_TX_Char(USART_TypeDef *uart, char d) {
+    if (UART_TXE_Get(uart) != 0)
+    {
+        uart->TDR = d;
+        return 0;
+    }else
+        return 1;
+}
+
 void UART1_Init(uint32_t baudRate, uint8_t uartRemap);
 void UART1_Poll(void);
 
@@ -45,25 +72,37 @@ void UART1_RxDma_ISR(void);
 
 uint32_t UART1_RX(uint8_t *data, uint32_t len);
 
+static inline uint32_t UART1_TXE_Get(void)
+{
+  return UART_TXE_Get(USART1);
+}
+
+static inline uint32_t UART1_RXNE_Get(void)
+{
+  return UART_RXNE_Get(USART1);
+}
+
+static inline char UART1_RX_Char(void)
+{
+    return UART_RX_Char(USART1);
+}
+
 void UART2_Init(uint32_t BaudRate, uint8_t uartRemap);
 void UART2_Poll(void);
 
 static inline uint32_t UART2_TXE_Get(void)
 {
-  return USART2->ISR & USART_ISR_TXE;
+  return UART_TXE_Get(USART2);
 }
 
 static inline uint32_t UART2_RXNE_Get(void)
 {
-#if CPU_TYPE == CPU_TYPE_STM32F0
-  return USART2->ISR & USART_ISR_RXNE;
-#elif CPU_TYPE == CPU_TYPE_STM32F1
-  return USART2->SR & USART_SR_RXNE;
-#elif CPU_TYPE == CPU_TYPE_STM32F4
-  return USART2->SR & USART_SR_RXNE;
-#else
-  return 0;
-#endif
+  return UART_RXNE_Get(USART2);
+}
+
+static inline char UART2_RX_Char(void)
+{
+    return UART_RX_Char(USART2);
 }
 
 #if UART2_DMA == 0

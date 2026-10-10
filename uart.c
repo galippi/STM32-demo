@@ -195,7 +195,7 @@ void UART2_Init(uint32_t baudRate, uint8_t uartRemap)
     if (uartRemap == 0)
     {
       GPIO_PortInit_AFOut(GPIOA, 2, 7); /* PA2 USART2_TX */
-      GPIO_PortInit_AFOut(GPIOA, 3, 7); /* PA3 USART2_RX */
+      GPIO_PortInit_AFIn( GPIOA, 3, 7); /* PA3 USART2_RX */
       //SYSCFG->CFGR1 |= (SYSCFG_CFGR1_PA11_RMP | SYSCFG_CFGR1_PA12_RMP); // TSSOP20 package pin remap
     }else if (uartRemap == 1)
     {
@@ -219,7 +219,7 @@ void UART2_Init(uint32_t baudRate, uint8_t uartRemap)
     RCC->APB1LENR |= RCC_APB1LENR_USART2EN ; /* enable the USART2 */
     USART2->CR1 = USART_CR1_TE | USART_CR1_RE; /* TX/RX are enabled */
     USART2->BRR = ((((f_USART2_Hz) / 1) + (baudRate / 2)) / baudRate);
-    USART2->CR2 = 0 | USART_CR2_ABREN | USART_CR2_ABRMOD; /* 1 stop bit, auto baud rate mode to 0x55 - 'U' */
+    USART2->CR2 = USART2_CR2; /* 1 stop bit, auto baud rate mode to 0x55 - 'U' */
   #if UART2_DMA == 0
     USART2->CR3 = 0x00; /* DMA is disabled (???) for the channel */
   #else

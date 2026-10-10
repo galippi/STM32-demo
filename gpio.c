@@ -106,6 +106,22 @@ void GPIO_PortInit_In(GPIO_TypeDef * const gpio, uint8_t portnum)
   BitfieldSet(gpio->PUPDR, portnum * 2, 2, GPIO_PUPDR_NOPULL);
 }
 
+void GPIO_PortInit_AFIn(GPIO_TypeDef * const gpio, uint8_t portnum, uint8_t AFR_val)
+{
+    GPIO_PortEnable(gpio);
+
+    BitfieldSet(gpio->OTYPER, portnum, 1, GPIO_OTYPER_OD); // maybe it's not used for input
+    BitfieldSet(gpio->PUPDR, portnum * 2, 2, GPIO_PUPDR_NOPULL);
+    BitfieldSet(gpio->MODER, portnum * 2, 2, GPIO_MODER_AF);
+    if (portnum <= 7)
+    {
+      BitfieldSet(gpio->AFR[0], portnum * 4, 4, AFR_val);
+    }else
+    {
+      BitfieldSet(gpio->AFR[1], (portnum - 8) * 4, 4, AFR_val);
+    }
+}
+
 void GPIO_PortInit_Analog(GPIO_TypeDef * const gpio, uint8_t portnum)
 {
   GPIO_PortEnable(gpio);
