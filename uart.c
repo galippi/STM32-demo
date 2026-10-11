@@ -21,16 +21,35 @@ void UART1_Init(uint32_t baudRate, uint8_t uartRemap)
   if (uartRemap == 0)
   {
     GPIO_PortInit_AFOut(GPIOA, 6, 7); /* PA6 USART1_TX */
-    GPIO_PortInit_AFOut(GPIOA, 7, 7); /* PA7 USART1_RX */
+    GPIO_PortInit_AFIn( GPIOA, 7, 7); /* PA7 USART1_RX */
     //SYSCFG->CFGR1 |= (SYSCFG_CFGR1_PA11_RMP | SYSCFG_CFGR1_PA12_RMP); // TSSOP20 package pin remap
-  }else
+  }else if (uartRemap == 1)
+  {
+    GPIO_PortInit_AFOut(GPIOA,  9, 7); /* PA9  USART1_TX */
+    GPIO_PortInit_AFIn( GPIOA, 10, 7); /* PA10 USART1_RX */
+  }else if (uartRemap == 2)
+  {
+    GPIO_PortInit_AFOut(GPIOA, 15, 11); /* PA15 USART1_TX */
+    GPIO_PortInit_AFIn( GPIOB,  4, 11); /* PB4  USART1_RX */
+  }else if (uartRemap == 3)
+  {
+    GPIO_PortInit_AFOut(GPIOB,  3, 11); /* PB3  USART1_TX */
+    GPIO_PortInit_AFIn( GPIOB,  4, 11); /* PB4  USART1_RX */
+  }else if (uartRemap == 4)
+  {
+    GPIO_PortInit_AFOut(GPIOB,  6, 7); /* PB6  USART1_TX */
+    GPIO_PortInit_AFIn( GPIOB,  7, 7); /* PB7  USART1_RX */
+  }else if (uartRemap == 5)
   {
     GPIO_PortInit_AFOut(GPIOB, 14, 4); /* PB14 USART1_TX */
-    GPIO_PortInit_AFOut(GPIOB, 15, 4); /* PB15 USART1_RX */
+    GPIO_PortInit_AFIn( GPIOB, 15, 4); /* PB15 USART1_RX */
+  }else
+  { // Error handler
   }
+
   BitfieldSetMask(RCC->CCIPR1, RCC_CCIPR1_USART1SEL_Pos, RCC_CCIPR1_USART1SEL_Msk, USART1SEL);
   //RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_USART1SEL_Msk) | ((USART1SEL) << RCC_CCIPR1_USART1SEL_Pos);
-  RCC->APB3ENR |= RCC_APB3ENR_LPUART1EN;   /* enable the USART1 */
+  RCC->APB2ENR |= RCC_APB2ENR_USART1EN;   /* enable the USART1 */
   USART1->CR1 = USART_CR1_TE | USART_CR1_RE; /* TX/RX are enabled */
   USART1->BRR = ((((f_USART1_Hz) / 1) + (baudRate / 2)) / baudRate);
   USART1->CR2 = 0 | USART_CR2_ABREN | USART_CR2_ABRMOD; /* 1 stop bit, auto baud rate mode to 0x55 - 'U' */
@@ -217,9 +236,9 @@ void UART2_Init(uint32_t baudRate, uint8_t uartRemap)
     BitfieldSetMask(RCC->CCIPR1, RCC_CCIPR1_USART2SEL_Pos, RCC_CCIPR1_USART2SEL_Msk, USART2SEL);
     //RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_USART1SEL_Msk) | ((USART1SEL) << RCC_CCIPR1_USART1SEL_Pos);
     RCC->APB1LENR |= RCC_APB1LENR_USART2EN ; /* enable the USART2 */
-    USART2->CR1 = USART_CR1_TE | USART_CR1_RE; /* TX/RX are enabled */
+    USART2->CR1 = USART_CR1_TE | USART_CR1_RE /*| USART_CR1_FIFOEN*/; /* TX/RX and FIFO are enabled */
     USART2->BRR = ((((f_USART2_Hz) / 1) + (baudRate / 2)) / baudRate);
-    USART2->CR2 = USART2_CR2; /* 1 stop bit, auto baud rate mode to 0x55 - 'U' */
+    USART2->CR2 = USART2_CR2;
   #if UART2_DMA == 0
     USART2->CR3 = 0x00; /* DMA is disabled (???) for the channel */
   #else

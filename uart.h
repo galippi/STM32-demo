@@ -15,8 +15,19 @@ static inline uint32_t UART_RXNE_Get(USART_TypeDef *uart)
   return uart->ISR & USART_ISR_RXNE;
 }
 
+static inline uint32_t UART_ORE_Get(USART_TypeDef *uart)
+{
+  return uart->ISR & USART_ISR_ORE;
+}
+
 static inline char UART_RX_Char(USART_TypeDef *uart)
 {
+    if (UART_ORE_Get(uart)) {
+        //if (uart->ISR & USART_ISR_EOBF)
+        //    uart->ICR = USART_ICR_EOBCF;
+        uart->ICR = USART_ICR_ORECF;
+        return 'O';
+    }else
     if (UART_RXNE_Get(uart))
         return uart->RDR & 0xFF;
     else
@@ -109,7 +120,7 @@ static inline char UART2_RX_Char(void)
 extern const uint8_t *UART2_TxData;
 extern uint8_t UART2_TxLen;
 #endif
-uint8_t UART2_TxOverrun;
+extern uint8_t UART2_TxOverrun;
 static inline void UART2_TX(const uint8_t *data, uint32_t len)
 {
 #if (CPU_TYPE == CPU_TYPE_STM32F0)
