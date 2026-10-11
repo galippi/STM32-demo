@@ -12,6 +12,7 @@ WARNINGS += -Wmissing-declarations
 WARNINGS += -Wmissing-prototypes -Wstrict-prototypes
 WARNINGS += -Wno-unused-function
 WARNINGS += -Wno-enum-compare
+WARNINGS += -Wno-expansion-to-defined
 # stop at warnings
 WARNINGS += -Werror
 
@@ -137,13 +138,23 @@ $(DUMMY_DIR_FILE):
 targetdir:
 	-mkdir $(sort $(dir $(OBJECTS)))
 
+tool_check_:
+	@echo $@ is skipped
+
 tool_check:
-	$(AS) --version | grep "2.26.2.20160923"
-	$(CC) --version | grep "5.4.1.20160919"
-	$(LL) --version | grep "2.26.2.20160923"
-	$(OBJCOPY) --version | grep "2.26.2.20160923"
-	$(OBJDUMP) --version | grep "2.26.2.20160923"
-	echo $@ is ok!
+	$(AS) --version | grep "2.36.1.20210621"
+	$(CC) --version | grep "10.3.1 20210824"
+	$(LL) --version | grep "2.36.1.20210621"
+	$(OBJCOPY) --version | grep "2.36.1.20210621"
+	$(OBJDUMP) --version | grep "2.36.1.20210621"
+	@echo $@ is ok!
+
+tool_version_list:
+	$(AS) --version
+	$(CC) --version
+	$(LL) --version
+	$(OBJCOPY) --version
+	$(OBJDUMP) --version
 
 ##################################################################
 # cleaning rule

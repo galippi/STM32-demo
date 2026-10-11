@@ -41,7 +41,7 @@ typedef struct {
     uint8_t UART1_TxOverrun;
     uint8_t clockHseInitError;
 }t_dbgBuffer;
-t_dbgBuffer dbgBuffer;
+extern t_dbgBuffer dbgBuffer;
 
 #define DBG_SET(field, val) dbgBuffer.field = (val)
 #define DBG_INC(field) dbgBuffer.field++

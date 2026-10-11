@@ -30,13 +30,14 @@
 	DBG_PORT(GPIO_TypeDef, gpioa, GPIOA) \
 	DBG_PORT(GPIO_TypeDef, gpiob, GPIOB) \
 	DBG_PORT(GPIO_TypeDef, gpioc, GPIOC) \
-    DBG_PORT(GPIO_TypeDef, gpiod, GPIOD) \
+    DBG_PORT(GPIO_TypeDef, gpioe, GPIOE) \
 	DBG_PORT(RCC_TypeDef, rcc, RCC) \
 	DBG_PORT(SysTick_Type, systick, SysTick) \
 	DBG_PORT(ADC_TypeDef, adc1, ADC1) \
 	DBG_PORT(SCB_Type, scb, SCB) \
 	DBG_PORT(NVIC_Type, nvic, NVIC) \
 	DBG_PORT(USART_TypeDef, uart1, USART1) \
+    DBG_PORT(USART_TypeDef, uart2, USART2) \
 	DBG_PORT(FLASH_TypeDef, flash, FLASH) \
     DBG_PORT(uint16_t, packageDataRegister, (uint16_t * const)PACKAGE_BASE) \
   /* no more peripheries */
@@ -75,6 +76,8 @@ const t_DBG_Ports dbg_ports = {
 	DBG_PORTS
 };
 #endif
+
+t_dbgBuffer dbgBuffer;
 
 /** \brief  Set Stack Pointer
 
