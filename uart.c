@@ -236,7 +236,7 @@ void UART2_Init(uint32_t baudRate, uint8_t uartRemap)
     BitfieldSetMask(RCC->CCIPR1, RCC_CCIPR1_USART2SEL_Pos, RCC_CCIPR1_USART2SEL_Msk, USART2SEL);
     //RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_USART1SEL_Msk) | ((USART1SEL) << RCC_CCIPR1_USART1SEL_Pos);
     RCC->APB1LENR |= RCC_APB1LENR_USART2EN ; /* enable the USART2 */
-    USART2->CR1 = USART_CR1_TE | USART_CR1_RE /*| USART_CR1_FIFOEN*/; /* TX/RX and FIFO are enabled */
+    USART2->CR1 = USART_CR1_TE | USART_CR1_RE | USART_CR1_FIFOEN; /* TX/RX and FIFO are enabled */
     USART2->BRR = ((((f_USART2_Hz) / 1) + (baudRate / 2)) / baudRate);
     USART2->CR2 = USART2_CR2;
   #if UART2_DMA == 0
