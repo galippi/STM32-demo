@@ -33,6 +33,7 @@
     DBG_PORT(GPIO_TypeDef, gpioe, GPIOE) \
 	DBG_PORT(RCC_TypeDef, rcc, RCC) \
 	DBG_PORT(SysTick_Type, systick, SysTick) \
+	DBG_PORT(TIM_TypeDef, tim2, TIM2) \
 	DBG_PORT(ADC_TypeDef, adc1, ADC1) \
 	DBG_PORT(SCB_Type, scb, SCB) \
 	DBG_PORT(NVIC_Type, nvic, NVIC) \

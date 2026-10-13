@@ -71,6 +71,7 @@ CFILES  += scheduler_preemptive.c
 CFILES  += tasks.c
 CFILES  += uart.c
 CFILES  += uart_app.c
+CFILES  += timer.c
 
 SFILES  =
 #SFILES += vectors.s

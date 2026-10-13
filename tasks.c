@@ -1,13 +1,14 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "timer.h"
+
 #if 0
 
 #include "SysClock.h"
 #include "debug.h"
 #include "scheduler_preemptive.h"
 #include "version.h"
-#include "timer.h"
 #include "u32_to_hexstring.h"
 #include "adc_app.h"
 #include "dma.h"
@@ -59,20 +60,7 @@ void Task_Init(void)
     LEDY_Init();
     LEDG_Init();
 
-    LEDR_Set(0);
-    LEDR_Set(1);
-    LEDR_Set(0);
-    LEDR_Set(1);
-
-    LEDY_Set(0);
-    LEDY_Set(1);
-    LEDY_Set(0);
-    LEDY_Set(1);
-
-    LEDG_Set(0);
-    LEDG_Set(1);
-    LEDG_Set(0);
-    LEDG_Set(1);
+    TIM2_Init();
 
 #if 0
     DMA_Init(DMA1);
@@ -168,8 +156,22 @@ void HAL_Delay(uint32_t delay)
     }
 }
 
+uint32_t dt;
+uint32_t t_last;
+
 void Task_10ms(void)
 {
+	uint32_t t = TIM2_Cnt_Get();
+	if (t_last != 0) {
+		uint32_t dtCurrent = t - t_last;
+		if (dt == 0)
+			dt = dtCurrent;
+		else {
+#define DT_FILTER 8
+			dt = ((dt * (DT_FILTER - 1)) + dtCurrent) / DT_FILTER;
+		}
+	}
+	t_last = t;
 }
 
 typedef enum
