@@ -25,7 +25,7 @@ static inline void TIM3_CC4IF_Callback(void)
 
 static inline uint16_t getTimer_us(void)
 {
-  return TIM6_Cnt_Get();
+  return TIM2_Cnt_Get();
 }
 
 /**

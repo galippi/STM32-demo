@@ -172,6 +172,9 @@ void Task_10ms(void)
 		}
 	}
 	t_last = t;
+
+	while((TIM2_Cnt_Get() - t) < 1500) {
+	}
 }
 
 typedef enum
