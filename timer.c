@@ -1,6 +1,6 @@
 #include "controller.h"
 
-#include "core_cm0plus.h"
+//#include "core_cm0plus.h"
 
 #include "SysClock.h"
 
@@ -8,10 +8,9 @@
 
 #include "timer.h"
 
-#if 0
 void TIM2_Init(void)
 {
-  RCC->APB1ENR |= RCC_APB1Periph_TIM2;
+  RCC->APB1LENR |= RCC_APB1LENR_TIM2EN;
 
   TIM2->CR1 = (TIM2->CR1 & 0xFC00) | TIM2_CR1_INIT;
   TIM2->CR2 = (TIM2->CR2 & 0xFF07) | TIM2_CR2_INIT;
@@ -22,11 +21,11 @@ void TIM2_Init(void)
   TIM2->CCMR2 = TIM2_CCMR2_INIT;
   TIM2->CCER = TIM2_CCER_INIT;
   TIM2->SR = 0x0000; /* clear all IT requests */
-  TIM2->DIER = (TIM2->DIER & 0xA0A0) | TIM2_DIER_INIT; /* enable update interrupt */
+  TIM2->DIER = (TIM2->DIER & 0xA0A0) | TIM2_DIER_INIT; /* enable selected interrupts */
   TIM2->CR1 |= 1; /* enable timer */
 }
-#endif
 
+#if 0
 void TIM3_Init(void)
 {
   if (!(RCC->APBENR1 & RCC_APBENR1_TIM3EN))
@@ -45,6 +44,7 @@ void TIM3_Init(void)
   TIM3->DIER = (TIM3->DIER & 0xA0A0) | TIM3_DIER_INIT; /* enable update interrupt */
   TIM3->CR1 |= 1; /* enable timer */
 }
+#endif
 
 #if 0
 void TIM4_Init(void)
@@ -68,6 +68,7 @@ void TIM4_Init(void)
 
 #endif
 
+#if 0
 void TIM14_Init(void)
 {
   if (!(RCC->APBENR2 & RCC_APBENR2_TIM14EN))
@@ -86,3 +87,4 @@ void TIM14_Init(void)
   TIM14->DIER = (TIM14->DIER & 0xA0A0) | TIM14_DIER_INIT; /* enable update interrupt */
   TIM14->CR1 |= 1; /* enable timer */
 }
+#endif
