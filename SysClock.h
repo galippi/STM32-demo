@@ -141,9 +141,9 @@
 
 #define PPRE2_VAL 1 /* to be calculated */
 
-#define f_APB2_CALC_Hz ((f_HCLK_Hz() / (PPRE2_VAL))
+#define f_APB2_CALC_Hz ((f_HCLK_Hz / (PPRE2_VAL))
 
-#define f_TIMXCLK_Hz f_HCLK_Hz()
+#define f_TIMXCLK_Hz f_HCLK_Hz
 
 #if 0
 
