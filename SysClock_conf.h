@@ -10,7 +10,7 @@
 //#define f_PSI_Hz 100000000 or 144000000 or 160000000
 #define f_PSI_Hz 100000000
 #define f_SYSCLK_Hz 100000000
-#define f_HCLK_Hz 25000000 // AHB
+#define f_HCLK_Hz 25000000 /* AHB */
 #define f_PCLK1_Hz 25000000 // APB1 - rcc_pclk1
 #define f_PCLK2_Hz 25000000 // APB2 - rcc_pclk2
 #define f_PCLK3_Hz 25000000 // APB3 - rcc_pclk3
