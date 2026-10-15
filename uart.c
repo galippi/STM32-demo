@@ -297,4 +297,18 @@ void UART2_Poll(void)
 
 #endif
 
+#if defined(UART2_TX_POLL) || defined(UART2_RX_POLL)
+
+void UART2_Poll(void)
+{
+#if defined(UART2_RX_POLL)
+	UART2_RX_POLL();
+#endif
+#if defined(UART2_TX_POLL)
+	UART2_TX_POLL();
+#endif
+}
+
+#endif
+
 #endif /* UART2_IS_ENABLED */

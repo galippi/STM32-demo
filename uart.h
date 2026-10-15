@@ -99,7 +99,6 @@ static inline char UART1_RX_Char(void)
 }
 
 void UART2_Init(uint32_t BaudRate, uint8_t uartRemap);
-void UART2_Poll(void);
 
 static inline uint32_t UART2_TXE_Get(void)
 {
@@ -125,11 +124,44 @@ static inline char UART2_TX_Char(char d) {
         return 1;
 }
 
+#if (UART2_TX_MODE == UART_MODE_POLLED) && defined(UART2_TX_QUEUE)
+static void UART2_TX_poll(void)
+{
+	tQueueIdx num = 8; // number to copy data in one step
+	tQueueData *data = queueGetDataBuffer(&UART2_TX_QUEUE, &num);
+	tQueueIdx processed = 0;
+	while (num != 0) {
+		if (UART2_TX_Char(*data) == 0) {
+			data++;
+			processed++;
+			num--;
+			if (num == 0)
+				break;
+		}
+	}
+	if (processed != 0)
+		queueRemoveData(&UART2_TX_QUEUE, processed);
+}
+#define UART2_TX_POLL() UART2_TX_poll()
+#endif
+
 static inline void UART2_TX(const void *dataP, uint32_t len)
 {
 #if (UART2_TX_MODE == UART_MODE_POLLED)
-#if defined(UART2_TX_QUEUE_PUT)
-#error Not yet implemented!
+#if defined(UART2_TX_QUEUE)
+	const uint8_t *data = dataP;
+	if (queueGetNum(&UART2_TX_QUEUE) == 0) {
+		while (UART2_TX_Char(*data) == 0) {
+			data++;
+			len--;
+			if (len == 0)
+				break;
+		}
+		if (len != 0) {
+			if (queueWrite(&UART2_TX_QUEUE, data, len) != len)
+				UART2_TX_Overrun();
+		}
+	}
 #else
 	const uint8_t *data = dataP;
 	while (len != 0) {
@@ -143,6 +175,11 @@ static inline void UART2_TX(const void *dataP, uint32_t len)
 #error Not yet implemented!
 #endif
 }
+
+#if defined(UART2_TX_POLL) || defined(UART2_RX_POLL)
+void UART2_Poll(void);
+#define UART2_POLL() UART2_Poll()
+#endif
 
 // User functions shall be implemented by the user application
 extern void UART_appInit(USART_TypeDef *dev);
