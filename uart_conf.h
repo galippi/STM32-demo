@@ -17,6 +17,7 @@
 
 #include "debug.h"
 #include "uart_app.h"
+#include "queue.h"
 
 #define UART_MODE_NONE   0
 #define UART_MODE_POLLED 1
@@ -39,8 +40,9 @@ typedef uint8_t t_UART1_idx;
 #define UART2_TX_MODE UART_MODE_POLLED
 #define UART2_RX_MODE UART_MODE_POLLED
 #define UART2_DMA 0
-#define UART2_TX_QUEUE 0
 extern uint32_t uart2TxOverrun;
 #define UART2_TX_Overrun() (uart2TxOverrun++)
+extern const tQueue uart2TxQueue;
+#define UART2_TX_QUEUE uart2TxQueue
 
 #endif /* _UART_CONF_H_ */

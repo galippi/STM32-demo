@@ -50,10 +50,13 @@ LEDx_Set(G)
 uint8_t uart1RxBuffer[128];
 //uint8_t uart1TxBuffer[128];
 
+QUEUE_CREATE(uart2TxQueue, 128);
+
 void Task_Init(void)
 {
     UART1_Init(9600, 0);
 
+    queueInit(&uart2TxQueue);
     UART2_Init(1200, 0);
 
     LEDR_Init();
@@ -128,6 +131,7 @@ void Task_Bgnd(void)
         UART1_TX(&data, 1);
     }
 #endif
+    UART2_POLL();
 }
 
 static uint32_t halTick_1ms;
