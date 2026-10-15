@@ -41,8 +41,8 @@
 #define TIM12_FREQ 98000 /* Hz */
 #define TIM12_ARR_INIT 254 /* PWM value range is 0..255 */
 #define TIM12_PSC_INIT  ((f_TIMXCLK_Hz / (TIM12_FREQ * (TIM12_ARR_INIT + 1))) - 1) /* prescaler of TIM12 */
-#define TIM12_CCER_INIT 0x0000
-#define TIM12_CCMR1_INIT 0x0000
+#define TIM12_CCER_INIT 0x0001 /* CC1 output */
+#define TIM12_CCMR1_INIT 0x0060 /* CC1 PWM-output */
 #define TIM12_CCMR2_INIT 0x0000
 #define TIM12_DIER_INIT 0x0000
 

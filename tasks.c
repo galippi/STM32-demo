@@ -61,7 +61,16 @@ void Task_Init(void)
     LEDG_Init();
 
     TIM2_Init();
+
     TIM12_Init();
+
+    GPIO_PortInit_Out(GPIOC, 14);
+    GPIO_Set(GPIOC, 14, 1);
+    GPIO_Set(GPIOC, 14, 0);
+    GPIO_Set(GPIOC, 14, 1);
+    GPIO_Set(GPIOC, 14, 0);
+
+    GPIO_PortInit_AFOut(GPIOC, 14, 2); /* PC14 TIM12.CH1 */
 
 #if 0
     DMA_Init(DMA1);
@@ -198,6 +207,11 @@ void Task_10ms(void)
 			if (t12Idx == T12_SIZE)
 				t12Idx = 0;
 		}
+	}
+	{
+		static uint8_t pwm;
+		TIMx_CCRy_Set(TIM12, 0, pwm);
+		pwm++;
 	}
 }
 
