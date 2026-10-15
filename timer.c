@@ -8,12 +8,17 @@
 
 #include "timer.h"
 
+#if defined(TIM2_CR1_INIT)
+
 void TIM2_Init(void)
 {
   RCC->APB1LENR |= RCC_APB1LENR_TIM2EN;
 
   TIM2->CR1 = (TIM2->CR1 & 0xFC00) | TIM2_CR1_INIT;
   TIM2->CR2 = (TIM2->CR2 & 0xFF07) | TIM2_CR2_INIT;
+  #if TIM2_ARR_INIT == 0
+  #error Timer will not work as expected!
+  #endif
   TIM2->ARR = TIM2_ARR_INIT;
   TIM2->PSC = TIM2_PSC_INIT;
   TIM2->EGR = 0x01; /* immediate reload */
@@ -24,6 +29,8 @@ void TIM2_Init(void)
   TIM2->DIER = (TIM2->DIER & 0xA0A0) | TIM2_DIER_INIT; /* enable selected interrupts */
   TIM2->CR1 |= 1; /* enable timer */
 }
+
+#endif
 
 #if 0
 void TIM3_Init(void)
@@ -64,6 +71,30 @@ void TIM4_Init(void)
   TIM4->SR = 0x0000; /* clear all IT requests */
   TIM4->DIER = (TIM4->DIER & 0xA0A0) | TIM4_DIER_INIT; /* enable update interrupt */
   TIM4->CR1 |= 1; /* enable timer */
+}
+
+#endif
+
+#if defined(TIM12_CR1_INIT)
+
+void TIM12_Init(void)
+{
+  RCC->APB1LENR |= RCC_APB1LENR_TIM12EN;
+
+  TIM12->CR1 = (TIM12->CR1 & 0xFC00) | TIM12_CR1_INIT;
+  TIM12->CR2 = (TIM12->CR2 & 0xFF07) | TIM12_CR2_INIT;
+  #if TIM12_ARR_INIT == 0
+  #error Timer will not work as expected!
+  #endif
+  TIM12->ARR = TIM12_ARR_INIT;
+  TIM12->PSC = TIM12_PSC_INIT;
+  TIM12->EGR = 0x01; /* immediate reload */
+  TIM12->CCMR1 = TIM12_CCMR1_INIT;
+  TIM12->CCMR2 = TIM12_CCMR2_INIT;
+  TIM12->CCER = TIM12_CCER_INIT;
+  TIM12->SR = 0x0000; /* clear all IT requests */
+  TIM12->DIER = (TIM12->DIER & 0xA0A0) | TIM12_DIER_INIT; /* enable selected interrupts */
+  TIM12->CR1 |= 1; /* enable timer */
 }
 
 #endif

@@ -6,6 +6,8 @@
 #include "controller.h"
 #include "bitfield_lib.h"
 
+#include "timer_conf.h"
+
 static inline void TIMx_CCRy_Set(TIM_TypeDef *tim, uint32_t chIdx, uint16_t val)
 {
     *((&(tim->CCR1)) + (chIdx * 2)) = val;
@@ -72,6 +74,8 @@ static inline void TIM15_CCR1_Set(uint32_t new_val)
 {
   TIM15->CCR1 = new_val;
 }
+
+#if defined(TIM2_CR1_INIT)
 
 void TIM2_Init(void);
 
@@ -190,6 +194,8 @@ static inline void TIM2_CCR4_Set(uint16_t new_val)
   TIM2->CCR4 = new_val;
 }
 
+#endif // defined(TIM2_CR1_INIT)
+
 void TIM6_Init(void);
 
 static inline uint32_t TIM6_SR_UIF_Get(void)
@@ -296,5 +302,26 @@ static inline void TIM6_CCR4_Set(uint16_t new_val)
 {
   TIM6->CCR4 = new_val;
 }
+
+#if defined(TIM12_CR1_INIT)
+
+void TIM12_Init(void);
+
+static inline uint32_t TIM12_SR_UIF_Get(void)
+{
+  return (TIM12->SR & TIM_SR_UIF);
+}
+
+static inline void TIM12_SR_UIF_Reset(void)
+{
+  TIM12->SR = ~(TIM_SR_UIF); /* reset the UpdateInterrupFlag */
+}
+
+static inline uint16_t TIM12_Cnt_Get(void)
+{
+  return TIM12->CNT;
+}
+
+#endif // defined(TIM12_CR1_INIT)
 
 #endif /* _TIMER_H_ */
