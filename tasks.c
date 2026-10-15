@@ -223,6 +223,8 @@ typedef enum
   e_Pulse_LongLow,
 }e_PulseType;
 
+uint32_t uart2TxOverrun;
+
 void Task_500ms(void)
 {
 	static const e_PulseType pulseConfig[] =
@@ -306,7 +308,12 @@ void Task_500ms(void)
             ctr = 0;
     }
 #if 1
-    UART2_TX_Char(UART2_RX_Char());
+    //UART2_TX_Char(UART2_RX_Char());
+    {
+    	char buf[10] = "Demo000\n12";
+    	buf[6] = '0' + (uart2TxOverrun & 0x07);
+        UART2_TX(buf, sizeof(buf));
+    }
 #else
     if (UART2_RXNE_Get())
         UART2_TX_Char(UART2_RX_Char());
