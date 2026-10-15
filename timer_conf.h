@@ -9,7 +9,7 @@
 //#define TIM2_PSC_INIT  ((f_TIMXCLK_Hz / (TIM2_FREQ * (TIM2_ARR_INIT + 1))) - 1) /* prescaler of TIM2 */
 #define TIM2_PSC_INIT  (25 - 1)
 //#define TIM2_ARR_INIT 254 /* PWM value range is 0..255 */
-#define TIM2_ARR_INIT 0xFFFFFFFF
+#define TIM2_ARR_INIT 0xFFFFFFFF /* continuous counter */
 #define TIM2_CCER_INIT 0x0000
 #define TIM2_CCMR1_INIT 0x0000
 #define TIM2_CCMR2_INIT 0x0000
@@ -35,6 +35,16 @@
 #define TIM4_CCMR2_INIT 0x0201 /* enable CC3/CC4 as input capture, both for TI3 */
 //#define TIM4_DIER_INIT 0x0018 /* disable update interrupt, enable CC3/CC4 interrupts */
 #define TIM4_DIER_INIT 0x0000 /* all interrupts are disabled */
+
+#define TIM12_CR1_INIT 0x00 /* up counter mode */
+#define TIM12_CR2_INIT 0x0
+#define TIM12_FREQ 98000 /* Hz */
+#define TIM12_ARR_INIT 254 /* PWM value range is 0..255 */
+#define TIM12_PSC_INIT  ((f_TIMXCLK_Hz / (TIM12_FREQ * (TIM12_ARR_INIT + 1))) - 1) /* prescaler of TIM12 */
+#define TIM12_CCER_INIT 0x0000
+#define TIM12_CCMR1_INIT 0x0000
+#define TIM12_CCMR2_INIT 0x0000
+#define TIM12_DIER_INIT 0x0000
 
 #define TIM14_CR1_INIT 0x00 /* up counter mode */
 #define TIM14_CR2_INIT 0x0

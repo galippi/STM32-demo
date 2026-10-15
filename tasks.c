@@ -61,6 +61,7 @@ void Task_Init(void)
     LEDG_Init();
 
     TIM2_Init();
+    TIM12_Init();
 
 #if 0
     DMA_Init(DMA1);
@@ -158,6 +159,13 @@ void HAL_Delay(uint32_t delay)
 
 uint32_t dt;
 uint32_t t_last;
+uint16_t dt12;
+#define T12_SIZE 64
+struct {
+	uint16_t t0;
+	uint16_t t1;
+	uint16_t dt;
+}dbgT12[T12_SIZE];
 
 void Task_10ms(void)
 {
@@ -173,7 +181,23 @@ void Task_10ms(void)
 	}
 	t_last = t;
 
-	while((TIM2_Cnt_Get() - t) < 1500) {
+	{
+		t = TIM2_Cnt_Get();
+		uint16_t t12 = TIM12_Cnt_Get();
+		while((TIM2_Cnt_Get() - t) < ((1000000 / TIM12_FREQ) / 2)) {
+		}
+		uint16_t t12New = TIM12_Cnt_Get();
+		uint16_t dtCurrent = (t12New << 8) - (t12 << 8);
+		dt12 = ((dt12 * (DT_FILTER - 1)) + dtCurrent) / DT_FILTER;
+		{
+			static uint8_t t12Idx;
+			dbgT12[t12Idx].t0 = t12;
+			dbgT12[t12Idx].t1 = t12New;
+			dbgT12[t12Idx].dt = dtCurrent;
+			t12Idx++;
+			if (t12Idx == T12_SIZE)
+				t12Idx = 0;
+		}
 	}
 }
 

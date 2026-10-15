@@ -5,7 +5,6 @@
 #include "scheduler_preemptive.h"
 
 #include "timer.h"
-#include "timer_conf.h"
 
 #define TIM3_CC1IF_Callback() /* do nothing */
 #define TIM3_CC2IF_Callback() /* do nothing */
