@@ -116,48 +116,6 @@ static inline char UART2_RX_Char(void)
     return UART_RX_Char(USART2);
 }
 
-#if UART2_DMA == 0
-extern const uint8_t *UART2_TxData;
-extern uint8_t UART2_TxLen;
-#endif
-extern uint8_t UART2_TxOverrun;
-static inline void UART2_TX(const uint8_t *data, uint32_t len)
-{
-#if (CPU_TYPE == CPU_TYPE_STM32F0)
-  DMA1_Channel4->CCR &= ~DMA_CCR_EN;
-  DMA1_Channel4->CMAR = (uint32_t)data;
-  DMA1_Channel4->CNDTR = len;
-  DMA1_Channel4->CCR |= DMA_CCR_EN;
-#elif (CPU_TYPE == CPU_TYPE_STM32F1)
-#if UART2_DMA != 0
-  if (DMA1_Channel7->CNDTR != 0)
-  {
-    UART2_TxOverrun++;
-  }else
-  { /* resetting Transfer Complete flag */
-    //DMA1->IFCR = DMA_ISR_TCIF7;
-  }
-  DMA1_Channel7->CCR &= ~DMA_CCR1_EN;
-  DMA1_Channel7->CMAR = (uint32_t)data;
-  DMA1_Channel7->CNDTR = len;
-  DMA1_Channel7->CCR |= DMA_CCR1_EN;
-#else
-  if (UART2_TxLen != 0)
-  {
-    UART2_TxOverrun++;
-  }else
-  {
-    UART2_TxData = data;
-    UART2_TxLen = len;
-    UART2_Poll();
-  }
-#endif
-#else
-  (void)data;
-  (void)len;
-#endif
-}
-
 static inline char UART2_TX_Char(char d) {
     if (UART2_TXE_Get() != 0)
     {
@@ -165,6 +123,25 @@ static inline char UART2_TX_Char(char d) {
         return 0;
     }else
         return 1;
+}
+
+static inline void UART2_TX(const void *dataP, uint32_t len)
+{
+#if (UART2_TX_MODE == UART_MODE_POLLED)
+#if defined(UART2_TX_QUEUE_PUT)
+#error Not yet implemented!
+#else
+	const uint8_t *data = dataP;
+	while (len != 0) {
+		if (UART2_TX_Char(*data))
+			UART2_TX_Overrun();
+		data++;
+		len--;
+	}
+#endif
+#else
+#error Not yet implemented!
+#endif
 }
 
 // User functions shall be implemented by the user application
