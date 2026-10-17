@@ -270,6 +270,9 @@ void UART2_Init(uint32_t baudRate, uint8_t uartRemap)
 #if (UART2_RX_MODE == UART_MODE_IRQ)
     USART2->CR1 |= USART_CR1_RXNEIE;
 #endif
+#if (UART2_TX_MODE == UART_MODE_IRQ)
+    //USART2->CR1 |= USART_CR1_TXEIE_TXFNFIE; // TX interrupt shall not be enabled - it will be done by write
+#endif
 #if (UART2_RX_MODE == UART_MODE_IRQ) || (UART2_TX_MODE == UART_MODE_IRQ)
     NVIC_SetPriority(USART2_IRQn, (1<<__NVIC_PRIO_BITS) / 2);  /* set Priority to middle for USART2 Interrupts */
     NVIC_EnableIRQ(USART2_IRQn);
@@ -338,7 +341,16 @@ void Usart2Isr(void)
 #endif
 
 #if (UART2_TX_MODE == UART_MODE_IRQ)
-#error Not yet implemented!
+    while((USART2->ISR & USART_ISR_TXE_TXFNF) != 0) {
+        uint8_t d;
+        if (queueGet(UART2_TX_QUEUE, &d) == 0) {
+            USART2->TDR = d;
+        }else
+            break;
+    }
+    if (USART2->ISR & USART_ISR_TXE_TXFNF) {
+        USART2->CR1 &= ~USART_CR1_TXEIE_TXFNFIE; // disable IT
+    }
 #endif
 }
 

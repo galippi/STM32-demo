@@ -171,6 +171,10 @@ static inline void UART2_TX(const void *dataP, uint32_t len)
 		len--;
 	}
 #endif
+#elif (UART2_TX_MODE == UART_MODE_IRQ)
+    if (queueWrite(UART2_TX_QUEUE, dataP, len) != len)
+        UART2_TX_Overrun();
+    USART2->CR1 |= USART_CR1_TXEIE_TXFNFIE; // enable TX interrupt to process the queue
 #else
 #error Not yet implemented!
 #endif
