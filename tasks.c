@@ -134,7 +134,6 @@ void Task_Bgnd(void)
         UART1_TX(&data, 1);
     }
 #endif
-    UART2_POLL();
 }
 
 static uint32_t halTick_1ms;
