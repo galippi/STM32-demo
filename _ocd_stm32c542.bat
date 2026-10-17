@@ -1,5 +1,6 @@
 @cls
 @set OCD_PATH=C:\Programok\OpenOCD-0.12.0-3
+@set DEBUG=
 ::@set DEBUG=-d
 ::@set DEBUG=-d4
 ::@set OCD_PATH=C:\Programok\openocd-0.9.0
