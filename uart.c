@@ -267,6 +267,14 @@ void UART2_Init(uint32_t baudRate, uint8_t uartRemap)
 
     UART_appInit(USART2);
 
+#if (UART2_RX_MODE == UART_MODE_IRQ)
+    USART2->CR1 |= USART_CR1_RXNEIE;
+#endif
+#if (UART2_RX_MODE == UART_MODE_IRQ) || (UART2_TX_MODE == UART_MODE_IRQ)
+    NVIC_SetPriority(USART2_IRQn, (1<<__NVIC_PRIO_BITS) / 2);  /* set Priority to middle for USART2 Interrupts */
+    NVIC_EnableIRQ(USART2_IRQn);
+#endif
+
     USART2->CR1 |= USART_CR1_UE; /* USART2 is enabled */
 }
 
@@ -306,6 +314,31 @@ void UART2_Poll(void)
 #endif
 #if defined(UART2_TX_POLL)
 	UART2_TX_POLL();
+#endif
+}
+
+#endif
+
+#if (UART2_RX_MODE == UART_MODE_IRQ) || (UART2_TX_MODE == UART_MODE_IRQ)
+
+void Usart2Isr(void)
+{
+#if (UART2_RX_MODE == UART_MODE_IRQ)
+    if (UART_ORE_Get(USART2)) {
+        USART2->ICR = USART_ICR_ORECF;
+        UART2_RX_FIFO_OVERRUN(UART2_RX_QUEUE);
+    }
+    while (1) {
+        if (UART_RXNE_Get(USART2) != 0) {
+            char c = USART2->RDR & 0xFF;
+            queuePut(UART2_RX_QUEUE, c);
+        }else
+            break;
+    }
+#endif
+
+#if (UART2_TX_MODE == UART_MODE_IRQ)
+#error Not yet implemented!
 #endif
 }
 

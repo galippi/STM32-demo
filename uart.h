@@ -200,6 +200,15 @@ void UART2_Poll(void);
 #define UART2_POLL() UART2_Poll()
 #endif
 
+#if UART2_RX_MODE == UART_MODE_IRQ
+#if !defined(UART2_RX_QUEUE)
+#error Invalid UART2_RX_QUEUE config!
+#endif
+void Usart2Isr(void);
+#else
+#define Usart2Isr ISR_Invalid
+#endif
+
 // User functions shall be implemented by the user application
 extern void UART_appInit(USART_TypeDef *dev);
 
