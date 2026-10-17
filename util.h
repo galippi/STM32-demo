@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "controller.h"
+
 #define NUMOF(array) (sizeof(array) / sizeof(array[0]))
 
 #define COMP_CHECK_VAL(vall, valr) \
@@ -13,8 +15,28 @@
 
 #define COMP_CHECK_ARRAY(array, length) COMP_CHECK_VAL(NUMOF(array), length)
 
+typedef struct {
+    uint32_t result;
+    uint32_t remainder;
+}t_DivU32;
+
+#if __CORTEX_M == 33
+static t_DivU32 udiv(uint32_t dividend, uint32_t divisor) {
+    t_DivU32 result;
+    result.result = dividend / divisor;
+    result.remainder = dividend % divisor;
+    return result;
+}
+
+static uint32_t DivU32_U32U32(uint32_t dividend, uint32_t divisor);
+static int32_t DivI32_I32I32(int32_t dividend, int32_t divisor);
+
+#else
+t_DivU32 udiv(uint32_t dividend, uint32_t divisor);
+
 uint32_t DivU32_U32U32(uint32_t dividend, uint32_t divisor);
 int32_t DivI32_I32I32(int32_t dividend, int32_t divisor);
+#endif
 
 #if 0
 static inline void *memset(void *ptr_, int data, size_t size)
