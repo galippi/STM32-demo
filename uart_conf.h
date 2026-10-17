@@ -43,6 +43,9 @@ typedef uint8_t t_UART1_idx;
 extern uint32_t uart2TxOverrun;
 #define UART2_TX_Overrun() (uart2TxOverrun++)
 extern const tQueue uart2TxQueue;
-#define UART2_TX_QUEUE uart2TxQueue
+#define UART2_TX_QUEUE &uart2TxQueue
+extern const tQueue uart2RxQueue;
+#define UART2_RX_QUEUE &uart2RxQueue
+#define UART2_RX_FIFO_OVERRUN(q) /* do nothing yet */
 
 #endif /* _UART_CONF_H_ */

@@ -23,6 +23,7 @@
 #include "FaultHandler.h"
 #include "uart.h"
 #include "queue.h"
+#include "u32_to_hexstring.h"
 
 #include "tasks.h"
 
@@ -51,12 +52,14 @@ uint8_t uart1RxBuffer[128];
 //uint8_t uart1TxBuffer[128];
 
 QUEUE_CREATE(uart2TxQueue, 128);
+QUEUE_CREATE(uart2RxQueue, 128);
 
 void Task_Init(void)
 {
     UART1_Init(9600, 0);
 
     queueInit(&uart2TxQueue);
+    queueInit(&uart2RxQueue);
     UART2_Init(1200, 0);
 
     LEDR_Init();
@@ -314,9 +317,19 @@ void Task_500ms(void)
 #if 1
     //UART2_TX_Char(UART2_RX_Char());
     {
-    	char buf[10] = "Demo000\n12";
+    	char buf[10] = "Demo000**\n";
     	buf[6] = '0' + (uart2TxOverrun & 0x07);
         UART2_TX(buf, sizeof(buf));
+    }
+    {
+        char buf[32] = "Rx:x ";
+        uint8_t rxData[12];
+        uint8_t len = queueRead(&uart2RxQueue, rxData, sizeof(rxData));
+        buf[3] = toHexDigit(len);
+        if (len > 0)
+            memcpy(buf + 5, rxData, len);
+        buf[5 + len] = '\n';
+        UART2_TX(buf, 5 + len + 1);
     }
 #else
     if (UART2_RXNE_Get())
