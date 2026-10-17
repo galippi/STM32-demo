@@ -38,7 +38,7 @@ typedef uint8_t t_UART1_idx;
 #define USART2_CR2 (0) /* 1 stop bit */
 #define UART2_IS_ENABLED 1
 #define UART2_TX_MODE UART_MODE_POLLED
-#define UART2_RX_MODE UART_MODE_POLLED
+#define UART2_RX_MODE UART_MODE_IRQ
 #define UART2_DMA 0
 extern uint32_t uart2TxOverrun;
 #define UART2_TX_Overrun() (uart2TxOverrun++)
