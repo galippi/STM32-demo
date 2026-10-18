@@ -21,10 +21,26 @@ typedef struct {
 }t_DivU32;
 
 #if __CORTEX_M == 33
+
+// multiply with subtract, using 32-bit operands and producing a 32-bit result
+// result = op3 - op1 * op2
+__STATIC_FORCEINLINE uint32_t __MLS (uint32_t op1, uint32_t op2, uint32_t op3)
+{
+  uint32_t result;
+
+  __ASM volatile ("mls %0, %1, %2, %3" : "=r" (result) : "r" (op1), "r" (op2), "r" (op3) );
+  return(result);
+}
+
 static t_DivU32 udiv(uint32_t dividend, uint32_t divisor) {
     t_DivU32 result;
     result.result = dividend / divisor;
+#if 0
+    result.remainder = __MLS(divisor, result.result, dividend);
+#else
+    // The generated assembly would be the same
     result.remainder = dividend % divisor;
+#endif
     return result;
 }
 
