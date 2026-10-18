@@ -24,6 +24,9 @@
 #include "uart.h"
 #include "queue.h"
 #include "u32_to_hexstring.h"
+#include "adc.h"
+#include "adc_app.h"
+#include "util.h"
 
 #include "tasks.h"
 
@@ -51,8 +54,8 @@ LEDx_Set(G)
 uint8_t uart1RxBuffer[128];
 //uint8_t uart1TxBuffer[128];
 
-QUEUE_CREATE(uart2TxQueue, 128);
-QUEUE_CREATE(uart2RxQueue, 128);
+QUEUE_CREATE(uart2TxQueue, 127);
+QUEUE_CREATE(uart2RxQueue, 127);
 
 void Task_Init(void)
 {
@@ -66,17 +69,16 @@ void Task_Init(void)
     LEDY_Init();
     LEDG_Init();
 
-    TIM2_Init();
+    TIM2_Init(); // used for general 32 bit timer with 1us resolution
 
     TIM12_Init();
-
-    GPIO_PortInit_Out(GPIOC, 14);
-    GPIO_Set(GPIOC, 14, 1);
-    GPIO_Set(GPIOC, 14, 0);
-    GPIO_Set(GPIOC, 14, 1);
-    GPIO_Set(GPIOC, 14, 0);
-
     GPIO_PortInit_AFOut(GPIOC, 14, 2); /* PC14 TIM12.CH1 */
+
+    ADC_Init();
+    GPIO_PortInit_Analog(GPIOA, 0);
+    GPIO_PortInit_Analog(GPIOA, 1);
+    GPIO_PortInit_Analog(GPIOA, 6);
+    GPIO_PortInit_Analog(GPIOA, 7);
 
 #if 0
     DMA_Init(DMA1);
@@ -219,6 +221,15 @@ void Task_10ms(void)
 		TIMx_CCRy_Set(TIM12, 0, pwm);
 		pwm++;
 	}
+    {
+        ADC1->CR |= ADC_CR_ADSTART;
+        while((ADC1->ISR & ADC_ISR_EOC) == 0)
+            ;
+        static uint8_t adcIdx;
+        ADC_values_raw[adcIdx++] = ADC1->DR;
+        if (adcIdx >= NUMOF(ADC_values_raw))
+            adcIdx = 0;
+    }
 }
 
 typedef enum

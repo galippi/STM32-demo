@@ -72,6 +72,8 @@ CFILES  += tasks.c
 CFILES  += uart.c
 CFILES  += uart_app.c
 CFILES  += timer.c
+CFILES  += adc.c
+CFILES  += adc_app.c
 
 SFILES  =
 #SFILES += vectors.s
