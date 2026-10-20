@@ -19,37 +19,41 @@
 #include "controller.h"
 //#include STM32_RCC_HEADER
 
-static inline void DMA_Init(DMA_TypeDef *dma)
-{
-  if (dma == LPDMA1)
-  {
-#if (CPU_TYPE == CPU_TYPE_STM32F0) || (CPU_TYPE == CPU_TYPE_STM32F1)
-    RCC->AHBENR |= RCC_AHBENR_DMA1EN; /* enable the DMA */
-#elif CPU_TYPE == CPU_TYPE_STM32F4
-  RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
-#elif CPU_TYPE == CPU_TYPE_STM32C542
-  RCC->AHB1ENR |= RCC_AHB1ENR_LPDMA1EN;
-#elif CPU_TYPE == CPU_TYPE_STM32G0
-  RCC->AHBENR |= RCC_AHBENR_DMA1EN;
-#elif CPU_TYPE == CPU_TYPE_STM32G0B1
-  RCC->AHBENR |= RCC_AHBENR_DMA1EN;
-#else
-#error Not implemented processor!
-#endif
+#define DMA_CTR1_SDW_LOG2_U8  0
+#define DMA_CTR1_SDW_LOG2_U16 DMA_CTR1_SDW_LOG2_0
+#define DMA_CTR1_SDW_LOG2_U32 DMA_CTR1_SDW_LOG2_1
+
+#define DMA_CTR1_DDW_LOG2_U8  0
+#define DMA_CTR1_DDW_LOG2_U16 DMA_CTR1_DDW_LOG2_0
+#define DMA_CTR1_DDW_LOG2_U32 DMA_CTR1_DDW_LOG2_1
 
 #if 0
-  }else
-  if (dma == DMA2)
-  {
-#if defined(RCC_AHBENR_DMA2EN)
-    RCC->AHBENR |= RCC_AHBENR_DMA2EN; /* enable the DMA */
-#elif CPU_TYPE == CPU_TYPE_STM32F4
-    RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN; /* enable the DMA */
+enum { // see it in rm0522 - section 14.3.4
+    e_DMA_REQSEL_ADC1,
+    e_DMA_REQSEL_USART2_RX = 14,
+    e_DMA_REQSEL_USART2_RX = 15,
+}e_DMA_REQSEL;
 #endif
+
+#if CPU_TYPE == CPU_TYPE_STM32C542
+#define LPDMA1_CH_LAST LPDMA1_CH3
+#define LPDMA2_CH_LAST LPDMA2_CH3
+#else
+#error Not yet implemented!
 #endif
-  }else
-  { /* not valid DMA -> fatal error */
-  }
+
+static inline void DMA_Init(DMA_Channel_TypeDef *dmaCh)
+{
+    if ((dmaCh >= LPDMA1_CH0) && (dmaCh <= LPDMA1_CH_LAST))
+    {
+        RCC->AHB1ENR |= RCC_AHB1ENR_LPDMA1EN;
+    }else
+    if ((dmaCh >= LPDMA2_CH0) && (dmaCh <= LPDMA2_CH_LAST))
+    {
+        RCC->AHB1ENR |= RCC_AHB1ENR_LPDMA2EN;
+    }else
+    { /* not valid DMA -> fatal error */
+    }
 }
 
 #endif /* _DMA_H_ */

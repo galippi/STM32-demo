@@ -3,6 +3,11 @@
 
 #include "controller.h"
 
+#define ADC_CFGR1_DMNGT_REGULAR      0
+#define ADC_CFGR1_DMNGT_DMA_ONE_SHOT (ADC_CFGR1_DMNGT_0)
+#define ADC_CFGR1_DMNGT_RESERVED     (ADC_CFGR1_DMNGT_1)
+#define ADC_CFGR1_DMNGT_CIRCULAR     (ADC_CFGR1_DMNGT_0 | ADC_CFGR1_DMNGT_1)
+
 #define ADC_CR2_ALIGN_LEFT 0
 #define ADC_CR2_ALIGN_RIGHT ADC_CR2_ALIGN
 
@@ -51,5 +56,7 @@ static inline char ADC_GetStatus(void)
 {
   return (ADC1->ISR & ADC_ISR_EOC) != 0; /* give back the state of the end of conversion flag */
 }
+
+void DmaAdc1_Isr(void);
 
 #endif /* _ADC_H_ */

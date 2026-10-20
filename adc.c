@@ -1,3 +1,6 @@
+#include "controller.h"
+#include "stm32c5xx_hal_dma.h"
+
 #include "dma.h"
 #include "adc.h"
 #include "adc_conf.h"
@@ -70,12 +73,16 @@ void ADC_Init(void)
 
 #ifdef ADC1_DMA_CMAR
   {
-    extern char _compile_check[((ADC_CFGR1_INIT & ADC_CFGR1_DMAEN) == 0) ? -1 : 1]; /* ADC1_DMA_CMAR is set, but the DMA is not configured for ADC */
+    extern char _compile_check[((ADC_CFGR1_INIT & 0x01) == 0) ? -1 : 1]; /* ADC1_DMA_CMAR is set, but the DMA is not configured for ADC */
     (void)_compile_check;
   }
 
+  DMA_Init(DMA1_Channel_ADC1);
+
   DMA1_Channel_ADC1->CCR &= ~DMA_CCR_EN;
-  DMA1_Channel_ADC1->CPAR = (uint32_t)&(ADC1->DR);
+  //DMA1_Channel_ADC1->CCR = DMA_CCR_PL_1; /* priority high */
+  DMA1_Channel_ADC1->CCR = DMA_CCR_TCIE;
+#if 0
   DMA1_Channel_ADC1->CCR = \
                        0 /* MEM2MEM */ | \
                        DMA_CCR_PL_1 /* priority high */ | \
@@ -85,13 +92,32 @@ void ADC_Init(void)
                        DMA_CCR_PSIZE_0 /* Peripheral size 16 bits */ | \
                        0 /* per2mem - DMA_CCR1_DIR */ | \
                        0;
-  DMA1_Channel_ADC1->CMAR = ADC1_DMA_CMAR;
-  DMA1_Channel_ADC1->CNDTR = ADC1_DMA_CNDTR;
-  DMAMUX1[DMA1_ChIdx_ADC1].CCR = 5;
+#endif
+  DMA1_Channel_ADC1->CTR1 = DMA_CTR1_SDW_LOG2_U32 /* Peripheral size 32 bits */ | \
+                            DMA_CTR1_DDW_LOG2_U16 /* Memory size 16 bits */ | \
+                            DMA_CTR1_DINC;
+  DMA1_Channel_ADC1->CTR2 = LL_LPDMA1_REQUEST_ADC1;
+  DMA1_Channel_ADC1->CSAR = (uint32_t)&(ADC1->DR);
+  DMA1_Channel_ADC1->CDAR = ADC1_DMA_CMAR;
+  DMA1_Channel_ADC1->CBR1 = ADC1_DMA_CNDTR * sizeof(ADC1->DR);
+  NVIC_SetPriority(LPDMA1_CH0_IRQn, 8);  /* set Priority to middle */
+  NVIC_EnableIRQ(LPDMA1_CH0_IRQn);
   DMA1_Channel_ADC1->CCR |= DMA_CCR_EN; /* channel is enabled */
+  ADC1->CR |= ADC_CR_ADSTART;
 #else
   {
     //extern char _compile_check[((ADC_CFGR1_INIT & 0x01) != 0) ? -1 : 1]; /* ADC-DMA is configured, but the DMA is not configured (ADC1_DMA_CMAR) */
   }
 #endif
+}
+
+uint32_t dbg_adc_dma;
+
+void DmaAdc1_Isr(void)
+{
+    dbg_adc_dma++;
+    DMA1_Channel_ADC1->CFCR = DMA_CFCR_TCF;
+    DMA1_Channel_ADC1->CDAR = ADC1_DMA_CMAR;
+    DMA1_Channel_ADC1->CBR1 = ADC1_DMA_CNDTR * sizeof(ADC1->DR);
+    DMA1_Channel_ADC1->CCR |= DMA_CCR_EN; /* channel is enabled */
 }
