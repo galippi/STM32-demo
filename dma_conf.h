@@ -2,13 +2,14 @@
 #define _DMA_CONF_H_
 
 #define DMA1_ChIdx_ADC1   0
-#define DMA1_Channel_ADC1 DMA1_Channel1
+#define DMA1_Channel_ADC1 LPDMA1_CH0
+#define DMA1_Channel0_Isr DmaAdc1_Isr
 
-#define DMA1_ChIdx_USART1_TX   3
-#define DMA1_Channel_USART1_TX DMA1_Channel4
+#define DMA1_ChIdx_USART2_TX   1
+#define DMA1_Channel_USART1_TX LPDMA1_CH1
 
-#define DMA1_ChIdx_USART1_RX   4
-#define DMA1_Channel_USART1_RX DMA1_Channel5
+#define DMA1_ChIdx_USART2_RX   2
+#define DMA1_Channel_USART1_RX LPDMA1_CH2
 
 #if 0
 #define DMA_ADC1      DMA1_Channel1

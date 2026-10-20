@@ -18,6 +18,7 @@
 #include "uart.h"
 #include "util.h"
 #include "SysClock_conf.h"
+#include "adc.h"
 
 #ifdef f_USBCLK_Hz
 #include "usbd_conf.h"
@@ -68,7 +69,7 @@ t_func_ptr const ISR_VectorTable[] =
   ISR_Invalid,       /* 23 EXTI3 */
   ISR_Invalid,       /* 23 EXTI14 */
   ISR_Invalid,       /* 23 EXTI15 */
-  ISR_Invalid,       /* 25 DMA1_Channel0 */
+  DMA1_Channel0_Isr, /* 25 DMA1_Channel0 */
   ISR_Invalid,       /* 25 DMA1_Channel1 */
   ISR_Invalid,       /* 26 DMA1_Channel2 */
   ISR_Invalid,       /* 26 DMA1_Channel3 */

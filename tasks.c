@@ -221,15 +221,6 @@ void Task_10ms(void)
 		TIMx_CCRy_Set(TIM12, 0, pwm);
 		pwm++;
 	}
-    {
-        ADC1->CR |= ADC_CR_ADSTART;
-        while((ADC1->ISR & ADC_ISR_EOC) == 0)
-            ;
-        static uint8_t adcIdx;
-        ADC_values_raw[adcIdx++] = ADC1->DR;
-        if (adcIdx >= NUMOF(ADC_values_raw))
-            adcIdx = 0;
-    }
 }
 
 typedef enum
