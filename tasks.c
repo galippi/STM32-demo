@@ -63,7 +63,7 @@ void Task_Init(void)
 
     queueInit(&uart2TxQueue);
     queueInit(&uart2RxQueue);
-    UART2_Init(1200, 0);
+    UART2_Init(19200, 0);
 
     LEDR_Init();
     LEDY_Init();
@@ -155,6 +155,7 @@ void Task_1ms(void)
   }
   halTick_1ms++;
   UART2_TxDma_Poll();
+  UART2_RxDma_Poll();
 }
 
 extern uint32_t HAL_GetTick(void);
