@@ -154,6 +154,7 @@ void Task_1ms(void)
     }
   }
   halTick_1ms++;
+  UART2_TxDma_Poll();
 }
 
 extern uint32_t HAL_GetTick(void);

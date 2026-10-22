@@ -40,6 +40,8 @@
 	DBG_PORT(USART_TypeDef, uart1, USART1) \
     DBG_PORT(USART_TypeDef, uart2, USART2) \
     DBG_PORT(DMA_Channel_TypeDef, dma10, LPDMA1_CH0) \
+    DBG_PORT(DMA_Channel_TypeDef, dma11, LPDMA1_CH1) \
+    DBG_PORT(DMA_Channel_TypeDef, dma12, LPDMA1_CH2) \
 	DBG_PORT(FLASH_TypeDef, flash, FLASH) \
     DBG_PORT(uint16_t, packageDataRegister, (uint16_t * const)PACKAGE_BASE) \
   /* no more peripheries */

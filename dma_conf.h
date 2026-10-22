@@ -6,10 +6,10 @@
 #define DMA1_Channel0_Isr DmaAdc1_Isr
 
 #define DMA1_ChIdx_USART2_TX   1
-#define DMA1_Channel_USART1_TX LPDMA1_CH1
+#define DMA1_Channel_USART2_TX LPDMA1_CH1
 
 #define DMA1_ChIdx_USART2_RX   2
-#define DMA1_Channel_USART1_RX LPDMA1_CH2
+#define DMA1_Channel_USART2_RX LPDMA1_CH2
 
 #if 0
 #define DMA_ADC1      DMA1_Channel1
