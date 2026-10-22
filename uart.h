@@ -3,7 +3,16 @@
 
 #include "controller.h"
 #include "uart_conf.h"
-#include "dma_conf.h"
+
+#if (UART1_TX_MODE == UART_MODE_DMA) || \
+    (UART1_RX_MODE == UART_MODE_DMA) || \
+    (UART2_TX_MODE == UART_MODE_DMA) || \
+    (UART2_RX_MODE == UART_MODE_DMA) || \
+    0
+#include "stm32c5xx_hal_dma.h"
+#include "dma.h"
+#include "atomic.h"
+#endif
 
 #define RCC_CCIPR_USART1SEL_PCLK   0
 #define RCC_CCIPR_USART1SEL_SYSCLK 1
@@ -145,6 +154,28 @@ static void UART2_TX_poll(void)
 #define UART2_TX_POLL() UART2_TX_poll()
 #endif
 
+#if (UART2_TX_MODE == UART_MODE_DMA) && defined(UART2_TX_QUEUE)
+static void UART2_TxDma_Poll(void)
+{
+    static uint8_t semaphorUart2TxDmaPoll;
+    if (!atomicSetU8(&semaphorUart2TxDmaPoll, 1))
+        return;
+    if (DMA1_Channel_USART2_TX->CSR & DMA_CSR_IDLEF) {
+        static tQueueIdx num = 0;
+        if (num != 0)
+            queueRemoveData(UART2_TX_QUEUE, num);
+        num = 255;
+        const tQueueData *buffer = queueGetDataBuffer(UART2_TX_QUEUE, &num);
+        if (buffer != NULL) {
+            DMA1_Channel_USART2_TX->CSAR = (uint32_t)buffer;
+            DMA1_Channel_USART2_TX->CBR1 = num;
+            DMA1_Channel_USART2_TX->CCR |= DMA_CCR_EN; /* channel is enabled */
+        }
+    }
+    semaphorUart2TxDmaPoll = 0;
+}
+#endif
+
 static inline void UART2_TX(const void *dataP, uint32_t len)
 {
 #if (UART2_TX_MODE == UART_MODE_POLLED)
@@ -162,7 +193,7 @@ static inline void UART2_TX(const void *dataP, uint32_t len)
         if (queueWrite(UART2_TX_QUEUE, data, len) != len)
             UART2_TX_Overrun();
     }
-#else
+#else // defined(UART2_TX_QUEUE)
 	const uint8_t *data = dataP;
 	while (len != 0) {
 		if (UART2_TX_Char(*data))
@@ -170,14 +201,26 @@ static inline void UART2_TX(const void *dataP, uint32_t len)
 		data++;
 		len--;
 	}
-#endif
+#endif // defined(UART2_TX_QUEUE)
 #elif (UART2_TX_MODE == UART_MODE_IRQ)
     if (queueWrite(UART2_TX_QUEUE, dataP, len) != len)
         UART2_TX_Overrun();
     USART2->CR1 |= USART_CR1_TXEIE_TXFNFIE; // enable TX interrupt to process the queue
 #else
-#error Not yet implemented!
-#endif
+#if defined(UART2_TX_QUEUE)
+    if (queueWrite(UART2_TX_QUEUE, dataP, len) != len)
+        UART2_TX_Overrun();
+    UART2_TxDma_Poll();
+#else // defined(UART2_TX_QUEUE)
+    if (DMA1_Channel_USART2_TX->CSR & DMA_CSR_IDLEF) {
+        DMA1_Channel_USART2_TX->CSAR = (uint32_t)dataP;
+        DMA1_Channel_USART2_TX->CBR1 = len;
+        DMA1_Channel_USART2_TX->CCR |= DMA_CCR_EN; /* channel is enabled */
+    }else {
+        UART2_TX_Overrun();
+    }
+#endif // defined(UART2_TX_QUEUE)
+#endif // (UART2_TX_MODE == UART_MODE_DMA)
 }
 
 #if (UART2_RX_MODE == UART_MODE_POLLED) && defined(UART2_RX_QUEUE)
