@@ -99,13 +99,13 @@ void ADC_Init(void)
   DMA1_Channel_ADC1->CSAR = (uint32_t)&(ADC1->DR);
   DMA1_Channel_ADC1->CDAR = ADC1_DMA_CMAR;
   DMA1_Channel_ADC1->CBR1 = ADC1_DMA_CNDTR * sizeof(ADC1->DR);
-#if 1
+
   static const struct {
       uint32_t cbr1;
       uint32_t cdar;
   }dmaAdc1LinkedList = {
-          .cbr1 = ADC1_DMA_CNDTR * sizeof(ADC1->DR),
-          .cdar = ADC1_DMA_CMAR,
+      .cbr1 = ADC1_DMA_CNDTR * sizeof(ADC1->DR),
+      .cdar = ADC1_DMA_CMAR,
   };
   DMA1_Channel_ADC1->CLBAR = ((uint32_t)&dmaAdc1LinkedList) & 0xFFFF0000;
   DMA1_Channel_ADC1->CLLR = (((uint32_t)&dmaAdc1LinkedList) & 0x0000FFFF) |
@@ -116,11 +116,7 @@ void ADC_Init(void)
       ADC_CONFIG_ERROR();
   }
   //DMA1_Channel_ADC1->CTR2 |= DMA_CTR2_TCEM_0 | DMA_CTR2_TCEM_1;
-#else
-  NVIC_SetPriority(LPDMA1_CH0_IRQn, 8);  /* set Priority to middle */
-  NVIC_EnableIRQ(LPDMA1_CH0_IRQn);
-  DMA1_Channel_ADC1->CCR |= DMA_CCR_TCIE;
-#endif
+
   DMA1_Channel_ADC1->CCR |= DMA_CCR_EN; /* channel is enabled */
 
   ADC1->CR |= ADC_CR_ADSTART;
@@ -129,26 +125,4 @@ void ADC_Init(void)
       COMP_CHECK_VAL_FUNC((ADC_CFGR1_INIT & 0x01), 0) /* ADC-DMA is configured, but the DMA is not configured (ADC1_DMA_CMAR) */
   }
 #endif
-}
-
-uint32_t dbg_adc_dma;
-volatile uint32_t dtAdcIsr;
-
-void DmaAdc1_Isr(void)
-{
-    uint32_t t = getTimer_us();
-    static uint32_t tLast;
-    if (tLast != 0) {
-        uint32_t dt = t - tLast;
-        if (dtAdcIsr == 0)
-            dtAdcIsr = dt;
-        else
-            dtAdcIsr = ((dtAdcIsr * 7) + dt) / 8;
-    }
-    tLast = t;
-    dbg_adc_dma++;
-    DMA1_Channel_ADC1->CFCR = DMA_CFCR_TCF;
-    DMA1_Channel_ADC1->CDAR = ADC1_DMA_CMAR;
-    DMA1_Channel_ADC1->CBR1 = ADC1_DMA_CNDTR * sizeof(ADC1->DR);
-    DMA1_Channel_ADC1->CCR |= DMA_CCR_EN; /* channel is enabled */
 }
