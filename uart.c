@@ -236,8 +236,7 @@ void UART2_Init(uint32_t baudRate, uint8_t uartRemap)
     BitfieldSetMask(RCC->CCIPR1, RCC_CCIPR1_USART2SEL_Pos, RCC_CCIPR1_USART2SEL_Msk, USART2SEL);
     //RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_USART1SEL_Msk) | ((USART1SEL) << RCC_CCIPR1_USART1SEL_Pos);
     RCC->APB1LENR |= RCC_APB1LENR_USART2EN ; /* enable the USART2 */
-//    USART2->CR1 = USART_CR1_TE | USART_CR1_RE | USART_CR1_FIFOEN; /* TX/RX and FIFO are enabled */
-    USART2->CR1 = USART_CR1_TE | USART_CR1_RE ; /* TX/RX are enabled */
+    USART2->CR1 = USART_CR1_TE | USART_CR1_RE | USART_CR1_FIFOEN; /* TX/RX and FIFO are enabled */
     USART2->BRR = ((((f_USART2_Hz) / 1) + (baudRate / 2)) / baudRate);
     USART2->CR2 = USART2_CR2;
   #if UART2_TX_MODE == UART_MODE_DMA
@@ -251,13 +250,17 @@ void UART2_Init(uint32_t baudRate, uint8_t uartRemap)
     DMA1_Channel_USART2_TX->CDAR = (uint32_t)&(USART2->TDR);
   #endif // UART1_TX_QUEUE
 
-  #if 0
-    /* configuring DMA for USART1-RX */
-    DMA1_Channel_USART1_RX->CCR &= ~DMA_CCR1_EN;
-    DMA1_Channel_USART1_RX->CPAR = (uint32_t)&(USART1->DR);
-    DMA1_Channel_USART1_RX->CCR = DMA_CCR1_MINC | DMA_CCR1_TCIE; /* per2mem, circ, no-per-inc, mem-inc, psize=8, memsize=8, ch-prio=low, no-mem2mem */
-    DMAMUX1[DMA1_ChIdx_USART1_RX].CCR = 51;
-    UART1_RxDma_Update();
+#if UART2_TX_MODE == UART_MODE_DMA
+    /* configuring DMA for USART2-RX */
+    USART2->CR3 |= USART_CR3_DMAR;
+    DMA_Init(DMA1_Channel_USART2_RX);
+    DMA1_Channel_USART2_RX->CCR &= ~DMA_CCR_EN;
+    DMA1_Channel_USART2_RX->CTR1 = DMA_CTR1_SDW_LOG2_U8 /* Peripheral size 8 bits */ | \
+                                   DMA_CTR1_DDW_LOG2_U8 /* Memory size 8 bits */ | \
+                                   DMA_CTR1_DINC;
+    DMA1_Channel_USART2_RX->CTR2 = LL_LPDMA1_REQUEST_USART2_RX;
+    DMA1_Channel_USART2_RX->CSAR = (uint32_t)&(USART2->RDR);
+    UART2_RxDma_Poll();
   #endif
 
     UART_appInit(USART2);

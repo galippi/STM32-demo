@@ -163,9 +163,9 @@ static void UART2_TxDma_Poll(void)
     if (DMA1_Channel_USART2_TX->CSR & DMA_CSR_IDLEF) {
         static tQueueIdx num = 0;
         if (num != 0)
-            queueRemoveData(UART2_TX_QUEUE, num);
+            queueRemoveOutData(UART2_TX_QUEUE, num);
         num = 255;
-        const tQueueData *buffer = queueGetDataBuffer(UART2_TX_QUEUE, &num);
+        const tQueueData *buffer = queueGetOutBuffer(UART2_TX_QUEUE, &num);
         if (buffer != NULL) {
             DMA1_Channel_USART2_TX->CSAR = (uint32_t)buffer;
             DMA1_Channel_USART2_TX->CBR1 = num;
@@ -173,6 +173,39 @@ static void UART2_TxDma_Poll(void)
         }
     }
     semaphorUart2TxDmaPoll = 0;
+}
+#endif
+
+#if (UART2_RX_MODE == UART_MODE_DMA)
+#if !defined(UART2_RX_QUEUE)
+#error RX-DMA must use queue!
+#endif
+
+static void UART2_RxDma_Poll(void)
+{
+    static uint8_t semaphorUart2RxDmaPoll;
+    if (!atomicSetU8(&semaphorUart2RxDmaPoll, 1))
+        return;
+    static uint8_t bufferLength;
+    if (DMA1_Channel_USART2_RX->CCR & DMA_CCR_EN) {
+        DMA1_Channel_USART2_RX->CCR |= DMA_CCR_SUSP;
+        while ((DMA1_Channel_USART2_RX->CCR & DMA_CCR_SUSP) == 0)
+            ; // wait while suspended
+        if (bufferLength != 0) {
+            uint8_t len = bufferLength - DMA1_Channel_USART2_RX->CBR1;
+            if (len != 0)
+                queueSkipInData(UART2_RX_QUEUE, len);
+        }
+        DMA1_Channel_USART2_RX->CCR |= DMA_CCR_RESET;
+    }
+    //bufferLength = 64;
+    const uint8_t *buffer = queueGetInBuffer(UART2_RX_QUEUE, &bufferLength);
+    if (buffer != NULL) {
+        DMA1_Channel_USART2_RX->CDAR = (uint32_t)buffer;
+        DMA1_Channel_USART2_RX->CBR1 = bufferLength;
+        DMA1_Channel_USART2_RX->CCR |= DMA_CCR_EN; /* channel is enabled */
+    }
+    semaphorUart2RxDmaPoll = 0;
 }
 #endif
 
