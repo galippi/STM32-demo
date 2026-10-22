@@ -11,6 +11,10 @@
 #define COMP_CHECK_VAL(vall, valr) \
     extern char __dummy_size_check[(vall) == (valr) ? 1 : -1];
 
+#define COMP_CHECK_VAL_FUNC(vall, valr) \
+        COMP_CHECK_VAL(vall, valr) \
+        (void)__dummy_size_check;
+
 #define COMP_CHECK_SIZE(var, size) COMP_CHECK_VAL(sizeof(var), size)
 
 #define COMP_CHECK_ARRAY(array, length) COMP_CHECK_VAL(NUMOF(array), length)

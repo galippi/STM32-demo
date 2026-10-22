@@ -38,4 +38,6 @@ extern uint16_t ADC_values_raw[ADC_Ch_Num];
 #define ADC1_DMA_CMAR ((uint32_t)ADC_values_raw)
 #define ADC1_DMA_CNDTR (ADC_Ch_Num)
 
+#define ADC_CONFIG_ERROR() do{*((uint32_t*)0) = 0; /* NULL pointer exception */}while(0)
+
 #endif /* _ADC_CONF_H_ */
