@@ -27,16 +27,11 @@
 #define DMA_CTR1_DDW_LOG2_U16 DMA_CTR1_DDW_LOG2_0
 #define DMA_CTR1_DDW_LOG2_U32 DMA_CTR1_DDW_LOG2_1
 
-#if 0
-enum { // see it in rm0522 - section 14.3.4
-    e_DMA_REQSEL_ADC1,
-    e_DMA_REQSEL_USART2_RX = 14,
-    e_DMA_REQSEL_USART2_RX = 15,
-}e_DMA_REQSEL;
-#endif
-
 #if CPU_TYPE == CPU_TYPE_STM32C542
 #define LPDMA1_CH_LAST LPDMA1_CH3
+#define LPDMA2_CH_LAST LPDMA2_CH3
+#elif CPU_TYPE == CPU_TYPE_STM32C562
+#define LPDMA1_CH_LAST LPDMA1_CH7
 #define LPDMA2_CH_LAST LPDMA2_CH3
 #else
 #error Not yet implemented!
