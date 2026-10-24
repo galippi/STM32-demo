@@ -59,21 +59,17 @@ uint8_t uart1RxBuffer[128];
 QUEUE_CREATE(uart2TxQueue, 127);
 QUEUE_CREATE(uart2RxQueue, 127);
 
-hal_flash_handle_t flash = {
-    .instance = HAL_FLASH,
-};
-hal_crc_handle_t crc = {
-    .instance = HAL_CRC,
-};
+hal_flash_handle_t flash;
+hal_crc_handle_t crc;
 
 ee_object_t object = {
     .f_object = &flash,
     .crc_object = &crc,
 };
 
-void flashEccCallback(void)
+hal_status_t flashEccCallback(void)
 {
-    flash.p_ecc_error_cb(&flash, 0);
+    return flash.p_ecc_error_cb(&flash, 0);
 }
 
 volatile ee_status eeState;
@@ -81,7 +77,8 @@ volatile ee_status eeState;
 void Task_Init(void)
 {
     SCB_EnableFPU();
-    STM32_ATOMIC_SET_BIT_32(RCC->AHB1ENR, RCC_AHB1ENR_CRCEN);
+    HAL_FLASH_Init(&flash, HAL_FLASH);
+    HAL_CRC_Init(&crc, HAL_CRC);
     EE_Init(&object, EE_CONDITIONAL_ERASE);
 
     {

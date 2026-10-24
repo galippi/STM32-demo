@@ -7,6 +7,6 @@ void Task_1ms(void);
 void Task_10ms(void);
 void Task_500ms(void);
 
-void flashEccCallback(void);
+hal_status_t flashEccCallback(void);
 
 #endif /* _TASKS_H_ */

@@ -187,7 +187,7 @@ extern "C" {
   */
 /* ########################## HAL_CRC Config #################################### */
 #define USE_HAL_CRC_MODULE                      1U
-#define USE_HAL_CRC_CLK_ENABLE_MODEL            HAL_CLK_ENABLE_NO
+#define USE_HAL_CRC_CLK_ENABLE_MODEL            HAL_CLK_ENABLE_PERIPH_PWR_SYSTEM
 #define USE_HAL_CRC_USER_DATA                   0U
 /**
   * @}

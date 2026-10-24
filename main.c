@@ -249,26 +249,13 @@ void SysTick_Isr(void)
 
 void NMI_Handler(void)
 {
-  /* Check if the NMI was caused by a Flash ECC double-error (ECCD) */
-  //if (__HAL_FLASH_GET_FLAG(FLASH_FLAG_ECCD))
   if (FLASH->ECCDETR & FLASH_ECCDETR_ECCD)
-  {
-    flashEccCallback();
-    /* Read the failing address or check if it's an unwritten/empty area */
-    //uint32_t ecc_addr = READ_REG(FLASH->ECCDR);
-
-    /* Clear the ECCD flag */
-    //__HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_ECCD);
-    FLASH->ECCDETR = FLASH_ECCDETR_ECCD;
-
-    /*
-     * Optional: If you use X-CUBE-EEPROM or custom EDATA handling,
-     * you can flag the address or skip corrupted data safely.
-     * Refer to application note AN4894 for routine integration like:
-     * EE_DeleteCorruptedFlashAddress(ecc_addr);
-     */
-
-    return;
+  { /* the NMI was caused by a Flash ECC double-error (ECCD) */
+    if (flashEccCallback() == HAL_OK) {
+        //__HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_ECCD); /* Clear the ECCD flag */
+        FLASH->ECCDETR = FLASH_ECCDETR_ECCD; /* Clear the ECCD flag */
+        return; // it was handled by the flash handler
+    }
   }
   CAT_Error(CAT_Exception_0, 1);
 }
