@@ -4,20 +4,12 @@
 #include "util.h"
 
 #include "SysClock.h"
-//#include "gpio_app.h"
-#include "gpio.h"
-//#include "adc.h"
-//#include "adc_app.h"
-//#include "timer.h"
 #include "system_conf.h"
-//#include "timer_conf.h"
-//#include "timer_app.h"
 #include "scheduler_preemptive.h"
 #include "tasks.h"
 #include "FaultHandler.h"
 #include "vector.h"
-
-//#include "stm32c5xx_hal_rcc.h"
+#include "timer.h"
 
 #include "main.h"
 
@@ -141,6 +133,8 @@ int main(void)
   SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
 
   SysClock_Init();
+
+  TIM2_Init(); // used for general 32 bit timer with 1us resolution
 
 #if 0
   TIM14_Init(); // scheduler timer init

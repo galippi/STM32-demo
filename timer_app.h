@@ -22,7 +22,7 @@ static inline void TIM3_CC4IF_Callback(void)
   tim3_cc4_ctr++;
 }
 
-static inline uint16_t getTimer_us(void)
+static inline uint32_t getTimer_us(void)
 {
   return TIM2_Cnt_Get();
 }

@@ -25,6 +25,7 @@
 #include "FaultHandler.h"
 #include "uart.h"
 #include "queue.h"
+#include "timer_app.h"
 #include "u32_to_hexstring.h"
 #include "adc.h"
 #include "adc_app.h"
@@ -92,13 +93,11 @@ void Task_Init(void)
 
     queueInit(&uart2TxQueue);
     queueInit(&uart2RxQueue);
-    UART2_Init(19200, 0);
+    UART2_Init(115200, 0);
 
     LEDR_Init();
     LEDY_Init();
     LEDG_Init();
-
-    TIM2_Init(); // used for general 32 bit timer with 1us resolution
 
     TIM12_Init();
     GPIO_PortInit_AFOut(GPIOC, 14, 2); /* PC14 TIM12.CH1 */
@@ -167,8 +166,6 @@ void Task_Bgnd(void)
 #endif
 }
 
-static uint32_t halTick_1ms;
-
 void Task_1ms(void)
 {
 #ifdef f_USBCLK_Hz
@@ -182,19 +179,23 @@ void Task_1ms(void)
         t_ug++;
     }
   }
-  halTick_1ms++;
   UART2_TxDma_Poll();
   UART2_RxDma_Poll();
 }
 
-extern uint32_t HAL_GetTick(void);
-
 uint32_t HAL_GetTick(void)
 {
+    static uint32_t tickLast; // upper 16 bits: offset, lower 16 bits: counter
+    uint32_t  tick = getTimer_us() / 1000;
+    uint32_t  tickLow = tick & 0x0000FFFF;
+    if (tickLow < (tickLast & 0x0000FFFF)) {
+        tickLast += 0x10000; // overflow had happen
+    }
+    uint32_t offset = tickLast & 0xFFFF0000;
+    uint32_t halTick_1ms = offset + tickLow;
+    tickLast = halTick_1ms;
     return halTick_1ms;
 }
-
-extern void HAL_Delay(uint32_t delay);
 
 void HAL_Delay(uint32_t delay)
 {
