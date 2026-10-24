@@ -3,6 +3,11 @@ CFLAGS_DEBUG = -gdwarf-2
 SUBDIRS := . u32_to_hexstring hal_STM32C5 hal_STM32C5/ST_lib
 SUBDIRS += hal_STM32C5/ST_lib/ll
 SUBDIRS += queue
+
+SUBDIRS += stm32-util-eeprom-emulation/core stm32-util-eeprom-emulation/core/algo
+SUBDIRS += stm32-util-eeprom-emulation/interface_flash
+SUBDIRS += stm32-util-eeprom-emulation/interface_crc
+
 SUBDIRS_LINKER := hal_STM32C5/lib
 
 WARNINGS = -Wall -Wextra
@@ -13,6 +18,9 @@ WARNINGS += -Wmissing-prototypes -Wstrict-prototypes
 WARNINGS += -Wno-unused-function
 WARNINGS += -Wno-enum-compare
 WARNINGS += -Wno-expansion-to-defined
+# this is required for EEPROM emulation
+WARNINGS += -Wno-implicit-fallthrough
+
 # stop at warnings
 WARNINGS += -Werror
 
@@ -38,6 +46,7 @@ CFLAGS_TARGET := -mthumb
 #CFLAGS_TARGET += -march=armv7-m
 CFLAGS_TARGET += -march=armv8-m.main -mfpu=fpv5-sp-d16 -mfloat-abi=hard
 #CFLAGS_TARGET += --short-enums
+CFLAGS_TARGET += -D=STM32C562xx
 
 #LDFLAGS_STRIP_DEBUG_INFO = -s
 LDFLAGS  += $(LDFLAGS_STRIP_DEBUG_INFO) $(addprefix -L, $(SUBDIRS_LINKER))
@@ -74,6 +83,11 @@ CFILES  += uart_app.c
 CFILES  += timer.c
 CFILES  += adc.c
 CFILES  += adc_app.c
+
+CFILES  += eeprom_emul_core.c eeprom_algo_flitf.c eeprom_itfflash_flitf_edata.c
+CFILES  += eeprom_itfcrc_crc.c
+CFILES  += stm32c5xx_hal_flash.c stm32c5xx_hal_flash_itf.c
+CFILES  += stm32c5xx_hal_crc.c
 
 SFILES  =
 #SFILES += vectors.s

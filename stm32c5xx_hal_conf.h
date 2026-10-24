@@ -186,7 +186,7 @@ extern "C" {
   * @{
   */
 /* ########################## HAL_CRC Config #################################### */
-#define USE_HAL_CRC_MODULE                      0U
+#define USE_HAL_CRC_MODULE                      1U
 #define USE_HAL_CRC_CLK_ENABLE_MODEL            HAL_CLK_ENABLE_NO
 #define USE_HAL_CRC_USER_DATA                   0U
 /**
@@ -289,13 +289,13 @@ extern "C" {
 /* ########################## HAL_FLASH Config ################################## */
 #define USE_HAL_FLASH_MODULE                    1U
 #define USE_HAL_FLASH_CLK_ENABLE_MODEL          HAL_CLK_ENABLE_NO
-#define USE_HAL_FLASH_REGISTER_CALLBACKS        0U
+#define USE_HAL_FLASH_REGISTER_CALLBACKS        1U
 #define USE_HAL_FLASH_USER_DATA                 0U
 #define USE_HAL_FLASH_GET_LAST_ERRORS           0U
 /* Use the FLASH program by address feature */
-#define USE_HAL_FLASH_PROGRAM_BY_ADDR           0U
+#define USE_HAL_FLASH_PROGRAM_BY_ADDR           1U
 /* Use the FLASH erase by address feature */
-#define USE_HAL_FLASH_ERASE_BY_ADDR             0U
+#define USE_HAL_FLASH_ERASE_BY_ADDR             1U
 /* Use the FLASH erase by PAGE feature */
 #define USE_HAL_FLASH_ERASE_PAGE                0U
 /* Use the FLASH bank erase feature */
@@ -303,9 +303,9 @@ extern "C" {
 /* Use the FLASH mass erase feature */
 #define USE_HAL_FLASH_MASS_ERASE                0U
 /* Use ECC errors handling APIs */
-#define USE_HAL_FLASH_ECC                       0U
+#define USE_HAL_FLASH_ECC                       1U
 /* Use FLASH HAL API for EDATA */
-#define USE_HAL_FLASH_OB_EDATA                  0U
+#define USE_HAL_FLASH_OB_EDATA                  1U
 /**
   * @}
   */

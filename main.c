@@ -141,7 +141,6 @@ int main(void)
   SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
 
   SysClock_Init();
-  SysTick_Init();
 
 #if 0
   TIM14_Init(); // scheduler timer init
@@ -189,6 +188,7 @@ int main(void)
   //TIM14_CCR1_Set(TIM14_Cnt_Get() + TIM14_1ms); /* set the first scheduler interrupt to 1ms */
   //NVIC_EnableIRQ(TIM14_IRQn); /* enable TIM14 interrupt */
   //NVIC->IP[TIM14_IRQn] = 0x80; /* set TIM14 interrupt priority to medium */
+  SysTick_Init();
   NVIC_SetPriority(SysTick_IRQn, 8);  /* set Priority to middle for SysTick Interrupts */
   NVIC_SetPriority(SVCall_IRQn,  0); // set priority to lowest one
   NVIC_SetPriority(PendSV_IRQn,  (1<<__NVIC_PRIO_BITS) - 1); /* it shall be lower than the prio of the scheduler-timer interrupt */
@@ -245,6 +245,32 @@ void SysTick_Isr(void)
 #endif
     }else
         CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) );
+}
+
+void NMI_Handler(void)
+{
+  /* Check if the NMI was caused by a Flash ECC double-error (ECCD) */
+  //if (__HAL_FLASH_GET_FLAG(FLASH_FLAG_ECCD))
+  if (FLASH->ECCDETR & FLASH_ECCDETR_ECCD)
+  {
+    flashEccCallback();
+    /* Read the failing address or check if it's an unwritten/empty area */
+    //uint32_t ecc_addr = READ_REG(FLASH->ECCDR);
+
+    /* Clear the ECCD flag */
+    //__HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_ECCD);
+    FLASH->ECCDETR = FLASH_ECCDETR_ECCD;
+
+    /*
+     * Optional: If you use X-CUBE-EEPROM or custom EDATA handling,
+     * you can flag the address or skip corrupted data safely.
+     * Refer to application note AN4894 for routine integration like:
+     * EE_DeleteCorruptedFlashAddress(ecc_addr);
+     */
+
+    return;
+  }
+  CAT_Error(CAT_Exception_0, 1);
 }
 
 void ExceptionHandler_0(void)

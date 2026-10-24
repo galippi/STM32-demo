@@ -31,7 +31,7 @@ t_func_ptr const ISR_VectorTable[] =
 {
   (const t_func_ptr) &SP_INIT, /* stack top address */
   reset,             /* 1 Reset */
-  ExceptionHandler_0,/* 2 NMI */
+  NMI_Handler,       /* 2 NMI */
   ExceptionHandler_1,/* 3 HardFault */
   ExceptionHandler_2,/* 4 MemManage */
   ExceptionHandler_3,/* 5 BusFault */
