@@ -62,4 +62,8 @@ inline static char atomic_check_and_set_u8(uint8_t *var, uint8_t val_old, uint8_
 #define SchedPreTask_EnableTaskLoadMeas 1
 #define SchedPreTask_LoadMeasResolution (TIM2_FREQ / 1000)
 
+#define SchedPreTask_ErrorStackError() do { \
+  CAT_Error(CAT_StackError, 0); \
+}while(0)
+
 #endif /* _SCHEDULER_PREEMPTIVE_CONF_H_ */

@@ -14,6 +14,7 @@ typedef enum {
   CAT_Exception_4,
   CAT_InvalidISR,
   CAT_SchedLostInterrupt,
+  CAT_StackError,
   CAT_TaskOverrun_1ms,
   CAT_TaskOverrun_10ms,
   CAT_TaskOverrun_500ms,
