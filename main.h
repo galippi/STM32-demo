@@ -16,7 +16,7 @@
 #define _MAIN_H_
 
 void RAM_StartCheck(void);
-int main(void);
+int mainNoReturn(void) __attribute__ ((noreturn));
 
 void SysTick_Isr(void);
 

@@ -115,7 +115,11 @@ $(TARGET_BIN) : $(TARGET_ELF)
 
 $(TARGET_S19) : $(TARGET_ELF)
 	$(OBJCOPY) $^ $@ -O srec
-	#python memmap.py $(TARGET_DIR)/$(TARGET).map
+	python memmap.py $(TARGET_DIR)/$(TARGET).map
+
+memmap.txt: $(TARGET_DIR)/$(TARGET).map
+	python3.4m.exe --version
+	python3.4m.exe memmap.py $(TARGET_DIR)/$(TARGET).map
 
 $(TARGET_LIST) : $(TARGET_ELF)
 	$(OBJDUMP) -D $^ > $@

@@ -2,8 +2,8 @@ import re
 from ast import literal_eval
 import sys
 
-ranges = [[0x08000000, 0x0000c000, "ROM"],
-          [0x20002000, 0x00003000, "RAM"]]
+ranges = [[0x08000000, 0x00020000, "ROM"],
+          [0x20000000, 0x00010000, "RAM"]]
 used = dict()
 
 def rangeCheck(addr):
@@ -60,7 +60,6 @@ print("Used memories:")
 for j in range(0, len(ranges)):
     r = used[str(j)]
     perc = (r[1] - r[0]) * 100 / ranges[j][1]
-    #print("Section " + hex(ranges[j][0]) + f": {perc:.2f}")
-    print("  Section " + ranges[j][2] + f": {perc:.1f}%")
+    print("  Section %s: %4.1f" % (ranges[j][2], perc))
 
 #end

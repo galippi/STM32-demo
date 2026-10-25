@@ -56,6 +56,8 @@ LEDx_Set(G)
 
 uint8_t uart1RxBuffer[128];
 //uint8_t uart1TxBuffer[128];
+QUEUE_CREATE(uart1TxQueue, 127);
+char uart1TxOverflowCtr1;
 
 QUEUE_CREATE(uart2TxQueue, 127);
 QUEUE_CREATE(uart2RxQueue, 127);
@@ -63,7 +65,7 @@ QUEUE_CREATE(uart2RxQueue, 127);
 hal_flash_handle_t flash;
 hal_crc_handle_t crc;
 
-ee_object_t object = {
+static const ee_object_t object = {
     .f_object = &flash,
     .crc_object = &crc,
 };
@@ -75,6 +77,8 @@ hal_status_t flashEccCallback(void)
 
 volatile ee_status eeState;
 
+static uint8_t startCtr;
+
 void Task_Init(void)
 {
     SCB_EnableFPU();
@@ -83,12 +87,12 @@ void Task_Init(void)
     EE_Init(&object, EE_CONDITIONAL_ERASE);
 
     {
-        uint8_t ctr;
-        eeState = EE_ReadVariable8bits(1, &ctr);
-        ctr++;
-        eeState = EE_WriteVariable8bits(1, ctr);
+        eeState = EE_ReadVariable8bits(1, &startCtr);
+        startCtr++;
+        eeState = EE_WriteVariable8bits(1, startCtr);
     }
 
+    queueInit(&uart1TxQueue);
     UART1_Init(9600, 0);
 
     queueInit(&uart2TxQueue);
@@ -121,9 +125,6 @@ void Task_Init(void)
     #endif
 #endif
 }
-
-QUEUE_CREATE(uart1TxQueue, 128);
-char uart1TxOverflowCtr1;
 
 static void UART_TX(const void *ptr, uint8_t len)
 {
@@ -350,7 +351,11 @@ void Task_500ms(void)
 #if 1
     //UART2_TX_Char(UART2_RX_Char());
     {
+        static uint8_t ctr;
     	char buf[10] = "Demo000**\n";
+    	buf[4] = toHexDigit(startCtr & 0x0F);
+        buf[5] = toHexDigit(ctr & 0x0F);
+    	ctr++;
     	buf[6] = '0' + (uart2TxOverrun & 0x07);
         UART2_TX(buf, sizeof(buf));
     }

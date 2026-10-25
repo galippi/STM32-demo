@@ -128,13 +128,15 @@ void RAM_StartCheck(void)
   }
 }
 
-int main(void)
+int mainNoReturn(void)
 {
   SCB->VTOR = (uint32_t)&ISR_VectorTable[0];
 
   SysClock_Init();
 
+  memset((void*)0x2000E000, 0, 0x2000 - 128);
   TIM2_Init(); // used for general 32 bit timer with 1us resolution
+  DBGMCU->APB1LFZR |= DBGMCU_APB1LFZR_DBG_TIM2_STOP; // stop TIM2 in debug mode
 
 #if 0
   TIM14_Init(); // scheduler timer init
@@ -183,6 +185,7 @@ int main(void)
   //NVIC_EnableIRQ(TIM14_IRQn); /* enable TIM14 interrupt */
   //NVIC->IP[TIM14_IRQn] = 0x80; /* set TIM14 interrupt priority to medium */
   SysTick_Init();
+  SchedulerPre_Init();
   NVIC_SetPriority(SysTick_IRQn, 8);  /* set Priority to middle for SysTick Interrupts */
   NVIC_SetPriority(SVCall_IRQn,  0); // set priority to lowest one
   NVIC_SetPriority(PendSV_IRQn,  (1<<__NVIC_PRIO_BITS) - 1); /* it shall be lower than the prio of the scheduler-timer interrupt */
@@ -204,8 +207,6 @@ int main(void)
     }
 #endif
   }
-
-  return 0;
 }
 
 void SysTick_Isr(void)
@@ -420,8 +421,7 @@ void svc_ret(void)
 {
   //__ASM("ADD sp,sp,#(1*4)"); /* pop the pushed stack */
 #if 1
-  /* remove one 8-register exception frame */
-  __ASM("ADD sp,sp,#(8*4)");
+  __ASM("ADD sp,sp,#(8*4)"); /* remove one 8-register exception frame */
 #else
   /* remove one 8-register exception frame */
   /* plus the "aligner" from the stack */
