@@ -231,6 +231,13 @@ void Task_10ms(void)
 	}
 	t_last = t;
 
+    {
+        __NOP();
+        while((TIM2_Cnt_Get() - t) < 2200) {
+        }
+        __NOP();
+    }
+
 	{
 		t = TIM2_Cnt_Get();
 		uint16_t t12 = TIM12_Cnt_Get();

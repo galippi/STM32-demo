@@ -228,6 +228,7 @@ void SysTick_Isr(void)
 #endif
         SchedulerPre_TaskTableUpdate();
         SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; /* activate PendSV handler */
+        __ISB();
 #else
         static uint32_t ctr;
         if (ctr == 0) {
@@ -407,14 +408,18 @@ void svc_ret(void)
 /* INTERRUPT */ void PendSV_Handler(void)
 {
   //PendSV_Ctr++;
-  //SchedulerPre_TaskManagement();
+#if 0
+    __set_BASEPRI(0); // restore the lowest priority level
+  SchedulerPre_TaskManagement();
+#else
     asm("MOV r3,%0" : : "r" (1 << 24));
   __ASM("LDR r2,=SchedulerPre_TaskManagement"); /* address of the QK scheduler (new pc) */
   __ASM("LDR r1,=svc_ret"); /* return address after the call (new lr) */
-  __ASM("PUSH {r1-r3}"); /* push xpsr,pc,lr */
+  __ASM("PUSH {r1-r3,lr}"); /* push xpsr,pc,lr */
   __ASM("SUB sp,sp,#(4*4)"); /* don't care for r12,r3,r2,r1 */
   __ASM("PUSH {r0}"); /* push the prio argument (new r0) */
   asm("BX %0" : : "r" (0xFFFFFFF9));
+#endif
 }
 
 /* INTERRUPT */ void SVC_Handler(void)
@@ -428,5 +433,6 @@ void svc_ret(void)
   __ASM("ADD sp,sp,#(9*4)");
 #endif
   /* return to the preempted task */
+  __ASM("pop {r0, lr}");
   __ASM("BX lr"); /* exception-return to the scheduler */
 }
