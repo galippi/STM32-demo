@@ -10,6 +10,7 @@
 #include "FaultHandler.h"
 #include "vector.h"
 #include "timer.h"
+#include "timer_app.h"
 
 #include "main.h"
 
@@ -213,33 +214,22 @@ int mainNoReturn(void)
 void SysTick_Isr(void)
 {
     if (SysTick_GetCountFlag()) {
-#if 1
-#if 0
         static uint16_t t_last;
         uint16_t t = getTimer_us();
-        if (t_last == 0) {
+        if (t_last == 0) { // first cycle - start the initial timer value
             t_last  = t;
-        }else {
-            if (((t - t_last) & 0xFFFF) > (2 * TIM6_1ms))
+        }else { // not the first cycle - check the elapsed time
+#define T_1ms_in_us 1000
+            if (((t - t_last) & 0xFFFF) > (2 * T_1ms_in_us))
               SchedulerPre_LostInterrupt();
-            t_last = t_last + TIM6_1ms;
+            t_last = t_last + T_1ms_in_us;
         }
         if (t_last == 0)
-            t_last = 1;
-#endif
+            t_last = 1; // do not store the 0, because it has special meaning - init cycle
+
         SchedulerPre_TaskTableUpdate();
         SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; /* activate PendSV handler */
         __ISB();
-#else
-        static uint32_t ctr;
-        if (ctr == 0) {
-            static uint8_t led_val;
-            GPIO_Set(GPIOA, 9, led_val);
-            led_val = 1 - led_val;
-            ctr = 1000;
-        }
-        ctr--;
-#endif
     }else
         CAT_Error(CAT_InvalidISR, (SCB->ICSR & 0x1FF) );
 }
@@ -398,8 +388,6 @@ void ISR_Invalid(void)
 extern void svc_ret(void);
 void svc_ret(void)
 {
-  // ???????????????????????????????
-  //__ASM("CPSIE i"); /* enable interrupts to allow SVCall exception*/
   /*
    * FPU handling
    */
@@ -408,17 +396,12 @@ void svc_ret(void)
     __ASM("PUSH {r2}");
     __ASM("LDR r0,=(0) \n"
           "MSR CONTROL, r0"); // disable FPU to save RAM - do not reserve stack for FPU registers
-          //"STR r0,[r1]"); // disable FPU to save RAM - do not reserve stack for FPU registers
     __ASM("SVC #0");
 }
 
 /* INTERRUPT */ void PendSV_Handler(void)
 {
   //PendSV_Ctr++;
-#if 0
-    __set_BASEPRI(0); // restore the lowest priority level
-  SchedulerPre_TaskManagement();
-#else
   __ASM("LDR r3,=(1 << 24)");
   __ASM("LDR r2,=SchedulerPre_TaskManagement"); /* address of the QK scheduler (new pc) */
   __ASM("LDR r1,=svc_ret"); /* return address after the call (new lr) */
@@ -426,29 +409,13 @@ void svc_ret(void)
   __ASM("SUB sp,sp,#(4*4)"); /* don't care for r12,r3,r2,r1 */
   __ASM("PUSH {r0}"); /* push the prio argument (new r0) */
   asm("BX %0" : : "r" (0xFFFFFFF9));
-#endif
 }
 
 /* INTERRUPT */ void SVC_Handler(void)
 {
-  //__ASM("ADD sp,sp,#(1*4)"); /* pop the pushed stack */
-#if 1
-#if 0
-  __ASM(" TST LR, #0x10         \n" /* Test bit 4 to check usage of FPU register */
-        " ITE EQ                \n"
-        " ADDEQ SP, SP, #104    \n" // Restore stack properly
-        " ADDNE SP, SP, #32     \n"); // remove one 8-register exception frame
-#else
-  __ASM("ADD sp,sp,#(8*4)");
-#endif
-#else
-  /* remove one 8-register exception frame */
-  /* plus the "aligner" from the stack */
-  __ASM("ADD sp,sp,#(9*4)");
-#endif
+  __ASM("ADD sp,sp,#(8*4)"); // remove one 8-register exception frame
   /* return to the preempted task */
-  __ASM("pop {r1}");
-  __ASM("pop {lr}");
+  __ASM("pop {r1,lr}");
   __ASM("LDR r3,=(0xE000EF34)"); // address of FPU->FPCCR
   __ASM("STR r1,[r3]"); // r4 -> FPU->FPCCR - restore lazy stacking info
   __ASM("BX lr"); /* exception-return to the interrupted process */
