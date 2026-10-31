@@ -155,6 +155,12 @@ static void UART_TX(const void *ptr, uint8_t len)
 
 uint8_t UART1_TxOverrun;
 
+typedef float float32_t;
+
+volatile float32_t v1 = 8.888;
+
+int errCtr;
+
 void Task_Bgnd(void)
 {
 #if UART1_DMA == 0
@@ -165,9 +171,19 @@ void Task_Bgnd(void)
         UART1_TX(&data, 1);
     }
 #endif
+    {
+        uint32_t t = TIM2_Cnt_Get();
+        float32_t temp = v1;
+        while((TIM2_Cnt_Get() - t) < 2200) {
+        }
+        if (fabsf(v1 - temp) > 0.001f)
+            errCtr++;
+        while((TIM2_Cnt_Get() - t) < 22000) {
+        }
+        if (fabsf(v1 - temp) > 0.001f)
+            errCtr++;
+    }
 }
-
-typedef float float32_t;
 
 void Task_1ms(void)
 {

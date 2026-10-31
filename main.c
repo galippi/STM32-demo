@@ -28,6 +28,7 @@
 	DBG_PORT(TIM_TypeDef, tim2, TIM2) \
 	DBG_PORT(ADC_TypeDef, adc1, ADC1) \
 	DBG_PORT(SCB_Type, scb, SCB) \
+	DBG_PORT(FPU_Type, fpu, FPU) \
 	DBG_PORT(NVIC_Type, nvic, NVIC) \
 	DBG_PORT(USART_TypeDef, uart1, USART1) \
     DBG_PORT(USART_TypeDef, uart2, USART2) \
@@ -403,8 +404,11 @@ void svc_ret(void)
    * FPU handling
    */
     __ASM("LDR r1,=(0xE000EF34)"); // address of FPU->FPCCR
-    __ASM("LDR r1,[r1]"); // r1 = FPU->FPCCR - store lazy stacking info
-    __ASM("PUSH {r1}");
+    __ASM("LDR r2,[r1]"); // r1 = FPU->FPCCR - store lazy stacking info
+    __ASM("PUSH {r2}");
+    __ASM("LDR r0,=(0) \n"
+          "MSR CONTROL, r0"); // disable FPU to save RAM - do not reserve stack for FPU registers
+          //"STR r0,[r1]"); // disable FPU to save RAM - do not reserve stack for FPU registers
     __ASM("SVC #0");
 }
 
@@ -429,10 +433,14 @@ void svc_ret(void)
 {
   //__ASM("ADD sp,sp,#(1*4)"); /* pop the pushed stack */
 #if 1
+#if 0
   __ASM(" TST LR, #0x10         \n" /* Test bit 4 to check usage of FPU register */
         " ITE EQ                \n"
         " ADDEQ SP, SP, #104    \n" // Restore stack properly
         " ADDNE SP, SP, #32     \n"); // remove one 8-register exception frame
+#else
+  __ASM("ADD sp,sp,#(8*4)");
+#endif
 #else
   /* remove one 8-register exception frame */
   /* plus the "aligner" from the stack */
