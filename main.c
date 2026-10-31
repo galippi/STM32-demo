@@ -402,7 +402,10 @@ void svc_ret(void)
   /*
    * FPU handling
    */
-  __ASM("SVC #0");
+    __ASM("LDR r1,=(0xE000EF34)"); // address of FPU->FPCCR
+    __ASM("LDR r1,[r1]"); // r1 = FPU->FPCCR - store lazy stacking info
+    __ASM("PUSH {r1}");
+    __ASM("SVC #0");
 }
 
 /* INTERRUPT */ void PendSV_Handler(void)
@@ -412,7 +415,7 @@ void svc_ret(void)
     __set_BASEPRI(0); // restore the lowest priority level
   SchedulerPre_TaskManagement();
 #else
-    asm("MOV r3,%0" : : "r" (1 << 24));
+  __ASM("LDR r3,=(1 << 24)");
   __ASM("LDR r2,=SchedulerPre_TaskManagement"); /* address of the QK scheduler (new pc) */
   __ASM("LDR r1,=svc_ret"); /* return address after the call (new lr) */
   __ASM("PUSH {r1-r3,lr}"); /* push xpsr,pc,lr */
@@ -426,13 +429,19 @@ void svc_ret(void)
 {
   //__ASM("ADD sp,sp,#(1*4)"); /* pop the pushed stack */
 #if 1
-  __ASM("ADD sp,sp,#(8*4)"); /* remove one 8-register exception frame */
+  __ASM(" TST LR, #0x10         \n" /* Test bit 4 to check usage of FPU register */
+        " ITE EQ                \n"
+        " ADDEQ SP, SP, #104    \n" // Restore stack properly
+        " ADDNE SP, SP, #32     \n"); // remove one 8-register exception frame
 #else
   /* remove one 8-register exception frame */
   /* plus the "aligner" from the stack */
   __ASM("ADD sp,sp,#(9*4)");
 #endif
   /* return to the preempted task */
-  __ASM("pop {r0, lr}");
-  __ASM("BX lr"); /* exception-return to the scheduler */
+  __ASM("pop {r1}");
+  __ASM("pop {lr}");
+  __ASM("LDR r3,=(0xE000EF34)"); // address of FPU->FPCCR
+  __ASM("STR r1,[r3]"); // r4 -> FPU->FPCCR - restore lazy stacking info
+  __ASM("BX lr"); /* exception-return to the interrupted process */
 }

@@ -167,6 +167,8 @@ void Task_Bgnd(void)
 #endif
 }
 
+typedef float float32_t;
+
 void Task_1ms(void)
 {
 #ifdef f_USBCLK_Hz
@@ -179,6 +181,10 @@ void Task_1ms(void)
     {
         t_ug++;
     }
+    volatile float32_t var = 3.0f;
+    var++;
+    var--;
+    var = (var * 2.2f) / 4.5f;
   }
   UART2_TxDma_Poll();
   UART2_RxDma_Poll();
@@ -217,6 +223,8 @@ struct {
 	uint16_t dt;
 }dbgT12[T12_SIZE];
 
+volatile float32_t v0 = 3.3333;
+
 void Task_10ms(void)
 {
 	uint32_t t = TIM2_Cnt_Get();
@@ -232,10 +240,12 @@ void Task_10ms(void)
 	t_last = t;
 
     {
+       float32_t temp = v0;
         __NOP();
         while((TIM2_Cnt_Get() - t) < 2200) {
         }
         __NOP();
+        while(fabsf(v0 - temp) > 0.001f);
     }
 
 	{
