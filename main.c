@@ -78,21 +78,27 @@ const t_DBG_Ports dbg_ports = {
 t_dbgBuffer dbgBuffer;
 
 /** \brief  Set Stack Pointer
-
     This function assigns the given value to the current Stack Pointer (SP).
-
-    \param [in]    topOfStack  Process Stack Pointer value to set
- */
+    \param [in]    topOfStack  Process Stack Pointer value to set */
 __attribute__( ( always_inline ) ) static __INLINE void __set_SP(uint32_t topOfStack)
 {
   __ASM volatile ("MOV sp, %0\n" : : "r" (topOfStack) );
 }
+
+/** \brief  Get SP
+    This function returns the current value of the SP register.
+    \return               SP register value */
+__attribute__( ( always_inline ) ) static __INLINE uint32_t __get_SP(void)
+{
+  uint32_t result;
+
+  __ASM volatile ("MOV %0, sp" : "=r" (result) );
+  return(result);
+}
+
 /** \brief  Get PC
-
     This function returns the current value of the PC register.
-
-    \return               PC register value
- */
+    \return               PC register value */
 __attribute__( ( always_inline ) ) static __INLINE uint32_t __get_PC(void)
 {
   uint32_t result;
@@ -254,7 +260,9 @@ void ExceptionHandler_0(void)
 
 void ExceptionHandler_1(void)
 {
-  CAT_Error(CAT_Exception_1, 0);
+  if (SCB->CFSR & SCB_CFSR_NOCP_Msk)
+      CAT_Error(CAT_NOCP, *(uint32_t*)(__get_SP() + 0x20));
+  CAT_Error(CAT_Exception_1, SCB->CFSR);
 }
 
 void ExceptionHandler_2(void)
