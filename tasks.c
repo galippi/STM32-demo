@@ -145,7 +145,7 @@ static void MX_I2C1_Init(void)
   static const hal_i2c_config_t ssd1306_config = {
           //.timing = LL_I2C_CONVERT_TIMINGS(0, 10, 4, 15, 32),
           //.timing = LL_I2C_CONVERT_TIMINGS(12, 2, 2, 8, 8),
-          .timing = LL_I2C_CONVERT_TIMINGS(2, 2, 1, 12, 42),
+          .timing = LL_I2C_CONVERT_TIMINGS(0, 2, 1, 12, 42),
           .own_address1 = 1,
           .addressing_mode = LL_I2C_ADDRESSING_MODE_7BIT,
   };
@@ -166,7 +166,8 @@ static void MX_I2C1_Init(void)
   SSD1306_UpdateScreen();
   SSD1306_Puts("Hello", &Font_7x10, SSD1306_COLOR_WHITE);
   SSD1306_UpdateScreen();
-  SSD1306_Puts(" World", &Font_16x26, SSD1306_COLOR_WHITE);
+  SSD1306_GotoXY(0, 12);
+  SSD1306_Puts("World", &Font_16x26, SSD1306_COLOR_WHITE);
   SSD1306_UpdateScreen();
   /* USER CODE END I2C1_Init 2 */
 }
