@@ -94,7 +94,7 @@ CFILES  += stm32c5xx_hal_flash.c stm32c5xx_hal_flash_itf.c
 CFILES  += stm32c5xx_hal_crc.c
 
 CFILES  += stm32c5xx_hal_i2c.c
-CFILES  += ssd1306.c
+CFILES  += ssd1306.c fonts.c
 
 SFILES  =
 #SFILES += vectors.s

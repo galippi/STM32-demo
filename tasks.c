@@ -79,8 +79,6 @@ static void HAL_I2C_ErrorHandler(void)
 
 }
 
-volatile int dbgI2C1CtrOk, dbgI2C1CtrError;
-
 hal_status_t HAL_I2C_IsDeviceReady(hal_i2c_handle_t *hi2c, uint16_t DevAddress, uint32_t Trials, uint32_t Timeout);
 /**
   * @brief  Checks if target device is ready for communication.
@@ -155,24 +153,20 @@ static void MX_I2C1_Init(void)
   LL_I2C_Enable(SSD1306_I2C);
 
   /* USER CODE BEGIN I2C1_Init 2 */
-  for (uint8_t addr = 1; addr < 128; addr++)
-  {
-    if (HAL_I2C_IsDeviceReady(&ssd1306_i2c, addr, 1, 10) == HAL_OK)
-    {
-        dbgI2C1CtrOk++;// a device answered at this 7-bit address, for example 0x3C
-    }else
-        dbgI2C1CtrError++;
-  }
-  if (HAL_I2C_IsDeviceReady(&ssd1306_i2c, SSD1306_I2C_ADDR, 1, 10) != HAL_OK) {
+  if (SSD1306_Init() != 1) {
       CAT_Error(CAT_NoDisplay, SSD1306_I2C_ADDR);
   }
-  //SSD1306_WRITECOMMAND(0xAE); //display off
-  SSD1306_Init();
   SSD1306_ON();
   SSD1306_UpdateScreen();
   SSD1306_Fill(SSD1306_COLOR_WHITE);
   SSD1306_UpdateScreen();
   SSD1306_Fill(SSD1306_COLOR_BLACK);
+  SSD1306_UpdateScreen();
+  SSD1306_DrawCircle(32, 32, 16, SSD1306_COLOR_WHITE);
+  SSD1306_UpdateScreen();
+  SSD1306_Puts("Hello", &Font_7x10, SSD1306_COLOR_WHITE);
+  SSD1306_UpdateScreen();
+  SSD1306_Puts(" World", &Font_16x26, SSD1306_COLOR_WHITE);
   SSD1306_UpdateScreen();
   /* USER CODE END I2C1_Init 2 */
 }
