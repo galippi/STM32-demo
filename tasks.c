@@ -505,4 +505,19 @@ void Task_500ms(void)
     else
         UART2_TX_Char('U');
 #endif
+
+    {
+        static uint8_t sec;
+        if (!sec) {
+            static uint8_t ctr;
+            SSD1306_GotoXY(0, 38);
+            char buf[16] = "t=?";
+            buf[2] = toHexDigit(ctr);
+            SSD1306_Puts(buf, &Font_11x18, SSD1306_COLOR_WHITE);
+            SSD1306_UpdateScreen();
+            ctr++;
+        }
+        sec = 1 - sec;
+    }
+
 }
