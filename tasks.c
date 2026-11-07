@@ -164,6 +164,7 @@ static void MX_I2C1_Init(void)
   SSD1306_UpdateScreen();
   SSD1306_DrawCircle(32, 32, 16, SSD1306_COLOR_WHITE);
   SSD1306_UpdateScreen();
+  SSD1306_GotoXY(0,0);
   SSD1306_Puts("Hello", &Font_7x10, SSD1306_COLOR_WHITE);
   SSD1306_UpdateScreen();
   SSD1306_GotoXY(0, 12);
@@ -470,10 +471,10 @@ void Task_500ms(void)
 
     {
         static uint8_t ctr;
-        LEDR_Set(ctr & 0x01);
+        //LEDR_Set(ctr & 0x01);
         LEDY_Set(ctr & 0x02);
-        LEDG_Set(ctr & 0x04);
-        if (ctr < 7)
+        LEDG_Set(ctr & 0x01);
+        if (ctr < 3)
             ctr++;
         else
             ctr = 0;
