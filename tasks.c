@@ -1,6 +1,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "stm32c5xx_hal_i2c.h"
+
 #include "eeprom_emul_core.h"
 
 #include "timer.h"
@@ -31,28 +33,9 @@
 #include "adc_app.h"
 #include "util.h"
 
+#include "ssd1306.h"
+
 #include "tasks.h"
-
-#define LEDR_PORT    GPIOB
-#define LEDR_PIN_NUM 14
-
-#define LEDY_PORT    GPIOB
-#define LEDY_PIN_NUM 13
-
-#define LEDG_PORT    GPIOB
-#define LEDG_PIN_NUM 12
-
-LEDx_Init(R)
-LEDx_Set(R)
-//LEDx_Get(R)
-
-LEDx_Init(Y)
-LEDx_Set(Y)
-//LEDx_Get(Y)
-
-LEDx_Init(G)
-LEDx_Set(G)
-//LEDx_Get(G)
 
 uint8_t uart1RxBuffer[128];
 //uint8_t uart1TxBuffer[128];
@@ -79,6 +62,121 @@ volatile ee_status eeState;
 
 static uint8_t startCtr;
 
+uint32_t SystemCoreClock;
+const uint8_t  AHBPrescTable[16];    /*!< AHB prescalers table values */
+const uint8_t  APBPrescTable[8];     /*!< APB prescalers table values */
+
+hal_i2c_handle_t ssd1306_i2c;
+#define SSD1306_I2C I2C1
+
+/* Write command */
+#define SSD1306_WRITECOMMAND(command)      ssd1306_I2C_Write(SSD1306_I2C_ADDR, 0x00, (command))
+/* Write data */
+#define SSD1306_WRITEDATA(data)            ssd1306_I2C_Write(SSD1306_I2C_ADDR, 0x40, (data))
+
+static void HAL_I2C_ErrorHandler(void)
+{
+
+}
+
+volatile int dbgI2C1CtrOk, dbgI2C1CtrError;
+
+hal_status_t HAL_I2C_IsDeviceReady(hal_i2c_handle_t *hi2c, uint16_t DevAddress, uint32_t Trials, uint32_t Timeout);
+/**
+  * @brief  Checks if target device is ready for communication.
+  * @note   This function is used with Memory devices
+  * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
+  *                the configuration information for the specified I2C.
+  * @param  DevAddress Target device address: The device 7 bits address value
+  *         in datasheet must be shifted to the left before calling the interface
+  * @param  Trials Number of trials
+  * @param  Timeout Timeout duration
+  * @retval HAL status
+  */
+hal_status_t HAL_I2C_IsDeviceReady(hal_i2c_handle_t *hi2c, uint16_t DevAddress, uint32_t Trials, uint32_t Timeout)
+{
+    //BitfieldSet(SSD1306_I2C->CR2, I2C_CR2_SADD_Pos, 10, DevAddress);
+    //SSD1306_I2C->CR2 |= I2C_CR2_START;
+    //LL_I2C_HandleTransfer(SSD1306_I2C, DevAddress, 0, 0, LL_I2C_MODE_AUTOEND, LL_I2C_GENERATE_STOP);
+    (void)Trials;
+    return HAL_I2C_MASTER_PollForSlaveReady(hi2c, DevAddress, Timeout);
+}
+
+/**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void)
+{
+
+  /* USER CODE BEGIN I2C1_Init 0 */
+    //GPIO_PortInit_AFPU(PIN_SSD1306_SCL, 9); /* PA8  I2C1.SCL */
+    GPIO_PortInit_AFPU(PIN_SSD1306_SCL, 4); /* PB6  I2C1.SCL */
+    //GPIO_PortInit_AFOut(PIN_SSD1306_SCL, 9); /* PA8  I2C1.SCL */
+    //GPIO_PortInit_AFPU(PIN_SSD1306_SDA, 8); /* PA12 I2C1.SDA */
+    GPIO_PortInit_AFPU(PIN_SSD1306_SDA, 4); /* PB7 I2C1.SDA */
+
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
+  RCC->APB1LENR |= RCC_APB1LENR_I2C1EN ;
+  //#define I2C1SEL (RCC_CCIPR2_I2C1SEL_0 | RCC_CCIPR2_I2C1SEL_1)
+  #define I2C1SEL (LL_RCC_I2C1_CLKSOURCE_PCLK1 >> RCC_CCIPR2_I2C1SEL_Pos)
+  BitfieldSet(RCC->CCIPR2, RCC_CCIPR2_I2C1SEL_Pos, 2, I2C1SEL);
+  if (HAL_I2C_Init(&ssd1306_i2c, HAL_I2C1) != HAL_OK)
+      HAL_I2C_ErrorHandler();
+  //ssd1306_i2c.Init.ClockSpeed = 400000;
+  //ssd1306_i2c.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  //LL_I2C_SetTiming(SSD1306_I2C, LL_I2C_CONVERT_TIMINGS(0, 10, 4, 15, 32));
+  //ssd1306_i2c.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  //LL_I2C_SetMasterAddressingMode(SSD1306_I2C, LL_I2C_ADDRESSING_MODE_7BIT);
+  //ssd1306_i2c.Init.OwnAddress1 = 0;
+  //ssd1306_i2c.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  //ssd1306_i2c.Init.OwnAddress2 = 0;
+  //ssd1306_i2c.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  //ssd1306_i2c.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+
+  //I2C1->CR1 = I2C_CR1_SWRST;
+  RCC->APB1LRSTR |= RCC_APB1LRSTR_I2C1RST;
+  //I2C1->CR1 &= ~I2C_CR1_SWRST;
+  RCC->APB1LRSTR &= ~RCC_APB1LRSTR_I2C1RST;
+
+  static const hal_i2c_config_t ssd1306_config = {
+          //.timing = LL_I2C_CONVERT_TIMINGS(0, 10, 4, 15, 32),
+          //.timing = LL_I2C_CONVERT_TIMINGS(12, 2, 2, 8, 8),
+          .timing = LL_I2C_CONVERT_TIMINGS(2, 2, 1, 12, 42),
+          .own_address1 = 1,
+          .addressing_mode = LL_I2C_ADDRESSING_MODE_7BIT,
+  };
+  HAL_I2C_SetConfig(&ssd1306_i2c, &ssd1306_config);
+  LL_I2C_Enable(SSD1306_I2C);
+
+  /* USER CODE BEGIN I2C1_Init 2 */
+  for (uint8_t addr = 1; addr < 128; addr++)
+  {
+    if (HAL_I2C_IsDeviceReady(&ssd1306_i2c, addr, 1, 10) == HAL_OK)
+    {
+        dbgI2C1CtrOk++;// a device answered at this 7-bit address, for example 0x3C
+    }else
+        dbgI2C1CtrError++;
+  }
+  if (HAL_I2C_IsDeviceReady(&ssd1306_i2c, SSD1306_I2C_ADDR, 1, 10) != HAL_OK) {
+      CAT_Error(CAT_NoDisplay, SSD1306_I2C_ADDR);
+  }
+  //SSD1306_WRITECOMMAND(0xAE); //display off
+  SSD1306_Init();
+  SSD1306_ON();
+  SSD1306_UpdateScreen();
+  SSD1306_Fill(SSD1306_COLOR_WHITE);
+  SSD1306_UpdateScreen();
+  SSD1306_Fill(SSD1306_COLOR_BLACK);
+  SSD1306_UpdateScreen();
+  /* USER CODE END I2C1_Init 2 */
+}
+
 void Task_Init(void)
 {
     SCB_EnableFPU();
@@ -90,6 +188,10 @@ void Task_Init(void)
         eeState = EE_ReadVariable8bits(1, &startCtr);
         startCtr++;
         eeState = EE_WriteVariable8bits(1, startCtr);
+    }
+
+    {
+        MX_I2C1_Init();
     }
 
     queueInit(&uart1TxQueue);
@@ -104,13 +206,13 @@ void Task_Init(void)
     LEDG_Init();
 
     TIM12_Init();
-    GPIO_PortInit_AFOut(GPIOC, 14, 2); /* PC14 TIM12.CH1 */
+    GPIO_PortInit_AFOut(PIN_PWM_DEMO, 2); /* PC14 TIM12.CH1 */
 
     ADC_Init();
-    GPIO_PortInit_Analog(GPIOA, 0);
-    GPIO_PortInit_Analog(GPIOA, 1);
-    GPIO_PortInit_Analog(GPIOA, 6);
-    GPIO_PortInit_Analog(GPIOA, 7);
+    GPIO_PortInit_Analog(PIN_AN0);
+    GPIO_PortInit_Analog(PIN_AN1);
+    GPIO_PortInit_Analog(PIN_AN6);
+    GPIO_PortInit_Analog(PIN_AN7);
 
 #if 0
     DMA_Init(DMA1);

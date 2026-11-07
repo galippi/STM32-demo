@@ -24,6 +24,7 @@ typedef enum {
   CAT_USBError,
   CAT_Debug,
   CAT_NOCP, // no cooprocessor - e.g. no FPU
+  CAT_NoDisplay,
 }t_CAT_ErrorCode;
 
 void CAT_Error(t_CAT_ErrorCode Code, uint32_t SubCode) __attribute__ ((noreturn));

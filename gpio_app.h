@@ -5,6 +5,34 @@
 
 #include "gpio.h"
 
+#define GPIO_PORT(port, pin) port
+#define GPIO_PIN(port, pin)  pin
+
+#define PIN_AN0 GPIOA, 0
+#define PIN_AN1 GPIOA, 1
+#define PIN_AN6 GPIOA, 6
+#define PIN_AN7 GPIOA, 7
+
+//#define PIN_SSD1306_SCL GPIOA,  8
+//#define PIN_SSD1306_SDA GPIOA,  12
+
+#define PIN_SSD1306_SCL GPIOB,  6
+#define PIN_SSD1306_SDA GPIOB,  7
+
+#define PIN_LEDG     GPIOB, 12
+#define LEDG_PORT    GPIOB
+#define LEDG_PIN_NUM 12
+
+#define PIN_LEDY     GPIOB, 13
+#define LEDY_PORT    GPIOB
+#define LEDY_PIN_NUM 13
+
+#define PIN_LEDR     GPIOB, 14
+#define LEDR_PORT    GPIOB
+#define LEDR_PIN_NUM 14
+
+#define PIN_PWM_DEMO GPIOC, 14
+
 #if TARGET_ECU == TARGET_ECU_STM32F0DISCOVERY
 /* port definition for STM32F0-discovery board */
 #define LED3_PORT GPIOC
@@ -19,8 +47,8 @@
 
 #elif (TARGET_ECU == TARGET_ECU_STM32C542) || (TARGET_ECU == TARGET_ECU_STM32C562)
 /* port definition for STM32G030 LQFP64 board */
-#define LED3_PORT GPIOA
-#define LED3_PIN_NUM 9
+//#define LED3_PORT GPIOA
+//#define LED3_PIN_NUM 9
 
 #elif TARGET_ECU == TARGET_ECU_STM32G030
 /* port definition for STM32G030 TSSOP20 board */
@@ -76,9 +104,26 @@
       return (((LED##x##_PORT->ODR) >> LED##x##_PIN_NUM) & 1); \
   }
 
+LEDx_Init(R)
+LEDx_Set(R)
+//LEDx_Get(R)
+
+LEDx_Init(Y)
+LEDx_Set(Y)
+//LEDx_Get(Y)
+
+LEDx_Init(G)
+LEDx_Set(G)
+//LEDx_Get(G)
+
+#ifdef LED3_PORT
 LEDx_Init(3)
 LEDx_Set(3)
 LEDx_Get(3)
+#else
+#define LED3_Init() {/* do nothing */}
+#define LED3_Set(x) {/* do nothing */}
+#endif
 
 #ifdef LED4_PORT
 LEDx_Init(4)

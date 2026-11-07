@@ -8,6 +8,8 @@ SUBDIRS += stm32-util-eeprom-emulation/core stm32-util-eeprom-emulation/core/alg
 SUBDIRS += stm32-util-eeprom-emulation/interface_flash
 SUBDIRS += stm32-util-eeprom-emulation/interface_crc
 
+SUBDIRS += SSD1306
+
 SUBDIRS_LINKER := hal_STM32C5/lib
 
 WARNINGS = -Wall -Wextra
@@ -84,10 +86,15 @@ CFILES  += timer.c
 CFILES  += adc.c
 CFILES  += adc_app.c
 
+CFILES  += stm32c5xx_hal.c stm32c5xx_hal_cortex.c stm32c5xx_hal_rcc.c
+
 CFILES  += eeprom_emul_core.c eeprom_algo_flitf.c eeprom_itfflash_flitf_edata.c
 CFILES  += eeprom_itfcrc_crc.c
 CFILES  += stm32c5xx_hal_flash.c stm32c5xx_hal_flash_itf.c
 CFILES  += stm32c5xx_hal_crc.c
+
+CFILES  += stm32c5xx_hal_i2c.c
+CFILES  += ssd1306.c
 
 SFILES  =
 #SFILES += vectors.s

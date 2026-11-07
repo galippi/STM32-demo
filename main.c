@@ -33,6 +33,7 @@
 	DBG_PORT(NVIC_Type, nvic, NVIC) \
 	DBG_PORT(USART_TypeDef, uart1, USART1) \
     DBG_PORT(USART_TypeDef, uart2, USART2) \
+    DBG_PORT(I2C_TypeDef, i2c1, I2C1) \
     DBG_PORT(DMA_Channel_TypeDef, dma10, LPDMA1_CH0) \
     DBG_PORT(DMA_Channel_TypeDef, dma11, LPDMA1_CH1) \
     DBG_PORT(DMA_Channel_TypeDef, dma12, LPDMA1_CH2) \

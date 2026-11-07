@@ -9,4 +9,7 @@
 	url = s:\\git\\Queue\\Queue.test
 [submodule "eeprom"]
 	path = stm32-util-eeprom-emulation
-	url = https://github.com/STMicroelectronics/stm32-util-eeprom-emulation
+	url = s:\\git\\stm32-util-eeprom-emulation
+[submodule "SSD1306"]
+	path = SSD1306
+	url = s:\\git\\stm32-util\\SSD1306
