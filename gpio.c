@@ -92,6 +92,27 @@ void GPIO_PortInit_AFOut(GPIO_TypeDef * const gpio, uint8_t portnum, uint8_t AFR
   }
 }
 
+void GPIO_PortInit_AFPU(GPIO_TypeDef * const gpio, uint8_t portnum, uint8_t AFR_val)
+{
+  GPIO_PortEnable(gpio);
+
+  //gpio->OSPEEDR = GPIO_Speed_50MHz << (portnum * 2);
+  BitfieldSet(gpio->OSPEEDR, portnum * 2, 2, GPIO_OSPEEDR_VERY_HIGH_SPEED);
+  //gpio->OTYPER = GPIO_OType_PP << portnum;
+  BitfieldSet(gpio->OTYPER, portnum, 1, GPIO_OTYPER_OD);
+  //gpio->MODER = GPIO_Mode_OUT << (portnum * 2);
+  BitfieldSet(gpio->MODER, portnum * 2, 2, GPIO_MODER_AF);
+  //gpio->PUPDR = GPIO_PuPd_NOPULL << (portnum * 2);
+  BitfieldSet(gpio->PUPDR, portnum * 2, 2, GPIO_PUPDR_PULLUP);
+  if (portnum <= 7)
+  {
+    BitfieldSet(gpio->AFR[0], portnum * 4, 4, AFR_val);
+  }else
+  {
+    BitfieldSet(gpio->AFR[1], (portnum - 8) * 4, 4, AFR_val);
+  }
+}
+
 void GPIO_PortInit_In(GPIO_TypeDef * const gpio, uint8_t portnum)
 {
   GPIO_PortEnable(gpio);

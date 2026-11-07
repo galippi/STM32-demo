@@ -28,6 +28,7 @@ void GPIO_PortInit_Out(GPIO_TypeDef * const gpio, uint8_t portnum);
 void GPIO_PortInit_OC(GPIO_TypeDef * const gpio, uint8_t portnum);
 
 void GPIO_PortInit_AFOut(GPIO_TypeDef * const gpio, uint8_t portnum, uint8_t AFR_val);
+void GPIO_PortInit_AFPU(GPIO_TypeDef * const gpio, uint8_t portnum, uint8_t AFR_val);
 void GPIO_PortInit_In(GPIO_TypeDef * const gpio, uint8_t portnum);
 void GPIO_PortInit_AFIn(GPIO_TypeDef * const gpio, uint8_t portnum, uint8_t AFR_val);
 
