@@ -510,11 +510,20 @@ void Task_500ms(void)
         static uint8_t sec;
         if (!sec) {
             static uint8_t ctr;
+            static uint32_t dtFiltered;
             SSD1306_GotoXY(0, 38);
-            char buf[16] = "t=?";
-            buf[2] = toHexDigit(ctr);
+            char buf[16] = "t=? ??????";
+            buf[2] = toHexDigit(ctr & 0x0F);
+            U32_to_DecString(buf +  4, 6, dtFiltered, ' ');
+            uint16_t t0 = getTimer_us();
             SSD1306_Puts(buf, &Font_11x18, SSD1306_COLOR_WHITE);
             SSD1306_UpdateScreen();
+            uint16_t t1 = getTimer_us();
+            uint16_t dt = t1 - t0;
+            if (dtFiltered == 0)
+                dtFiltered = dt;
+            else
+                dtFiltered = ((dtFiltered * 7) + dt) / 8;
             ctr++;
         }
         sec = 1 - sec;
