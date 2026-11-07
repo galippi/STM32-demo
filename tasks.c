@@ -508,7 +508,17 @@ void Task_500ms(void)
 #endif
 
     {
-        static uint8_t sec;
+        static uint8_t sec = 8;
+        if (sec > 1) {
+            if (sec <= 5) {
+                SSD1306_Fill(SSD1306_COLOR_BLACK);
+                SSD1306_DrawLine(0, 0, 127, sec * 12 + 3, SSD1306_COLOR_WHITE);
+                SSD1306_DrawLine(0, 63 - sec * 12 , 127, 0, SSD1306_COLOR_WHITE);
+                SSD1306_UpdateScreen();
+            }
+            sec--;
+        }else
+        {
         if (!sec) {
             static uint8_t ctr;
             static uint32_t dtFiltered;
@@ -528,6 +538,7 @@ void Task_500ms(void)
             ctr++;
         }
         sec = 1 - sec;
+        }
     }
 
 }

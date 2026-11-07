@@ -13,7 +13,7 @@ t_CAT_store CAT_store;
 void CAT_Error(t_CAT_ErrorCode Code, uint32_t SubCode)
 {
   __disable_irq();
-  LEDR_Set(0); // turn on red led
+  LEDR_Set(1); // turn on red led
   CAT_store.errorCode    = Code;
   CAT_store.errorSubCode = SubCode;
   while(1)
