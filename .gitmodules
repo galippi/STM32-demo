@@ -1,0 +1,3 @@
+[submodule "stm32c5xx-drivers"]
+	path = stm32c5xx-drivers
+	url = s:\\git\\stm32.drivers
