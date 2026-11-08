@@ -1,7 +1,8 @@
 ##################################################################
 CFLAGS_DEBUG = -gdwarf-2
 SUBDIRS := . u32_to_hexstring hal_STM32C5 hal_STM32C5/ST_lib
-SUBDIRS += hal_STM32C5/ST_lib/ll
+#SUBDIRS += hal_STM32C5/ST_lib/ll
+SUBDIRS += hal_STM32C5/stm32c5xx-drivers/hal hal_STM32C5/stm32c5xx-drivers/ll
 SUBDIRS += queue
 
 SUBDIRS += stm32-util-eeprom-emulation/core stm32-util-eeprom-emulation/core/algo
