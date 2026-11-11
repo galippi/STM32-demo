@@ -13,8 +13,8 @@
 #define PIN_AN6 GPIOA, 6
 #define PIN_AN7 GPIOA, 7
 
-//#define PIN_SSD1306_SCL GPIOA,  8
-//#define PIN_SSD1306_SDA GPIOA,  12
+//#define PIN_SSD1306_SCL GPIOA,  8, 9
+//#define PIN_SSD1306_SDA GPIOA,  12, 8 /* only for STM32C542 ??? */
 
 #define PIN_SSD1306_SCL GPIOB,  6,  4
 #define PIN_SSD1306_SDA GPIOB,  7,  4
