@@ -110,10 +110,10 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE BEGIN I2C1_Init 0 */
     //GPIO_PortInit_AFPU(PIN_SSD1306_SCL, 9); /* PA8  I2C1.SCL */
-    GPIO_PortInit_AFPU(PIN_SSD1306_SCL, 4); /* PB6  I2C1.SCL */
+    GPIO_PortInit_AFPU(PIN_SSD1306_SCL); /* PB6  I2C1.SCL */
     //GPIO_PortInit_AFOut(PIN_SSD1306_SCL, 9); /* PA8  I2C1.SCL */
     //GPIO_PortInit_AFPU(PIN_SSD1306_SDA, 8); /* PA12 I2C1.SDA */
-    GPIO_PortInit_AFPU(PIN_SSD1306_SDA, 4); /* PB7 I2C1.SDA */
+    GPIO_PortInit_AFPU(PIN_SSD1306_SDA); /* PB7 I2C1.SDA */
 
   /* USER CODE END I2C1_Init 0 */
 
@@ -202,7 +202,7 @@ void Task_Init(void)
     LEDG_Init();
 
     TIM12_Init();
-    GPIO_PortInit_AFOut(PIN_PWM_DEMO, 2); /* PC14 TIM12.CH1 */
+    GPIO_PortInit_AFOut(PIN_PWM_DEMO); /* PC14 TIM12.CH1 */
 
     ADC_Init();
     GPIO_PortInit_Analog(PIN_AN0);

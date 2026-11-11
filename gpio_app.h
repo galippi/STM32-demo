@@ -16,8 +16,8 @@
 //#define PIN_SSD1306_SCL GPIOA,  8
 //#define PIN_SSD1306_SDA GPIOA,  12
 
-#define PIN_SSD1306_SCL GPIOB,  6
-#define PIN_SSD1306_SDA GPIOB,  7
+#define PIN_SSD1306_SCL GPIOB,  6,  4
+#define PIN_SSD1306_SDA GPIOB,  7,  4
 
 #define PIN_LEDG     GPIOB, 12
 #define LEDG_PORT    GPIOB
@@ -31,7 +31,7 @@
 #define LEDR_PORT    GPIOB
 #define LEDR_PIN_NUM 14
 
-#define PIN_PWM_DEMO GPIOC, 14
+#define PIN_PWM_DEMO GPIOC, 14,  2
 
 #if TARGET_ECU == TARGET_ECU_STM32F0DISCOVERY
 /* port definition for STM32F0-discovery board */
