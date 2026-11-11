@@ -191,11 +191,11 @@ void Task_Init(void)
     }
 
     queueInit(&uart1TxQueue);
-    UART1_Init(9600, 0);
+    UART1_Init(9600);
 
     queueInit(&uart2TxQueue);
     queueInit(&uart2RxQueue);
-    UART2_Init(115200, 0);
+    UART2_Init(115200);
 
     LEDR_Init();
     LEDY_Init();

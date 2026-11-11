@@ -10,14 +10,33 @@
 
 #define PIN_AN0 GPIOA, 0
 #define PIN_AN1 GPIOA, 1
+#define PIN_USART2_TX GPIOA, 2, 7
+#define PIN_USART2_RX GPIOA, 3, 7
+//#define PIN_USART1_TX GPIOA, 6, 7
 #define PIN_AN6 GPIOA, 6
+//#define PIN_USART1_RX GPIOA, 6, 7
 #define PIN_AN7 GPIOA, 7
 
 //#define PIN_SSD1306_SCL GPIOA,  8, 9
-//#define PIN_SSD1306_SDA GPIOA,  12, 8 /* only for STM32C542 ??? */
+#define PIN_USART1_TX   GPIOA,  9, 7
+#define PIN_USART1_RX   GPIOA, 10, 7
 
-#define PIN_SSD1306_SCL GPIOB,  6,  4
-#define PIN_SSD1306_SDA GPIOB,  7,  4
+//#define PIN_USART2_TX   GPIOA, 11, 4
+//#define PIN_USART2_RX   GPIOA, 12, 4
+//#define PIN_SSD1306_SDA GPIOA, 12, 8 /* only for STM32C542 ??? */
+//#define PIN_USART1_TX   GPIOA, 15, 11
+
+//#define PIN_USART2_TX   GPIOB,  0, 7
+//#define PIN_USART2_RX   GPIOB,  1, 7
+//#define PIN_USART1_TX   GPIOB,  3, 11
+//#define PIN_USART1_RX   GPIOB,  4, 11
+
+#define PIN_SSD1306_SCL   GPIOB,  6,  4
+//#define PIN_USART1_TX   GPIOB,  6,  7
+#define PIN_SSD1306_SDA   GPIOB,  7,  4
+//#define PIN_USART1_RX   GPIOB,  7,  7
+
+//#define PIN_USART2_TX   GPIOB, 10, 7
 
 #define PIN_LEDG     GPIOB, 12
 #define LEDG_PORT    GPIOB
@@ -30,7 +49,12 @@
 #define PIN_LEDR     GPIOB, 14
 #define LEDR_PORT    GPIOB
 #define LEDR_PIN_NUM 14
+//#define PIN_USART1_TX GPIOB, 14, 4
+//#define PIN_USART1_RX GPIOB, 15, 4
 
+//#define PIN_USART2_RX   GPIOC,  4, 7
+//#define PIN_USART2_TX   GPIOC, 10, 7
+//#define PIN_USART2_RX   GPIOC, 11, 7
 #define PIN_PWM_DEMO GPIOC, 14,  2
 
 #if TARGET_ECU == TARGET_ECU_STM32F0DISCOVERY
