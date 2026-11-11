@@ -1,7 +1,7 @@
 #include <string.h>
 
 #include "controller.h"
-#include "gpio.h"
+#include "gpio_app.h"
 #include "dma.h"
 #include "bitfield_lib.h"
 #include "SysClock.h"
@@ -16,36 +16,11 @@
 static void UART1_RxDma_Update(void);
 #endif
 
-void UART1_Init(uint32_t baudRate, uint8_t uartRemap)
+void UART1_Init(uint32_t baudRate)
 {
-  if (uartRemap == 0)
-  {
-    GPIO_PortInit_AFOut(GPIOA, 6, 7); /* PA6 USART1_TX */
-    GPIO_PortInit_AFIn( GPIOA, 7, 7); /* PA7 USART1_RX */
-    //SYSCFG->CFGR1 |= (SYSCFG_CFGR1_PA11_RMP | SYSCFG_CFGR1_PA12_RMP); // TSSOP20 package pin remap
-  }else if (uartRemap == 1)
-  {
-    GPIO_PortInit_AFOut(GPIOA,  9, 7); /* PA9  USART1_TX */
-    GPIO_PortInit_AFIn( GPIOA, 10, 7); /* PA10 USART1_RX */
-  }else if (uartRemap == 2)
-  {
-    GPIO_PortInit_AFOut(GPIOA, 15, 11); /* PA15 USART1_TX */
-    GPIO_PortInit_AFIn( GPIOB,  4, 11); /* PB4  USART1_RX */
-  }else if (uartRemap == 3)
-  {
-    GPIO_PortInit_AFOut(GPIOB,  3, 11); /* PB3  USART1_TX */
-    GPIO_PortInit_AFIn( GPIOB,  4, 11); /* PB4  USART1_RX */
-  }else if (uartRemap == 4)
-  {
-    GPIO_PortInit_AFOut(GPIOB,  6, 7); /* PB6  USART1_TX */
-    GPIO_PortInit_AFIn( GPIOB,  7, 7); /* PB7  USART1_RX */
-  }else if (uartRemap == 5)
-  {
-    GPIO_PortInit_AFOut(GPIOB, 14, 4); /* PB14 USART1_TX */
-    GPIO_PortInit_AFIn( GPIOB, 15, 4); /* PB15 USART1_RX */
-  }else
-  { // Error handler
-  }
+  GPIO_PortInit_AFOut(PIN_USART1_TX);
+  GPIO_PortInit_AFIn( PIN_USART1_RX);
+  //SYSCFG->CFGR1 |= (SYSCFG_CFGR1_PA11_RMP | SYSCFG_CFGR1_PA12_RMP); // TSSOP20 package pin remap
 
   BitfieldSetMask(RCC->CCIPR1, RCC_CCIPR1_USART1SEL_Pos, RCC_CCIPR1_USART1SEL_Msk, USART1SEL);
   //RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_USART1SEL_Msk) | ((USART1SEL) << RCC_CCIPR1_USART1SEL_Pos);
@@ -209,30 +184,12 @@ uint32_t UART1_RX(uint8_t *data, uint32_t len)
 #endif
 #endif
 
-void UART2_Init(uint32_t baudRate, uint8_t uartRemap)
+void UART2_Init(uint32_t baudRate)
 {
-    if (uartRemap == 0)
-    {
-      GPIO_PortInit_AFOut(GPIOA, 2, 7); /* PA2 USART2_TX */
-      GPIO_PortInit_AFIn( GPIOA, 3, 7); /* PA3 USART2_RX */
-      //SYSCFG->CFGR1 |= (SYSCFG_CFGR1_PA11_RMP | SYSCFG_CFGR1_PA12_RMP); // TSSOP20 package pin remap
-    }else if (uartRemap == 1)
-    {
-      GPIO_PortInit_AFOut(GPIOA, 11, 4); /* PA11 USART2_TX */
-      GPIO_PortInit_AFOut(GPIOA, 12, 4); /* PA12 USART2_RX */
-    }else if (uartRemap == 2)
-    {
-      GPIO_PortInit_AFOut(GPIOB,  0, 7); /* PB0 USART2_TX */
-      GPIO_PortInit_AFOut(GPIOB,  1, 7); /* PB1 USART2_RX */
-    }else if (uartRemap == 3)
-    {
-      GPIO_PortInit_AFOut(GPIOB, 10, 7); /* PB10 USART2_TX */
-      GPIO_PortInit_AFOut(GPIOC,  4, 7); /* PC4  USART2_RX */
-    }else
-    {
-      GPIO_PortInit_AFOut(GPIOC, 10, 7); /* PC10 USART2_TX */
-      GPIO_PortInit_AFOut(GPIOC, 11, 7); /* PC11 USART2_RX */
-    }
+    GPIO_PortInit_AFOut(PIN_USART2_TX); /* PA2 USART2_TX */
+    GPIO_PortInit_AFIn( PIN_USART2_RX); /* PA3 USART2_RX */
+    //SYSCFG->CFGR1 |= (SYSCFG_CFGR1_PA11_RMP | SYSCFG_CFGR1_PA12_RMP); // TSSOP20 package pin remap
+
     BitfieldSetMask(RCC->CCIPR1, RCC_CCIPR1_USART2SEL_Pos, RCC_CCIPR1_USART2SEL_Msk, USART2SEL);
     //RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_USART1SEL_Msk) | ((USART1SEL) << RCC_CCIPR1_USART1SEL_Pos);
     RCC->APB1LENR |= RCC_APB1LENR_USART2EN ; /* enable the USART2 */

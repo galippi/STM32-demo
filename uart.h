@@ -57,7 +57,7 @@ static inline char UART_TX_Char(USART_TypeDef *uart, char d) {
         return 1;
 }
 
-void UART1_Init(uint32_t baudRate, uint8_t uartRemap);
+void UART1_Init(uint32_t baudRate);
 void UART1_Poll(void);
 
 static inline void UART1_TX(const uint8_t *data, uint32_t len)
@@ -107,7 +107,7 @@ static inline char UART1_RX_Char(void)
     return UART_RX_Char(USART1);
 }
 
-void UART2_Init(uint32_t BaudRate, uint8_t uartRemap);
+void UART2_Init(uint32_t BaudRate);
 
 static inline uint32_t UART2_TXE_Get(void)
 {
